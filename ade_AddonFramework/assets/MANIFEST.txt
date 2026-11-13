@@ -1,0 +1,17 @@
+# ade_AddonFramework 素材登记（只读源 → 本插件 assets/）
+# 用户已确认素材可自由拷贝（2026-11-12）；只读源未做任何修改
+# 目录约定（2026-11-13 用户指定）：插件图标 assets/、字体 assets/fonts/、贴图 assets/textures/
+# 2026-11-14 清理：仅保留被代码实际引用的素材，其余未引用素材已删除（可从 git 恢复）
+# 格式：文件名 | 源目录 | 字节数
+
+== assets/（插件图标；被 TabbedFrame 标题栏引用） ==
+ade_128.tga | wow-textures/ | 65554
+
+== assets/fonts/（空目录，仅占位；当前代码使用暴雪 STANDARD_TEXT_FONT，未引用自定义字体） ==
+# 预留：放入 .ttf 后删除占位文件
+
+== assets/textures/（贴图；被 Checkbox 通过 AF.CHECK_TEX 引用） ==
+check-outline.tga | MiliUI_Tooltip | 16428
+
+== assets/sounds/（空目录，仅占位；当前代码未播放任何音效） ==
+# 预留：放入 .wav/.ogg/.mp3 后删除占位文件

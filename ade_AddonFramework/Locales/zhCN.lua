@@ -1,0 +1,45 @@
+-- zhCN（库自身可见文本；key 即原文兜底）
+local AF = ResolveNamespace("ade_AddonFramework")
+if not AF then return end
+if GetLocale() ~= "zhCN" then return end
+-- 宿主若把本包加载在 Env.lua 之前，AF.L 可能还没建：这里兜底初始化（键缺译文时回显 key 本身）
+AF.L = AF.L or setmetatable({}, { __index = function(_, key) return key end })
+local L = AF.L
+
+L["AF_NEW"] = "新建"
+L["AF_COPY"] = "复制"
+L["AF_RENAME"] = "重命名"
+L["AF_RESET"] = "重置"
+L["AF_DELETE"] = "删除"
+L["AF_RESET_ROW"] = "重置此选项"
+L["AF_RESET_ALL"] = "将所有设置恢复为默认值？"
+L["AF_NAME_EXISTS"] = "同名配置已存在"
+L["AF_NAME_EMPTY"] = "请先输入新配置的名称"
+L["AF_PROFILE_SHARED"] = "共用配置不可删除"
+L["AF_DELETE_CONFIRM"] = "删除当前配置？"
+L["AF_RENAME_PROMPT"] = "将当前配置重命名为："
+L["AF_ABOUT"] = "关于"
+L["AF_PROFILES"] = "配置"
+L["AF_EXPORT"] = "导出"
+L["AF_IMPORT"] = "导入"
+L["AF_PREFIX_MISMATCH"] = "前缀不符"
+L["AF_IMPORT_INVALID"] = "字符串无效"
+L["AF_EXPORT_COPY"] = "导出（Ctrl+C 复制）"
+L["AF_IMPORT_VALID"] = "导入：|cff44ff44字符串有效|r"
+L["AF_IMPORT_COLON"] = "导入："
+L["AF_IMPORT_CONFIRM"] = "导入会覆盖当前配置的全部设置。继续？"
+L["AF_EXPORT_NOTE"] = "导出字符串只包含这份配置的设置。粘贴有效字符串后「导入」按钮才会亮起。"
+L["AF_CLOSE"] = "关闭"
+L["AF_OK"] = "确定"
+L["AF_CANCEL"] = "取消"
+L["AF_NONE"] = "无"
+L["AF_SEARCH"] = "搜索..."
+L["AF_SELECT_ALL"] = "全选"
+L["AF_SECTION_TITLE"] = "分组"
+L["AF_PROFILE_HINT"] = "每个角色可以使用自己的配置；导出与导入只作用于当前配置。"
+L["AF_NUDGE_UP"] = "上移"
+L["AF_NUDGE_DOWN"] = "下移"
+L["AF_NUDGE_LEFT"] = "左移"
+L["AF_NUDGE_RIGHT"] = "右移"
+L["AF_CENTER_H"] = "水平居中"
+L["AF_CENTER_V"] = "垂直居中"
