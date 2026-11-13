@@ -1,0 +1,25 @@
+## Interface: 120105
+## Title: adeTooltip
+## Notes: ADE v6 工具提示美化（MiliUI 蓝本 + Pretty 观感 + Prime 增量）
+## Author: ADE
+## Version: v6-r001-b001
+## Dependencies: ade_AddonFramework
+## SavedVariables: adeTooltipDB
+## Category: User Interface
+## IconTexture: Interface\AddOns\adeTooltip\assets\ade_128
+## X-Localizations: enUS, zhCN, zhTW
+## License: MIT
+## X-Credits: MiliUI_Tooltip（蓝本）; PrettyTooltip（新版观感/双修饰键/羊皮纸）; PrimeTooltip（增量）
+
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+InitDB.lua
+Core.lua
+Colors.lua
+Hooks.lua
+Modules/Minimap.lua
+Options/Options.lua
+Options/Pages.lua
+Options/PreviewSamples.lua
+Options/Blizzard.lua
