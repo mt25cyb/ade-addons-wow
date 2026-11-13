@@ -1,0 +1,10 @@
+## Interface: 120105
+## Title: Retrace |cff00ccff多语言支持|r
+## Notes: Retrace 的多语言支持补丁（外挂式，不修改原插件文件）；本仓库附带简体中文，其他语种可按 Lang_<locale>.lua 模式扩展
+## Author: Ade
+## Version: 1.0.0
+## Dependencies: Retrace
+## X-Localizations: zhCN
+
+Lang_zhCN.lua
+LocalesPatch.lua

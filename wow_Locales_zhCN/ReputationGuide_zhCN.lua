@@ -1,0 +1,682 @@
+-- ReputationGuide full-1.6.0-release · zhCN 本地化（基准 enUS full-1.6.0-release）
+------------------------------------
+-- 简体中文 (Simplified Chinese) --
+------------------------------------
+if (GetLocale() =="zhCN") then
+  -- Binding names
+  BINDING_HEADER_REPUTATIONS	= "声望指南"
+  BINDING_NAME_SHOWCONFIG	= "显示设置选项"
+  BINDING_NAME_SHOWDETAILS	= "显示声望细节"
+
+  REP_TXT	= {}
+  -- help
+  REP_TXT.help	= "一个管理声望的工具"
+  REP_TXT.command	= "无效指令"
+  REP_TXT.usage	= "使用方法"
+  REP_TXT.helphelp	= "显示帮助手册"
+  REP_TXT.helpabout	= "显示作者信息"
+  REP_TXT.helpstatus	= "显示设置状态"
+  -- about
+  REP_TXT.by	= "作者："
+  REP_TXT.version	= "版本"
+  REP_TXT.date	= "日期"
+  REP_TXT.web	= "网站"
+  REP_TXT.slash	= "斜扛命令"
+  -- status
+  REP_TXT.status	= "状态"
+  REP_TXT.disabled	= "禁用"
+  REP_TXT.enabled	= "启用"
+  REP_TXT.statMobs	= "显示怪物 [M]"
+  REP_TXT.statQuests	= "显示任务 [Q]"
+  REP_TXT.statInstances	= "显示副本 [D]"
+  REP_TXT.statItems	= "显示物品 [I]"
+  REP_TXT.statGeneral	= "显示一般 [G]"
+  REP_TXT.statMissing	= "显示缺失声望值"
+  REP_TXT.statDetails	= "显示详细信息"
+  REP_TXT.statChat	= "详细的聊天信息"
+  REP_TXT.statNoGuildChat	= "公会声望无聊天提示"
+  REP_TXT.statSuppress	= "隐藏原始聊天信息"
+  REP_TXT.statPreview	= "在声望框中显示预览声望"
+  REP_TXT.statSwitch	= "自动切换声望条的阵营"
+  REP_TXT.statNoGuildSwitch	= "公会声望不自动切换"
+  REP_TXT.statSilentSwitch	= "切换声望条时不提示"
+  REP_TXT.statGuildCap	= "在聊天栏显示公会声望上限"
+  -- XML UI elements
+  REP_TXT.showQuests	= "任务"
+  REP_TXT.showPvPQuests	= "PvP 任务"
+  REP_TXT.showInstances	= "副本"
+  REP_TXT.showMobs	= "怪物"
+  REP_TXT.showItems	= "物品"
+  REP_TXT.showGeneral	= "其他"
+  REP_TXT.showAll	= "全部显示"
+  REP_TXT.showNone	= "不显示"
+  REP_TXT.expand	= "展开"
+  REP_TXT.darkmoonFaireBuff = "暗月"
+  REP_TXT.collapse	= "折叠"
+  REP_TXT.supressNoneFaction	= "清空此阵营排除项目"
+  REP_TXT.supressNoneGlobal	= "清空全部排除项目"
+  REP_TXT.suppressHint	= "右键点击列表中的项目，可以从列表中排除。"
+  REP_TXT.clearSessionGain	= "清除本次会话声望计数"
+  REP_TXT.moveToInactive = "隐藏"
+  REP_TXT.showFactionOnMainscreen = "显示为经验条"
+  -- options dialog
+  REP_TXT.showMissing	= "在声望列表显示缺少的声望"
+  REP_TXT.extendDetails	= "显示扩展的声望细节"
+  REP_TXT.gainToChat	= "获得声望时，在聊天框显示更完整的信息，取代暴雪默认的声望信息"
+  REP_TXT.noGuildGain	= "隐藏公会声望"
+  REP_TXT.suppressOriginalGain	= "不显示暴雪默认的声望信息"
+  REP_TXT.showPreviewRep	= "显示预估"
+  REP_TXT.switchFactionBar	= "自动追踪"
+  REP_TXT.noGuildSwitch	= "排除公会声望"
+  REP_TXT.silentSwitch	= "静默切换"
+  REP_TXT.guildCap	= "在聊天栏显示公会声望上限"
+  REP_TXT.defaultChatFrame	= "使用默认聊天框"
+  REP_TXT.chatFrame	= "使用聊天框 %d (%s)"
+  REP_TXT.usingDefaultChatFrame	= "使用默认聊天框"
+  REP_TXT.usingChatFrame	= "使用聊天框"
+  REP_TXT.EnableParagonBar = "显示巅峰声望进度条"
+  -- various LUA
+  REP_TXT.options	= "选项"
+  REP_TXT.orderByStanding	= "声望排序"
+  REP_TXT.lookup	= "追踪阵营："
+  REP_TXT.allFactions	= "列出所有阵营"
+  REP_TXT.missing	= "（到下一阶段）"
+  REP_TXT.missing2	= "缺少"
+  REP_TXT.heroic	= "英雄"
+  REP_TXT.normal	= "普通"
+  REP_TXT.switchBar	= "切换追踪声望："
+  -- REP_ShowFactions
+  REP_TXT.faction	= "阵营"
+  REP_TXT.is	= "是"
+  REP_TXT.withStanding	= "当前声望"
+  REP_TXT.needed	= "需要"
+  REP_TXT.mob	= "[怪物]"
+  REP_TXT.limited	= "限制为"
+  REP_TXT.limitedPl	= "限制为"
+  REP_TXT.quest	= "[任务]"
+  REP_TXT.instance	= "[副本]"
+  REP_TXT.items	= "[物品]"
+  REP_TXT.unknown	= "不为该玩家所知"
+  REP_TXT.guildReputation	= "公会声望"
+  -- mob Details
+  REP_TXT.tmob	= "小怪"
+  REP_TXT.oboss	= "其他首领"
+  REP_TXT.aboss	= "所有首领"
+  REP_TXT.pboss	= "每个首领"
+  REP_TXT.fclear	= "全清"
+  REP_TXT.AU	= "任意无名"
+  REP_TXT.AN	= "任意有名"
+  REP_TXT.BB	= "血帆海盗"
+  REP_TXT.SSP	= "南海海盗"
+  REP_TXT.Wa	= "荒土浪游者"
+  REP_TXT.VCm	= "任意风险投资公司怪物"
+  -- Quest Details
+  REP_TXT.cdq	= "主城烹饪每日任务"
+  REP_TXT.coq	= "其他烹饪每日任务"
+  REP_TXT.fdq	= "主城钓鱼每日任务"
+  REP_TXT.foq	= "其他钓鱼每日任务"
+  REP_TXT.ndq	= "没有每日任务"
+  REP_TXT.deleted	= "已过时"
+  REP_TXT.Championing	= "捍卫（战袍）"
+  REP_TXT.bpqfg	= "按任务声望获取百分比"
+  -- items Details
+  REP_TXT.cbadge	= "其他主城嘉奖徽章"
+  -- instance Details
+  REP_TXT.srfd	= "副本溢出声望"
+  REP_TXT.tbd	= "待完成"
+  REP_TXT.nci	= "普通大灾变副本"
+  REP_TXT.hci	= "英雄大灾变副本"
+  REP_TXT.ncit	= "有阵营战袍的普通大灾变副本"
+  REP_TXT.hcit	= "有阵营战袍的英雄大灾变副本"
+  -- ToBeDone general
+  REP_TXT.tfr	= "耕者声望"
+  REP_TXT.nswts	= "不确定何时开始"
+  REP_TXT.mnd	= "最大每日任务数"
+  REP_TXT.mnds	= "每日任务的最大数量为"
+  -- ReputationDetails
+  REP_TXT.currentRep	= "目前声望"
+  REP_TXT.neededRep	= "需要声望"
+  REP_TXT.missingRep	= "缺少声望"
+  REP_TXT.repInBag	= "背包中的声望"
+  REP_TXT.repInBagBank	= "背包和银行中的声望"
+  REP_TXT.repInQuest	= "任务声望"
+  REP_TXT.factionGained	= "本次会话获得"
+  REP_TXT.noInfo	= "没有关于该阵营声望的信息。"
+  REP_TXT.toExalted	= "到崇拜"
+  REP_TXT.toBestFriend = "到挚友"
+  -- to chat
+  REP_TXT.stats	= " （总计：%s%d，还少：%d）"
+  REP_TXT.statsNextStanding = " （总计：%s%d，剩馀 %s：%d）"
+  -- config changed
+  REP_TXT.configQuestion	= "Reputation Guide 启用了一些新设置，是否要查看选项？这个询问是一次性的。"
+  REP_TXT.showConfig	= "查看设置"
+  REP_TXT.later	= "之后再说"
+  -- UpdateList
+  REP_TXT.mobShort	= "[M]"
+  REP_TXT.questShort	= "[Q]"
+  REP_TXT.instanceShort	= "[D]"
+  REP_TXT.itemsShort	= "[I]"
+  REP_TXT.generalShort	= "[G]"
+  REP_TXT.mobHead	= "杀死怪物获得声望"
+  REP_TXT.questHead	= "完成任务获得声望"
+  REP_TXT.instanceHead	= "完成副本获得声望"
+  REP_TXT.itemsHead	= "交付物品获得声望"
+  REP_TXT.generalHead	= "有关获得声望的一般信息"
+  REP_TXT.mobTip	= "每当你杀死这个怪物，都会获得声望。"
+  REP_TXT.questTip	= "每当你完成可重复任务或日常任务时，都会获得声望。"
+  REP_TXT.instanceTip	= "每当你完成副本，都会获得声望。"
+  REP_TXT.itemsName	= "交付物品"
+  REP_TXT.itemsTip	= "向 NPC 交出列出的物品，你都会获得声望。"
+  REP_TXT.generalTip	= "这是关于获取某个阵营声望的信息，与重复获取声望的方法无关。"
+  REP_TXT.allOfTheAbove	= "上面列出的 %d 个任务摘要"
+  REP_TXT.questSummaryHead	= REP_TXT.allOfTheAbove
+  REP_TXT.questSummaryTip	= "此条目显示了上述所有任务的摘要。\r\n假设列出的任务都是日常任务，将计算如果每天完成所有日常任务，需要多少天才能达到下一个声望等级。"
+  REP_TXT.complete	= "完成"
+  REP_TXT.active	= "启用中"
+  REP_TXT.inBag	= "背包"
+  REP_TXT.turnIns	= "交付："
+  REP_TXT.reputation	= "声望："
+  REP_TXT.reputationCap	= "声望上限："
+  REP_TXT.reputationCapCurrent	= "目前声望："
+  REP_TXT.inBagBank	= "背包和银行"
+  REP_TXT.questCompleted	= "任务完成"
+  REP_TXT.timesToDo	= "执行次数："
+  REP_TXT.instance2	= "副本："
+  REP_TXT.mode	= "模式："
+  REP_TXT.timesToRun	= "运行次数："
+  REP_TXT.mob2	= "怪物："
+  REP_TXT.location	= "地点："
+  REP_TXT.toDo	= "待做："
+  REP_TXT.quest2	= "任务："
+  REP_TXT.itemsRequired	= "需要物品"
+  REP_TXT.general2	= "通用："
+  REP_TXT.maxStanding	= "产生声望直到"
+  REP_TXT.renown = "名望"
+  -- skills
+  REP_TXT.skillHerb	= "草药"
+  REP_TXT.skillMine	= "采矿"
+  REP_TXT.skillSkin	= "剥皮"
+  REP_TXT.skillAlch	= "炼金"
+  REP_TXT.skillBlack	= "锻造"
+  REP_TXT.skillEnch	= "附魔"
+  REP_TXT.skillEngi	= "工程学"
+  REP_TXT.skillIncrip	= "铭文"
+  REP_TXT.skillJewel	= "珠宝加工"
+  REP_TXT.skillLeath	= "制皮"
+  REP_TXT.skillTail	= "裁缝"
+  REP_TXT.skillAid	= "急救"
+  REP_TXT.skillArch	= "考古"
+  REP_TXT.skillCook	= "烹饪"
+  REP_TXT.skillFish	= "钓鱼"
+  ---------------------------
+  -- Random Reputation stuff
+  ---------------------------
+  REP_TXT.syndicateMobs	= "所有辛迪加成员"
+
+  ---------------------------
+  -- Reputation Standing
+  ---------------------------
+  ---- Initialize
+  REP_TXT.STAND_LV	= {}
+  REP_TXT.STAND_LV_TIER	= {}
+  REP_TXT.STAND_LV_TRUST = {}
+  REP_TXT.STAND_LV_RENOWN	= {}
+  REP_TXT.STAND_LV_RANK = {}
+  REP_TXT.STAND_LV_LEVEL = {}
+  REP_TXT.BFFLabels = {}
+  ---- Normal standings
+  REP_TXT.STAND_LV[0]	= "未知"
+  REP_TXT.STAND_LV[1]	= "仇恨"
+  REP_TXT.STAND_LV[2]	= "敌对"
+  REP_TXT.STAND_LV[3]	= "不友好"
+  REP_TXT.STAND_LV[4]	= "中立"
+  REP_TXT.STAND_LV[5]	= "友好"
+  REP_TXT.STAND_LV[6]	= "尊敬"
+  REP_TXT.STAND_LV[7]	= "崇敬"
+  REP_TXT.STAND_LV[8]	= "崇拜"
+  REP_TXT.STAND_LV[9] = "巅峰"
+  ---- Tier standings
+  REP_TXT.STAND_LV_TIER[0]	= "未知"
+  REP_TXT.STAND_LV_TIER[1] = "等级 1"
+  REP_TXT.STAND_LV_TIER[2] = "等级 2"
+  REP_TXT.STAND_LV_TIER[3] = "等级 3"
+  REP_TXT.STAND_LV_TIER[4] = "等级 4"
+  REP_TXT.STAND_LV_TIER[5] = "等级 5"
+  REP_TXT.STAND_LV_TIER[6] = "等级 6"
+  ---- Trust standings
+  REP_TXT.STAND_LV_TRUST[0] = "未知"
+  REP_TXT.STAND_LV_TRUST[1] = "犹豫"
+  REP_TXT.STAND_LV_TRUST[2] = "猜忌"
+  REP_TXT.STAND_LV_TRUST[3] = "防备"
+  REP_TXT.STAND_LV_TRUST[4] = "纠结"
+  REP_TXT.STAND_LV_TRUST[5] = "和善"
+  REP_TXT.STAND_LV_TRUST[6] = "欣赏"
+  ---- Renown standings
+  REP_TXT.STAND_LV_RENOWN[0] = "未知"
+  REP_TXT.STAND_LV_RENOWN[1] = "名望等级 1"
+  REP_TXT.STAND_LV_RENOWN[2] = "名望等级 2"
+  REP_TXT.STAND_LV_RENOWN[3] = "名望等级 3"
+  REP_TXT.STAND_LV_RENOWN[4] = "名望等级 4"
+  REP_TXT.STAND_LV_RENOWN[5] = "名望等级 5"
+  REP_TXT.STAND_LV_RENOWN[6] = "名望等级 6"
+  REP_TXT.STAND_LV_RENOWN[7] = "名望等级 7"
+  REP_TXT.STAND_LV_RENOWN[8] = "名望等级 8"
+  REP_TXT.STAND_LV_RENOWN[9] = "名望等级 9"
+  REP_TXT.STAND_LV_RENOWN[10] = "名望等级 10"
+  REP_TXT.STAND_LV_RENOWN[11] = "名望等级 11"
+  REP_TXT.STAND_LV_RENOWN[12] = "名望等级 12"
+  REP_TXT.STAND_LV_RENOWN[13] = "名望等级 13"
+  REP_TXT.STAND_LV_RENOWN[14] = "名望等级 14"
+  REP_TXT.STAND_LV_RENOWN[15] = "名望等级 15"
+  REP_TXT.STAND_LV_RENOWN[16] = "名望等级 16"
+  REP_TXT.STAND_LV_RENOWN[17] = "名望等级 17"
+  REP_TXT.STAND_LV_RENOWN[18] = "名望等级 18"
+  REP_TXT.STAND_LV_RENOWN[19] = "名望等级 19"
+  REP_TXT.STAND_LV_RENOWN[20] = "名望等级 20"
+  REP_TXT.STAND_LV_RENOWN[21] = "名望等级 21"
+  REP_TXT.STAND_LV_RENOWN[22] = "名望等级 22"
+  REP_TXT.STAND_LV_RENOWN[23] = "名望等级 23"
+  REP_TXT.STAND_LV_RENOWN[24] = "名望等级 24"
+  REP_TXT.STAND_LV_RENOWN[25] = "名望等级 25"
+  ---- Rank standings
+  REP_TXT.STAND_LV_MAX_RANK = "最高等级"
+  REP_TXT.STAND_LV_RANK[0] = "未知"
+  REP_TXT.STAND_LV_RANK[1] = "等级 1"
+  REP_TXT.STAND_LV_RANK[2] = "等级 2"
+  REP_TXT.STAND_LV_RANK[3] = "等级 3"
+  REP_TXT.STAND_LV_RANK[4] = "等级 4"
+  REP_TXT.STAND_LV_RANK[5] = "等级 5"
+  REP_TXT.STAND_LV_RANK[6] = "等级 6"
+  REP_TXT.STAND_LV_RANK[7] = "等级 7"
+  REP_TXT.STAND_LV_RANK[8] = "等级 8"
+  REP_TXT.STAND_LV_RANK[9] = "等级 9"
+  REP_TXT.STAND_LV_RANK[10] = "等级 10"
+  REP_TXT.STAND_LV_RANK[11] = "等级 11"
+  REP_TXT.STAND_LV_RANK[12] = "等级 12"
+  REP_TXT.STAND_LV_RANK[13] = "等级 13"
+  REP_TXT.STAND_LV_RANK[14] = "等级 14"
+  REP_TXT.STAND_LV_RANK[15] = "等级 15"
+  REP_TXT.STAND_LV_RANK[16] = "等级 16"
+  REP_TXT.STAND_LV_RANK[17] = "等级 17"
+  REP_TXT.STAND_LV_RANK[18] = "等级 18"
+  REP_TXT.STAND_LV_RANK[19] = "等级 19"
+  REP_TXT.STAND_LV_RANK[20] = "等级 20"
+  REP_TXT.STAND_LV_RANK[21] = "等级 21"
+  REP_TXT.STAND_LV_RANK[22] = "等级 22"
+  REP_TXT.STAND_LV_RANK[23] = "等级 23"
+  REP_TXT.STAND_LV_RANK[24] = "等级 24"
+  REP_TXT.STAND_LV_RANK[25] = "等级 25"
+  REP_TXT.STAND_LV_RANK[26] = "等级 26"
+  REP_TXT.STAND_LV_RANK[27] = "等级 27"
+  REP_TXT.STAND_LV_RANK[28] = "等级 28"
+  REP_TXT.STAND_LV_RANK[29] = "等级 29"
+  REP_TXT.STAND_LV_RANK[30] = "等级 30"
+  ---- Level standings
+  REP_TXT.STAND_LV_LEVEL[0] = "未知"
+  REP_TXT.STAND_LV_LEVEL[1] = "等级 1"
+  REP_TXT.STAND_LV_LEVEL[2] = "等级 2"
+  REP_TXT.STAND_LV_LEVEL[3] = "等级 3"
+  REP_TXT.STAND_LV_LEVEL[4] = "等级 4"
+  REP_TXT.STAND_LV_LEVEL[5] = "等级 5"
+  REP_TXT.STAND_LV_LEVEL[6] = "等级 6"
+  REP_TXT.STAND_LV_LEVEL[7] = "等级 7"
+  REP_TXT.STAND_LV_LEVEL[8] = "等级 8"
+  REP_TXT.STAND_LV_LEVEL[9] = "等级 9"
+  REP_TXT.STAND_LV_LEVEL[10] = "等级 10"
+  REP_TXT.STAND_LV_LEVEL[11] = "等级 11"
+  REP_TXT.STAND_LV_LEVEL[12] = "等级 12"
+  REP_TXT.STAND_LV_LEVEL[13] = "等级 13"
+  REP_TXT.STAND_LV_LEVEL[14] = "等级 14"
+  REP_TXT.STAND_LV_LEVEL[15] = "等级 15"
+  REP_TXT.STAND_LV_LEVEL[16] = "等级 16"
+  REP_TXT.STAND_LV_LEVEL[17] = "等级 17"
+  REP_TXT.STAND_LV_LEVEL[18] = "等级 18"
+  REP_TXT.STAND_LV_LEVEL[19] = "等级 19"
+  REP_TXT.STAND_LV_LEVEL[20] = "等级 20"
+  REP_TXT.STAND_LV_LEVEL[21] = "等级 21"
+  REP_TXT.STAND_LV_LEVEL[22] = "等级 22"
+  REP_TXT.STAND_LV_LEVEL[23] = "等级 23"
+  REP_TXT.STAND_LV_LEVEL[24] = "等级 24"
+  REP_TXT.STAND_LV_LEVEL[25] = "等级 25"
+  REP_TXT.STAND_LV_LEVEL[26] = "等级 26"
+  REP_TXT.STAND_LV_LEVEL[27] = "等级 27"
+  REP_TXT.STAND_LV_LEVEL[28] = "等级 28"
+  REP_TXT.STAND_LV_LEVEL[29] = "等级 29"
+  REP_TXT.STAND_LV_LEVEL[30] = "等级 30"
+  REP_TXT.STAND_LV_LEVEL[31] = "等级 31"
+  REP_TXT.STAND_LV_LEVEL[32] = "等级 32"
+  REP_TXT.STAND_LV_LEVEL[33] = "等级 33"
+  REP_TXT.STAND_LV_LEVEL[34] = "等级 34"
+  REP_TXT.STAND_LV_LEVEL[35] = "等级 35"
+  REP_TXT.STAND_LV_LEVEL[36] = "等级 36"
+  REP_TXT.STAND_LV_LEVEL[37] = "等级 37"
+  REP_TXT.STAND_LV_LEVEL[38] = "等级 38"
+  REP_TXT.STAND_LV_LEVEL[39] = "等级 39"
+  REP_TXT.STAND_LV_LEVEL[40] = "等级 40"
+  REP_TXT.STAND_LV_LEVEL[41] = "等级 41"
+  REP_TXT.STAND_LV_LEVEL[42] = "等级 42"
+  REP_TXT.STAND_LV_LEVEL[43] = "等级 43"
+  REP_TXT.STAND_LV_LEVEL[44] = "等级 44"
+  REP_TXT.STAND_LV_LEVEL[45] = "等级 45"
+  REP_TXT.STAND_LV_LEVEL[46] = "等级 46"
+  REP_TXT.STAND_LV_LEVEL[47] = "等级 47"
+  REP_TXT.STAND_LV_LEVEL[48] = "等级 48"
+  REP_TXT.STAND_LV_LEVEL[49] = "等级 49"
+  REP_TXT.STAND_LV_LEVEL[50] = "等级 50"
+  REP_TXT.STAND_LV_LEVEL[51] = "等级 51"
+  REP_TXT.STAND_LV_LEVEL[52] = "等级 52"
+  REP_TXT.STAND_LV_LEVEL[53] = "等级 53"
+  REP_TXT.STAND_LV_LEVEL[54] = "等级 54"
+  REP_TXT.STAND_LV_LEVEL[55] = "等级 55"
+  REP_TXT.STAND_LV_LEVEL[56] = "等级 56"
+  REP_TXT.STAND_LV_LEVEL[57] = "等级 57"
+  REP_TXT.STAND_LV_LEVEL[58] = "等级 58"
+  REP_TXT.STAND_LV_LEVEL[59] = "等级 59"
+  REP_TXT.STAND_LV_LEVEL[60] = "等级 60"
+  REP_TXT.STAND_LV_LEVEL[61] = "等级 61"
+  REP_TXT.STAND_LV_LEVEL[62] = "等级 62"
+  REP_TXT.STAND_LV_LEVEL[63] = "等级 63"
+  REP_TXT.STAND_LV_LEVEL[64] = "等级 64"
+  REP_TXT.STAND_LV_LEVEL[65] = "等级 65"
+  REP_TXT.STAND_LV_LEVEL[66] = "等级 66"
+  REP_TXT.STAND_LV_LEVEL[67] = "等级 67"
+  REP_TXT.STAND_LV_LEVEL[68] = "等级 68"
+  REP_TXT.STAND_LV_LEVEL[69] = "等级 69"
+  REP_TXT.STAND_LV_LEVEL[70] = "等级 70"
+  REP_TXT.STAND_LV_LEVEL[71] = "等级 71"
+  REP_TXT.STAND_LV_LEVEL[72] = "等级 72"
+  REP_TXT.STAND_LV_LEVEL[73] = "等级 73"
+  REP_TXT.STAND_LV_LEVEL[74] = "等级 74"
+  REP_TXT.STAND_LV_LEVEL[75] = "等级 75"
+  REP_TXT.STAND_LV_LEVEL[76] = "等级 76"
+  REP_TXT.STAND_LV_LEVEL[77] = "等级 77"
+  REP_TXT.STAND_LV_LEVEL[78] = "等级 78"
+  REP_TXT.STAND_LV_LEVEL[79] = "等级 79"
+  REP_TXT.STAND_LV_LEVEL[80] = "等级 80"
+  REP_TXT.STAND_LV_LEVEL[81] = "等级 81"
+  REP_TXT.STAND_LV_LEVEL[82] = "等级 82"
+  REP_TXT.STAND_LV_LEVEL[83] = "等级 83"
+  REP_TXT.STAND_LV_LEVEL[84] = "等级 84"
+  REP_TXT.STAND_LV_LEVEL[85] = "等级 85"
+  REP_TXT.STAND_LV_LEVEL[86] = "等级 86"
+  REP_TXT.STAND_LV_LEVEL[87] = "等级 87"
+  REP_TXT.STAND_LV_LEVEL[88] = "等级 88"
+  REP_TXT.STAND_LV_LEVEL[89] = "等级 89"
+  REP_TXT.STAND_LV_LEVEL[90] = "等级 90"
+  REP_TXT.STAND_LV_LEVEL[91] = "等级 91"
+  REP_TXT.STAND_LV_LEVEL[92] = "等级 92"
+  REP_TXT.STAND_LV_LEVEL[93] = "等级 93"
+  REP_TXT.STAND_LV_LEVEL[94] = "等级 94"
+  REP_TXT.STAND_LV_LEVEL[95] = "等级 95"
+  REP_TXT.STAND_LV_LEVEL[96] = "等级 96"
+  REP_TXT.STAND_LV_LEVEL[97] = "等级 97"
+  REP_TXT.STAND_LV_LEVEL[98] = "等级 98"
+  REP_TXT.STAND_LV_LEVEL[99] = "等级 99"
+  REP_TXT.STAND_LV_LEVEL[100] = "等级 100"
+  -------------------------------------
+  -- BFFLabels / Friendship factions --
+  -------------------------------------
+  -- BFF Labels placeholder
+  REP_TXT.BFFLabels[0] = {} -- Unknown
+  REP_TXT.BFFLabels[0][1] = "熟人"
+  REP_TXT.BFFLabels[0][2] = "哥们"
+  REP_TXT.BFFLabels[0][3] = "朋友"
+  REP_TXT.BFFLabels[0][4] = "好友"
+  REP_TXT.BFFLabels[0][5] = "挚友"
+  ---- Fishing Masters placeholder
+  REP_TXT.BFFFishingMastersLabels = {}
+  REP_TXT.BFFFishingMastersLabels[1] = "陌生人"
+  REP_TXT.BFFFishingMastersLabels[2] = "同伴"
+  REP_TXT.BFFFishingMastersLabels[3] = "哥们"
+  REP_TXT.BFFFishingMastersLabels[4] = "朋友"
+  REP_TXT.BFFFishingMastersLabels[5] = "好友"
+  REP_TXT.BFFFishingMastersLabels[6] = "挚友"
+  ---- Barracks Bodyguards placeholder
+  REP_TXT.BFFBarracksBodyguardsLabels = {}
+  REP_TXT.BFFBarracksBodyguardsLabels[1] = "保镖"
+  REP_TXT.BFFBarracksBodyguardsLabels[2] = "贴身保镖"
+  REP_TXT.BFFBarracksBodyguardsLabels[3] = "亲密搭档"
+  ---- The First Responders 1984
+  REP_TXT.BFFLabels[1984] = {} -- Intern
+  REP_TXT.BFFLabels[1984][1] = "初级驻院医师"
+  REP_TXT.BFFLabels[1984][2] = "资深驻院医师"
+  REP_TXT.BFFLabels[1984][3] = "急救队"
+  ---- Corbyn 2100
+  REP_TXT.BFFLabels[2100] = {} -- Stranger
+  REP_TXT.BFFLabels[2100][1] = "关注"
+  REP_TXT.BFFLabels[2100][2] = "不具威胁的人"
+  REP_TXT.BFFLabels[2100][3] = REP_TXT.BFFFishingMastersLabels[4]
+  REP_TXT.BFFLabels[2100][4] = "益友"
+  REP_TXT.BFFLabels[2100][5] = REP_TXT.BFFFishingMastersLabels[6]
+  -- Chromie 2135
+  REP_TXT.BFFLabels[2135] = {} -- 雏龙
+  REP_TXT.BFFLabels[2135][1] = "时空新兵"
+  REP_TXT.BFFLabels[2135][2] = "时空跃迁者"
+  REP_TXT.BFFLabels[2135][3] = "时光之友"
+  REP_TXT.BFFLabels[2135][4] = "青铜盟友"
+  REP_TXT.BFFLabels[2135][5] = "纪元修复者"
+  REP_TXT.BFFLabels[2135][6] = "时光领主"
+  ---- Wrathion 2517
+  REP_TXT.BFFLabels[2517] = {} -- Acquaintance
+  REP_TXT.BFFLabels[2517][1] = "同好"
+  REP_TXT.BFFLabels[2517][2] = "盟友"
+  REP_TXT.BFFLabels[2517][3] = "龙牙"
+  REP_TXT.BFFLabels[2517][4] = "朋友"
+  REP_TXT.BFFLabels[2517][5] = "挚友"
+  ---- Sabellian 2518
+  REP_TXT.BFFLabels[2518] = {} -- Acquaintance
+  REP_TXT.BFFLabels[2518][1] = "同好"
+  REP_TXT.BFFLabels[2518][2] = "盟友"
+  REP_TXT.BFFLabels[2518][3] = "龙牙"
+  REP_TXT.BFFLabels[2518][4] = "朋友"
+  REP_TXT.BFFLabels[2518][5] = "挚友"
+  ---- Artisan's Consortium - Dragon Isles Branch 2544
+  REP_TXT.BFFLabels[2544] = {} -- Neutral
+  REP_TXT.BFFLabels[2544][1] = "偏爱"
+  REP_TXT.BFFLabels[2544][2] = "尊重"
+  REP_TXT.BFFLabels[2544][3] = "重视"
+  REP_TXT.BFFLabels[2544][4] = "崇尚"
+  ---- Cobalt Assembly 2550
+  REP_TXT.BFFLabels[2550] = {} -- Empty
+  REP_TXT.BFFLabels[2550][1] = "低"
+  REP_TXT.BFFLabels[2550][2] = "中"
+  REP_TXT.BFFLabels[2550][3] = "高"
+  REP_TXT.BFFLabels[2550][4] = "最大"
+  ---- Soridormi 2553
+  REP_TXT.BFFLabels[2553] = {} -- Anomaly
+  REP_TXT.BFFLabels[2553][1] = "未来之友"
+  REP_TXT.BFFLabels[2553][2] = "裂隙修复者"
+  REP_TXT.BFFLabels[2553][3] = "时间行者"
+  REP_TXT.BFFLabels[2553][4] = "传奇"
+  ---- The Weaver 2601
+  REP_TXT.BFFLabels[2601] = {} -- Stranger
+  REP_TXT.BFFLabels[2601][1] = "熟人"
+  REP_TXT.BFFLabels[2601][2] = "亲信"
+  REP_TXT.BFFLabels[2601][3] = "同谋"
+  REP_TXT.BFFLabels[2601][4] = "沆瀣"
+  REP_TXT.BFFLabels[2601][5] = "从犯"
+  REP_TXT.BFFLabels[2601][6] = "教唆者"
+  REP_TXT.BFFLabels[2601][7] = "阴谋家"
+  REP_TXT.BFFLabels[2601][8] = "幕后黑手"
+  ---- The General 2605
+  REP_TXT.BFFLabels[2605] = {} -- Stranger
+  REP_TXT.BFFLabels[2605][1] = "熟人"
+  REP_TXT.BFFLabels[2605][2] = "亲信"
+  REP_TXT.BFFLabels[2605][3] = "同谋"
+  REP_TXT.BFFLabels[2605][4] = "沆瀣"
+  REP_TXT.BFFLabels[2605][5] = "从犯"
+  REP_TXT.BFFLabels[2605][6] = "教唆者"
+  REP_TXT.BFFLabels[2605][7] = "阴谋家"
+  REP_TXT.BFFLabels[2605][8] = "幕后黑手"
+  ---- The Vizier 2607
+  REP_TXT.BFFLabels[2607] = {} -- Stranger
+  REP_TXT.BFFLabels[2607][1] = "熟人"
+  REP_TXT.BFFLabels[2607][2] = "亲信"
+  REP_TXT.BFFLabels[2607][3] = "同谋"
+  REP_TXT.BFFLabels[2607][4] = "沆瀣"
+  REP_TXT.BFFLabels[2607][5] = "从犯"
+  REP_TXT.BFFLabels[2607][6] = "教唆者"
+  REP_TXT.BFFLabels[2607][7] = "阴谋家"
+  REP_TXT.BFFLabels[2607][8] = "幕后黑手"
+  ---- Azerothian Archives 2615
+  REP_TXT.BFFLabels[2615] = {} -- Graduate
+  REP_TXT.BFFLabels[2615][1] = "助理"
+  REP_TXT.BFFLabels[2615][2] = "合约"
+  REP_TXT.BFFLabels[2615][3] = "常驻"
+  REP_TXT.BFFLabels[2615][4] = "终身"
+
+  ---------------------------
+  -- Tooltips
+  ---------------------------
+  ---- Initialize
+  REP_TXT.elements	= {}
+  REP_TXT.elements.name	= {}
+  REP_TXT.elements.tip	= {}
+  ---- Names and tips
+  REP_TXT.elements.name.REP_OptionsButton	= REP_TXT.options
+  REP_TXT.elements.tip.REP_OptionsButton	= "开启 ReputationGuide 设置选项。"
+  REP_TXT.elements.name.REP_OrderByStandingCheckBox	= REP_TXT.orderByStanding
+  REP_TXT.elements.tip.REP_OrderByStandingCheckBox	= "停用此选项，声望列表按照暴雪默认排序，依资料片和字母顺序排列。\r\n\r\n启用此选项，声望列表按声望等级排序\r\n\r\n要查看|cFFFAA0A0移至閒置|r的阵营声望，停用此选项，然后查看列表底部。"
+  REP_TXT.elements.name.REP_ShowMobsButton	= REP_TXT.showMobs
+  REP_TXT.elements.tip.REP_ShowMobsButton	= "显示击杀可以获得声望的小怪。"
+  REP_TXT.elements.name.REP_ShowNonPvPQuestsButton	= REP_TXT.showQuests
+  REP_TXT.elements.tip.REP_ShowNonPvPQuestsButton	= "显示可以提高声望的任务。"
+  REP_TXT.elements.name.REP_ShowPvPQuestsButton	= REP_TXT.showPvPQuests
+  REP_TXT.elements.tip.REP_ShowPvPQuestsButton	= "显示可以提高声望的 PVP 任务。"
+  REP_TXT.elements.name.REP_ShowItemsButton	= REP_TXT.showItems
+  REP_TXT.elements.tip.REP_ShowItemsButton	= "显示可以交付给 NPC 换取声望的物品。"
+  REP_TXT.elements.name.REP_ShowInstancesButton	= REP_TXT.showInstances
+  REP_TXT.elements.tip.REP_ShowInstancesButton	= "显示可以提供声望的副本。"
+  REP_TXT.elements.name.REP_ShowGeneralButton	= REP_TXT.showGeneral
+  REP_TXT.elements.tip.REP_ShowGeneralButton	= "显示可以获得声望的其他方法，通常指除了任务、物品、副本、特定怪物以外的方式。"
+  REP_TXT.elements.name.REP_DetailShowAllButton	= REP_TXT.showAll
+  REP_TXT.elements.tip.REP_DetailShowAllButton	= "显示从任务、物品、副本、特定小怪四种方式获得声望的方法。"
+  REP_TXT.elements.name.REP_DetailShowNoneButton	= REP_TXT.showNone
+  REP_TXT.elements.tip.REP_DetailShowNoneButton	= "隐藏从任务、物品、副本、特定小怪四种方式获得声望的方法。"
+  REP_TXT.elements.name.REP_DetailExpandButton	= REP_TXT.expand
+  REP_TXT.elements.tip.REP_DetailExpandButton	= "展开列表中的所有条目，显示详细资料，例如任务内容或需要的物品。"
+  REP_TXT.elements.name.REP_DetailCollapseButton	= REP_TXT.collapse
+  REP_TXT.elements.tip.REP_DetailCollapseButton	= "折叠列表中的所有条目，隐藏详细资料。"
+  REP_TXT.elements.name.REP_DetailSupressNoneFactionButton	= REP_TXT.supressNoneFaction
+  REP_TXT.elements.tip.REP_DetailSupressNoneFactionButton	= "重新启用此阵营声望列表中，被右键点击排除的项目。"
+  REP_TXT.elements.name.REP_DetailSupressNoneGlobalButton	= REP_TXT.supressNoneGlobal
+  REP_TXT.elements.tip.REP_DetailSupressNoneGlobalButton	= "重新启用所有阵营声望列表中，被右键点击排除的项目。"
+  REP_TXT.elements.name.REP_DetailClearSessionGainButton	= REP_TXT.clearSessionGain
+  REP_TXT.elements.tip.REP_DetailClearSessionGainButton	= "点击此按钮重置本次会话获得的声望计数。"
+  REP_TXT.elements.name.REP_EnableMissingBox	= REP_TXT.showMissing
+  REP_TXT.elements.tip.REP_EnableMissingBox	= "在声望列表显示声望到达下一阶段所需要的声望值。"
+  REP_TXT.elements.name.REP_ExtendDetailsBox	= REP_TXT.extendDetails
+  REP_TXT.elements.tip.REP_ExtendDetailsBox	= "启用此设置以显示扩展的声望详情框。\r\n除原始详情框的信息外，还将显示达到下一声望等级所需的剩余声望，以及通过列出可获取该阵营声望的任务、怪物、物品与副本来获得声望的方式列表。"
+  REP_TXT.elements.name.REP_GainToChatBox	= REP_TXT.gainToChat
+  REP_TXT.elements.tip.REP_GainToChatBox	= "启用此设置，以便在获得声望时显示所有阵营的声望获取情况。\r\n这与标准的声望获取报告方式不同，标准方式通常只列出主阵营的获取。"
+  REP_TXT.elements.name.REP_NoGuildGainBox	= REP_TXT.noGuildGain
+  REP_TXT.elements.tip.REP_NoGuildGainBox	= "不要在聊天框显示获得公会声望的信息。"
+  REP_TXT.elements.name.REP_SupressOriginalGainBox	= REP_TXT.suppressOriginalGain
+  REP_TXT.elements.tip.REP_SupressOriginalGainBox	= "隐藏暴雪默认的声望信息。\r \n如果已经启用了详细的声望信息，勾选这个选项，可以避免聊天框输出重复的信息。"
+  REP_TXT.elements.name.REP_ShowPreviewRepBox	= REP_TXT.showPreviewRep
+  REP_TXT.elements.tip.REP_ShowPreviewRepBox	= "以灰色的进度条显示即将获得的声望。\n\n根据你背包和银行中可以兑换声望的物品、已完成但尚未提交的任务，预估你可以获得的声望，并在声望条上以灰色显示。"
+  REP_TXT.elements.name.REP_SwitchFactionBarBox	= REP_TXT.switchFactionBar
+  REP_TXT.elements.tip.REP_SwitchFactionBarBox	= "当你获得声望，自动将追踪的声望切换至该阵营。"
+  REP_TXT.elements.name.REP_NoGuildSwitchBox	= REP_TXT.noGuildSwitch
+  REP_TXT.elements.tip.REP_NoGuildSwitchBox	= "使自动切换追踪声望的功能排除公会声望；当你获得公会声望时，不会自动切换至公会声望。"
+  REP_TXT.elements.name.REP_SilentSwitchBox	= REP_TXT.silentSwitch
+  REP_TXT.elements.tip.REP_SilentSwitchBox	= "切换追踪的声望时，不要在聊天框显示切换通知。"
+  REP_TXT.elements.name.REP_GuildCapBox	= REP_TXT.guildCap
+  REP_TXT.elements.name.REP_ChatFrameSlider	= "聊天框"
+  REP_TXT.elements.tip.REP_ChatFrameSlider	= "选择要显示声望信息的聊天框"
+  REP_TXT.elements.name.REP_EnableParagonBarBox = REP_TXT.EnableParagonBar
+  REP_TXT.elements.tip.REP_EnableParagonBarBox  = "以声望进度条显示巅峰声望。"
+  REP_TXT.elements.name.REP_OptionEnableMissing	= REP_TXT.elements.name.REP_EnableMissingBox
+  REP_TXT.elements.tip.REP_OptionEnableMissing	= REP_TXT.elements.tip.REP_EnableMissingBox
+  REP_TXT.elements.name.REP_OptionEnableMissingCB	= REP_TXT.elements.name.REP_EnableMissingBox
+  REP_TXT.elements.tip.REP_OptionEnableMissingCB	= REP_TXT.elements.tip.REP_EnableMissingBox
+  REP_TXT.elements.name.REP_OptionExtendDetails	= REP_TXT.elements.name.REP_ExtendDetailsBox
+  REP_TXT.elements.tip.REP_OptionExtendDetails	= REP_TXT.elements.tip.REP_ExtendDetailsBox
+  REP_TXT.elements.name.REP_OptionExtendDetailsCB	= REP_TXT.elements.name.REP_ExtendDetailsBox
+  REP_TXT.elements.tip.REP_OptionExtendDetailsCB	= REP_TXT.elements.tip.REP_ExtendDetailsBox
+  REP_TXT.elements.name.REP_OptionGainToChat	= REP_TXT.elements.name.REP_GainToChatBox
+  REP_TXT.elements.tip.REP_OptionGainToChat	= REP_TXT.elements.tip.REP_GainToChatBox
+  REP_TXT.elements.name.REP_OptionGainToChatCB	= REP_TXT.elements.name.REP_GainToChatBox
+  REP_TXT.elements.tip.REP_OptionGainToChatCB	= REP_TXT.elements.tip.REP_GainToChatBox
+  REP_TXT.elements.name.REP_OptionNoGuildGain	= REP_TXT.elements.name.REP_NoGuildGainBox
+  REP_TXT.elements.tip.REP_OptionNoGuildGain	= REP_TXT.elements.tip.REP_NoGuildGainBox
+  REP_TXT.elements.name.REP_OptionNoGuildGainCB	= REP_TXT.elements.name.REP_NoGuildGainBox
+  REP_TXT.elements.tip.REP_OptionNoGuildGainCB	= REP_TXT.elements.tip.REP_NoGuildGainBox
+  REP_TXT.elements.name.REP_OptionSupressOriginalGain	= REP_TXT.elements.name.REP_SupressOriginalGainBox
+  REP_TXT.elements.tip.REP_OptionSupressOriginalGain	= REP_TXT.elements.tip.REP_SupressOriginalGainBox
+  REP_TXT.elements.name.REP_OptionSupressOriginalGainCB	= REP_TXT.elements.name.REP_SupressOriginalGainBox
+  REP_TXT.elements.tip.REP_OptionSupressOriginalGainCB	= REP_TXT.elements.tip.REP_SupressOriginalGainBox
+  REP_TXT.elements.name.REP_OptionShowPreviewRep	= REP_TXT.elements.name.REP_ShowPreviewRepBox
+  REP_TXT.elements.tip.REP_OptionShowPreviewRep	= REP_TXT.elements.tip.REP_ShowPreviewRepBox
+  REP_TXT.elements.name.REP_OptionShowPreviewRepCB	= REP_TXT.elements.name.REP_ShowPreviewRepBox
+  REP_TXT.elements.tip.REP_OptionShowPreviewRepCB	= REP_TXT.elements.tip.REP_ShowPreviewRepBox
+  REP_TXT.elements.name.REP_OptionSwitchFactionBar	= REP_TXT.elements.name.REP_SwitchFactionBarBox
+  REP_TXT.elements.tip.REP_OptionSwitchFactionBar	= REP_TXT.elements.tip.REP_SwitchFactionBarBox
+  REP_TXT.elements.name.REP_OptionSwitchFactionBarCB	= REP_TXT.elements.name.REP_SwitchFactionBarBox
+  REP_TXT.elements.tip.REP_OptionSwitchFactionBarCB	= REP_TXT.elements.tip.REP_SwitchFactionBarBox
+  REP_TXT.elements.name.REP_OptionNoGuildSwitch	= REP_TXT.elements.name.REP_NoGuildSwitchBox
+  REP_TXT.elements.tip.REP_OptionNoGuildSwitch	= REP_TXT.elements.tip.REP_NoGuildSwitchBox
+  REP_TXT.elements.name.REP_OptionNoGuildSwitchCB	= REP_TXT.elements.name.REP_NoGuildSwitchBox
+  REP_TXT.elements.tip.REP_OptionNoGuildSwitchCB	= REP_TXT.elements.tip.REP_NoGuildSwitchBox
+  REP_TXT.elements.name.REP_OptionSilentSwitch	= REP_TXT.elements.name.REP_SilentSwitchBox
+  REP_TXT.elements.tip.REP_OptionSilentSwitch	= REP_TXT.elements.tip.REP_SilentSwitchBox
+  REP_TXT.elements.name.REP_OptionSilentSwitchCB	= REP_TXT.elements.name.REP_SilentSwitchBox
+  REP_TXT.elements.tip.REP_OptionSilentSwitchCB	= REP_TXT.elements.tip.REP_SilentSwitchBox
+  REP_TXT.elements.name.REP_OptionGuildCap	= REP_TXT.elements.name.REP_GuildCapBox
+  REP_TXT.elements.tip.REP_OptionGuildCap	= REP_TXT.elements.tip.REP_GuildCapBox
+  REP_TXT.elements.name.REP_OptionGuildCapCB	= REP_TXT.elements.name.REP_GuildCapBox
+  REP_TXT.elements.tip.REP_OptionGuildCapCB	= REP_TXT.elements.tip.REP_GuildCapBox
+  REP_TXT.elements.name.REP_OptionChatFrameSlider	= REP_TXT.elements.name.REP_ChatFrameSlider
+  REP_TXT.elements.tip.REP_OptionChatFrameSlider	= REP_TXT.elements.tip.REP_ChatFrameSlider
+  REP_TXT.elements.name.REP_OptionEnableParagonBar = REP_TXT.elements.name.REP_EnableParagonBarBox
+  REP_TXT.elements.tip.REP_OptionEnableParagonBar = REP_TXT.elements.tip.REP_EnableParagonBarBox
+  REP_TXT.elements.name.REP_OptionEnableParagonBarCB = REP_TXT.elements.name.REP_EnableParagonBarBox
+  REP_TXT.elements.tip.REP_OptionEnableParagonBarCB = REP_TXT.elements.tip.REP_EnableParagonBarBox
+  ---------------------------
+  -- New options settings
+  ---------------------------
+  ---- General
+  REP_TXT.settings = {}
+  REP_TXT.settings.info = {}
+  REP_TXT.settings.tooltips = {}
+  ---- Titles
+  REP_TXT.settings.buffTitle = "声望增益"
+  REP_TXT.settings.buffSubTitle = "您可以切换这些声望增益，以查看您可以从不同的活动中获得多少声望。无法叠加的增益效果在切换其对应增益效果时将会停用。"
+  ---- Buffs
+  REP_TXT.settings.harvestBountyRepBuff = "分享之魂 (感恩节)"
+  REP_TXT.settings.info.harvestBountyRepBuff = "所获得的声望提高10%。持续 2 小时。"
+  REP_TXT.settings.wickermanRepBuff = "稻草人的祈祷 (万圣节)"
+  REP_TXT.settings.info.wickermanRepBuff = "生命值和法力值回复速度提高25%，耐力提高25%。持续 2 小时。"
+  REP_TXT.settings.wickermanRepBuffUnburdened = "无忧 (万圣节)"
+  REP_TXT.settings.info.wickermanRepBuffUnburdened = "你将你的烦恼投入了稻草人的火堆中。经验和声望获取速度提高10%。持续 2 小时。"
+  REP_TXT.settings.wickermanRepBuffGrimVisage = "恐怖面容 (万圣节)"
+  REP_TXT.settings.info.wickermanRepBuffGrimVisage = "你将稻草人的灰烬涂在脸上。经验和声望获取速度提高10%。持续 2 小时"
+  REP_TXT.settings.MrPopularityRankOne = "声望阁下 (公会福利, 等级1)"
+  REP_TXT.settings.info.MrPopularityRankOne = "通过杀死怪物和完成任务获得的声望值提高5%。"
+  REP_TXT.settings.MrPopularityRankTwo = "声望阁下 (公会福利, 等级2)"
+  REP_TXT.settings.info.MrPopularityRankTwo = "通过杀死怪物和完成任务获得的声望值提高10%。"
+  REP_TXT.settings.DarkmoonFaireWeeRepBuff = "耶！ (暗月马戏团)"
+  REP_TXT.settings.info.DarkmoonFaireWeeRepBuff = "乘坐暗月旋转木马或过山车。经验值和声望值获取速度提高10%。"
+  REP_TXT.settings.DarkmoonFaireHatRep = "暗月大礼帽 (暗月马戏团)"
+  REP_TXT.settings.info.DarkmoonFaireHatRep = "经验值和声望值获取速度提高10%，持续 1 小时。礼帽为一次性使用。"
+  REP_TXT.settings.ShowBonusGainsInChat = "在聊天栏显示额外声望"
+  REP_TXT.settings.info.ShowBonusGainsInChat = "获得声望时在聊天栏显示来自嘉奖的额外声望。"
+  ---------------------------
+  -- Characters tab settings
+  ---------------------------
+  REP_TXT.settings.characterTabSubTitle = "你可以从下方列表重置或删除某个角色的插件设置。"
+  REP_TXT.settings.tooltips.removeCharacter = "从此角色的提示信息中移除。"
+  REP_TXT.settings.tooltips.addCharacter = "将此角色添加到提示信息。"
+  REP_TXT.settings.delete = "删除"
+  REP_TXT.settings.reset = "重置"
+  REP_TXT.settings.characterUpdated = "%s 的保存变量已更新。"
+  REP_TXT.settings.characterReset = "%s 的保存变量已被重置。"
+  REP_TXT.settings.characterDeleted = "%s 的保存变量已被删除。"
+  -- 由 Locales_zhCN 项目补全的缺失条目
+  REP_TXT.Mob = {}
+  REP_TXT.Mob.BoulderfistOgre = "巨石拳食人魔"
+  REP_TXT.Mob.MoshOgg_Spellcrafter = "莫什奥格咒术师"
+  REP_TXT.elements.name.REP_ShowDarkmoonFaireButton = "暗月马戏团增益"
+  REP_TXT.elements.tip.REP_ShowDarkmoonFaireButton = "启用此选项可显示暗月马戏团增益生效时能获得的声望量。"
+
+end
