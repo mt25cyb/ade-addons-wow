@@ -1,0 +1,17 @@
+## Interface: 120105
+## Title: ade_Demo
+## Notes: ade_AddonFramework 控件画廊与功能自测
+## Author: ADE
+## Version: v6-r001-b008
+## Dependencies: ade_AddonFramework
+## SavedVariables: ade_DemoDB
+## IconTexture: Interface\AddOns\ade_Demo\assets\ade_128
+## X-Localizations: enUS, zhCN, zhTW
+## X-License: MIT
+
+Core.lua
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+About.lua
+Demo.lua
