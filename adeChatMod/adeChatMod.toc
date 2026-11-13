@@ -1,0 +1,22 @@
+## Interface: 120105
+## Title: adeChatMod
+## Notes: 聊天频道快捷条 + 频道名缩写 + ADE 风格设置界面
+## Author: ADE
+## Version: v6-r001-b013
+## IconAtlas: communities-icon-chat
+## Dependencies: ade_AddonFramework
+## SavedVariables: adeChatModDB
+## Category: Chat
+## X-Localizations: enUS, zhCN, zhTW
+## License: MIT
+## X-Credits: ChannelBar by CHANGEEN (MIT); PrimeTooltip by PrimeCraze (设置界面风格参考)
+
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+Core.lua
+InitDB.lua
+ChannelBar.lua
+ChannelAbbrev.lua
+Minimap.lua
+Options.lua
