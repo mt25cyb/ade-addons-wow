@@ -65,8 +65,11 @@ logs/
 _docs/
 _backup/
 _temp/
-_tools/
 wow-textures
 wow-textures/*
 z-ref_*
 z-ref_*/*
+
+# 工具运行时产物
+__pycache__/
+_tools/wow_dict/temp/
