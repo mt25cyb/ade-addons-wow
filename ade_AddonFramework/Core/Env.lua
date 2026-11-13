@@ -3,7 +3,7 @@ local AF = ResolveNamespace("ade_AddonFramework")
 if not AF then return end
 
 AF.L = AF.L or setmetatable({}, { __index = function(_, key) return key end })
-AF.VERSION = "v6-r001-b008"
+AF.VERSION = "v6-r001-b010"
 
 -- 内置形态的宿主在加载本包之前覆盖此值，即可复用同一份素材（见 SYNC.md）。
 AF.ADDON_DIR = AF.ADDON_DIR or "ade_AddonFramework"

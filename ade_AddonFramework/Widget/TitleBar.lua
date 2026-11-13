@@ -62,5 +62,29 @@ function W.Create(window, opts)
 
     bar.bg, bar.divider, bar.title, bar.drag = bg, divider, title, drag
     function bar:SetTitle(text) title:SetText(text or "") end
+
+    -- 标题栏右侧按钮区（ADE-v6-FrameDesign，2026-11-13：单布局页切换按钮移入标题栏）。
+    -- 按钮排在 X 关闭钮左侧的 26px 安全区以左；第一颗最靠左，后续按钮链式排其右侧，
+    -- 每加一颗整体随占宽左移，并同步收窄拖拽热区，避免拖拽盖住按钮。
+    bar.rightButtons = {}
+    local rightUsed = 0
+    function bar:AddRightButton(btn, height)
+        height = height or 20
+        local w = btn:GetWidth() or 88
+        rightUsed = rightUsed + w + 6
+        btn:SetParent(bar)
+        btn:SetSize(w, height)
+        if #bar.rightButtons == 0 then
+            btn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -(rightUsed + 26), -4)
+        else
+            btn:SetPoint("TOPLEFT", bar.rightButtons[#bar.rightButtons], "TOPRIGHT", 6, 0)
+        end
+        btn:SetFrameLevel(bar:GetFrameLevel() + 3)
+        bar.rightButtons[#bar.rightButtons + 1] = btn
+        drag:ClearAllPoints()
+        drag:SetPoint("TOPLEFT", 0, 0)
+        drag:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -(rightUsed + 26), 0)
+        return btn
+    end
     return bar
 end

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v6-r001-b010 - 2026-11-14
+
+**预览面板组件化（adeTooltip 开发计划 §九/§十，用户确认「预览面板的创建是单独组件，双布局只留开关」）：新增 `Template/PreviewPanel`（`New/AttachTo/SetAnchor/SetBuild/SetRefresh/Refresh/Show/Hide/Toggle/BindButton`，外框主题色边、内容首次显示构建、主窗隐藏联动隐藏、绑定按钮自动切换 `AF_PREVIEW_OPEN/CLOSE` 文案并接管 OnClick）；`TabbedFrame` 删除内嵌预览（原 opts.preview 块与预览按钮块），只保留开关位（`titleBar:AddRightButton` / `AddSidebarFooterButton` / `AddSidebarFooterCheckbox`），新增 `onPageChanged`/`SetOnPageChanged` 页切换回调供预览联动；`Form` 新增 `spec.enabled`（布尔或函数，禁用态 = 标签灰化 + 控件半透明 + 鼠标遮挡层 + `Refresh()` 重算，遮挡层方案因子帧不受 `EnableMouse(false)` 影响）与 `ScrollToRow(scroll,key)`/`HighlightRow(key)`（主题色底纹 1.5s 消退，供预览点击定位设置项）；`ade_Demo` 迁移到组件并演示页切换联动（三语新增 `DEMO_PREVIEW_PAGE`）。**
+
+## v6-r001-b009 - 2026-11-14
+
+**布局调整（ADE-v6-FrameDesign，2026-11-13 手绘图定稿）：单选项页布局页切换按钮移入标题栏右侧（顶部页签取消，内容区顶距 66→38 与多布局一致），可选预览按钮也在标题栏最左；多选项页布局左栏底部新增页脚区——复选框固定最底槽位（如「小地图图标」）、按钮自其上方堆叠（如「打开预览」）；新增预览面板（窗口左侧独立面板，`opts.preview` 启用，主窗隐藏时一并隐藏，内容首次打开构建一次）；`TitleBar` 新增 `AddRightButton`（右侧按钮区随占宽自动收窄拖拽热区）；三语新增 `AF_PREVIEW_OPEN`/`AF_PREVIEW_CLOSE`。**
+
 ## v6-r001-b008 - 2026-11-14
 
 **实机反馈修复（七）：多行编辑框「未达滑块最小高度却仍显示滚动条」——根因为 `ScrollUtil.InitScrollFrameWithScrollBar` 会替换 `OnScrollRangeChanged`，令模板自带的 `scrollBarHideIfUnscrollable` keyvalue 失效；改为手工 `OnScrollRangeChanged` 钩子按 `GetVerticalScrollRange()` 显隐（范围≈0 隐藏、>0.5 显示，滚轮始终可用）。**

@@ -1,4 +1,8 @@
 -- 表单构建：每行 label + 控件 + 可选逐项重置按钮（§六.1）。
+-- b010 新增（adeTooltip 开发计划 §十）：
+--   spec.enabled = boolean | function() → 禁用态（灰化 + 鼠标遮挡拦截 + Refresh 重算），
+--     如 adeTooltip「不使用新版排版时，仅新版生效的选项置灰」；
+--   ScrollToRow(scroll, key) / HighlightRow(key) → 预览区点击元素后定位到对应设置行。
 local AF = ResolveNamespace("ade_AddonFramework")
 if not AF then return end
 AF.Template = AF.Template or {}
@@ -18,12 +22,45 @@ local function Set(ctx, key, value)
     if key and ctx.set then ctx.set(key, value) end
 end
 
+-- 禁用态实现：灰色标签 + 控件半透明 + 一张鼠标遮挡层。
+-- 遮挡层而不是逐控件 EnableMouse(false)：Frame:EnableMouse 不影响子帧，
+-- 下拉/滑块等控件的交互在子帧上，统一遮挡最稳；键盘输入用 ClearFocus 收尾。
+local function ApplyEnabled(meta)
+    local entry, row, control = meta.entry, meta.row, meta.control
+    local en = entry.enabled
+    if type(en) == "function" then en = en() and true or false end
+    if en == nil then en = true end
+    if control then
+        control:SetAlpha(en and 1 or 0.45)
+        if not en then
+            if control.ClearFocus then control:ClearFocus() end
+            if control.editBox and control.editBox.ClearFocus then control.editBox:ClearFocus() end
+        end
+    end
+    if not en then
+        if not meta.blocker then
+            local blocker = CreateFrame("Frame", nil, row)
+            blocker:SetAllPoints()
+            blocker:EnableMouse(true)
+            blocker:SetFrameLevel(row:GetFrameLevel() + 50)
+            meta.blocker = blocker
+        end
+        meta.blocker:Show()
+        row.label:SetTextColor(0.42, 0.42, 0.42)
+    else
+        if meta.blocker then meta.blocker:Hide() end
+        -- 启用时标签色交还 Row.Refresh（reset="changed" 的偏离默认变色逻辑）
+        if not row.Refresh then row.label:SetTextColor(unpack(AF.C.TEXT_MAIN)) end
+    end
+end
+
 function F.Build(parent, spec, ctx)
     ctx = ctx or {}
     local width = ctx.width or AF.LAYOUT.contentW
     local labelW = ctx.labelW or AF.LAYOUT.labelW
     local y = 0
     local rows = {}
+    local rowByKey, rowY, enabledRows = {}, {}, {}
 
     for _, entry in ipairs(spec or {}) do
         local kind = entry.type or "text"
@@ -107,6 +144,13 @@ function F.Build(parent, spec, ctx)
                     onChange = function() if entry.onChange then entry.onChange() end end,
                 })
                 row:SetPoint("TOPLEFT", 0, -y)
+                if entry.key then
+                    rowByKey[entry.key] = row
+                    rowY[entry.key] = y
+                end
+                if entry.enabled ~= nil then
+                    enabledRows[#enabledRows + 1] = { row = row, control = control, entry = entry }
+                end
                 y = y + rowH + 4
             end
         end
@@ -114,9 +158,40 @@ function F.Build(parent, spec, ctx)
     end
 
     parent:SetHeight(y + 10)
-    local obj = { rows = rows, height = y + 10 }
+    local obj = { rows = rows, height = y + 10, rowByKey = rowByKey }
     function obj:Refresh()
         for _, row in ipairs(rows) do if row.Refresh then row:Refresh() end end
+        for _, meta in ipairs(enabledRows) do ApplyEnabled(meta) end
     end
+
+    --- 滚动到指定 key 的设置行（scroll = AF.Widget.Scroll 容器，有 :ScrollTo）。
+    function obj:ScrollToRow(scroll, key)
+        local top = rowY[key]
+        if not top or not scroll then return false end
+        if scroll.ScrollTo then scroll:ScrollTo(math.max(top - 8, 0)) end
+        return true
+    end
+
+    --- 高亮指定 key 的设置行（主题色底纹，默认 1.5 秒后自动消退；重复调用重置计时）。
+    function obj:HighlightRow(key, duration)
+        local row = rowByKey[key]
+        if not row then return false end
+        if not row._afHighlight then
+            local hl = AF.Fill(row, AF.ColorTable("accent"), "BACKGROUND", 0)
+            hl:SetAllPoints()
+            hl:SetAlpha(0.12)
+            row._afHighlight = hl
+        end
+        local hl = row._afHighlight
+        row._afHlToken = (row._afHlToken or 0) + 1
+        local token = row._afHlToken
+        hl:Show()
+        C_Timer.After(duration or 1.5, function()
+            if row._afHlToken == token then hl:Hide() end
+        end)
+        return true
+    end
+
+    obj:Refresh()
     return obj
 end

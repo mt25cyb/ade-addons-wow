@@ -2,7 +2,7 @@
 ## Title: ade_AddonFramework
 ## Notes: ADE v6 控件库 / 样式库 / 公共函数库（MiliUI 元素风格基线）
 ## Author: ADE
-## Version: v6-r001-b008
+## Version: v6-r001-b010
 ## Category: Libraries
 ## IconTexture: Interface\AddOns\ade_AddonFramework\assets\ade_128
 ## X-Localizations: enUS, zhCN, zhTW
@@ -52,6 +52,7 @@ Template/Form.lua
 Template/List.lua
 Template/Reorder.lua
 Template/TabbedFrame.lua
+Template/PreviewPanel.lua
 Template/AboutPage.lua
 Template/ProfileDB.lua
 Template/ProfilePage.lua
