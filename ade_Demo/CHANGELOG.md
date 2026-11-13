@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v6-r001-b010 - 2026-11-14
+
+**跟进框架 b010 预览组件化：预览区从 `opts.preview` 迁移为独立组件 `AF.Template.PreviewPanel`（`AttachTo` 主窗 + `BindButton` 开关；单布局开关放标题栏 `AddRightButton`、多布局放侧栏页脚 `AddSidebarFooterButton`）；新增页切换联动演示（`onPageChanged` → 预览区显示当前页名，三语新增 `DEMO_PREVIEW_PAGE`）。**
+
+## v6-r001-b009 - 2026-11-14
+
+**跟进框架 b009 布局调整（ADE-v6-FrameDesign）：页签「配置/設定檔」统一更名「配置管理」；新增预览面板演示（窗口左侧独立面板、「打开预览」按钮开关）与多布局左栏页脚示例开关。**
+
 ## v6-r001-b008 - 2026-11-14
 
 **实机反馈修复（七）：多行编辑框未达滑块最小高度时滚动条仍显示的修复（库层）。**

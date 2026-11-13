@@ -2,7 +2,7 @@
 
 `ade_AddonFramework` 的控件画廊与功能自测插件，`## Dependencies: ade_AddonFramework`（验证独立形态）。
 
-- 版本：`v6-r001-b008`
+- 版本：`v6-r001-b010`
 - 客户端：12.1.5（`## Interface: 120105`）
 - 存档：`ade_DemoDB`，统一 `settings.*`，颜色 `{red,green,blue}`
 - 本地化：enUS / zhCN / zhTW

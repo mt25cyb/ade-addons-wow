@@ -2,7 +2,7 @@
 ## Title: ade_Demo
 ## Notes: ade_AddonFramework 控件画廊与功能自测
 ## Author: ADE
-## Version: v6-r001-b008
+## Version: v6-r001-b010
 ## Dependencies: ade_AddonFramework
 ## SavedVariables: ade_DemoDB
 ## IconTexture: Interface\AddOns\ade_Demo\assets\ade_128

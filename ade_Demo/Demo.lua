@@ -303,6 +303,39 @@ local function Open(layout)
         title = L["DEMO_TITLE"], layout = layoutMode,
         icon = "Interface\\AddOns\\ade_Demo\\assets\\ade_128.tga",
     })
+    -- b010：预览区迁移为独立组件（Template/PreviewPanel），双布局只留开关位——
+    -- 单布局开关放标题栏（AddRightButton），多布局放左栏页脚（AddSidebarFooterButton）。
+    local previewPageText
+    local preview = AF.Template.PreviewPanel.New({
+        width = 340,
+        build = function(content)
+            local title = AF.Widget.Text.SectionTitle(content, L["DEMO_PREVIEW_TITLE"], 300)
+            title:SetPoint("TOPLEFT", 0, 0)
+            local tile = AF.Widget.Preview.CreateTile(content, { width = 160, height = 40, text = "P" })
+            tile:SetPoint("TOPLEFT", 0, -40)
+            local desc = AF.Widget.Text.Desc(content, L["DEMO_PREVIEW_NOTE"], 300)
+            desc:SetPoint("TOPLEFT", 0, -96)
+            previewPageText = AF.Widget.Text.Desc(content, "", 300)
+            previewPageText:SetPoint("TOPLEFT", 0, -160)
+        end,
+    })
+    preview:AttachTo(frame)
+    frame.previewPanel = preview
+    local pb
+    if layoutMode == "single" then
+        pb = AF.Widget.Button.Create(frame.titleBar, { text = AF.L["AF_PREVIEW_OPEN"], width = 88, height = 20 })
+        AF.Widget.Button.FitButton(pb, 72, 20)
+        frame.titleBar:AddRightButton(pb, 20)
+    else
+        pb = frame:AddSidebarFooterButton(AF.L["AF_PREVIEW_OPEN"])
+    end
+    preview:BindButton(pb)
+    -- 页切换联动演示（TabbedFrame onPageChanged）：预览区显示当前页名
+    frame:SetOnPageChanged(function(id, page)
+        if previewPageText then
+            previewPageText:SetText(L["DEMO_PREVIEW_PAGE"]:format(page and page.label or tostring(id)))
+        end
+    end)
     frame:AddPage("basic", L["DEMO_TAB_BASIC"], BuildBasic)
     frame:AddPage("form", L["DEMO_TAB_FORM"], BuildForm)
     frame:AddPage("display", L["DEMO_TAB_DISPLAY"], BuildDisplay)
@@ -311,6 +344,12 @@ local function Open(layout)
     frame:AddPage("integration", L["DEMO_TAB_INTEGRATION"], BuildIntegration)
     frame:AddPage("profiles", L["DEMO_TAB_PROFILES"], BuildProfiles)
     frame:AddPage("about", L["DEMO_TAB_ABOUT"], BuildAbout)
+    -- 多布局页脚演示：复选框固定最底槽位（ADE-v6-FrameDesign 的「小地图图标」槽位）
+    if layoutMode == "multi" and frame.AddSidebarFooterCheckbox then
+        frame:AddSidebarFooterCheckbox(L["DEMO_FOOTER_SAMPLE"],
+            function() return Get("footerSample", false) end,
+            function(v) Set("footerSample", v and true or false) end)
+    end
     frame:Show()
 end
 
