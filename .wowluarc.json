@@ -5,6 +5,7 @@
     "wow-textures/**",
     "_backup/**",
     "_temp/**",
+    "_tools/**",
     ".git/**",
     ".codebuddy/**"
   ],

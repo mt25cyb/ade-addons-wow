@@ -62,8 +62,10 @@ logs/
 *.temp
 
 # 工作区辅助目录（与 dev 工作区约定一致，不属于发布内容）
+_docs/
 _backup/
 _temp/
+_tools/
 wow-textures
 wow-textures/*
 z-ref_*
