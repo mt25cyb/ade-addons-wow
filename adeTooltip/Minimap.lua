@@ -1,21 +1,20 @@
--- adeTooltip — 小地图按钮（PrimeTooltip Minimap.lua 规格复用，同 adeChatMod 适配）。
--- 差异（§八.6 用户确认）：只有左键（开关设置窗口）+ 圆周拖拽；不做右键预览/菜单。
+-- adeTooltip — 小地图按钮（复用 adeChatMod / PrimeTooltip 规格）。
+-- 左键/右键打开设置界面；图标取自 TOC 元数据，缺省回退暴雪内置纹理。
 local ADT = _G.adeTooltip
 if not ADT then return end
-local AF = GetFramework("ade_AddonFramework", true)
+local AF = GetFramework("ade_AddonFramework", true, "adeTooltip")
 if not AF then return end
 local L = ADT.L or {}
 
--- math.atan2 在 12.1.5 有效：_1-2_Lua_API.md:69；LuaLS 按标准 Lua 5.4 误报弃用，保留兜底写法。
 ---@diagnostic disable-next-line: deprecated
 local atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
-local DEFAULT_ANGLE = ADT.DEFAULTS.state.minimapAngle
+local DEFAULT_ANGLE = ADT.DEFAULTS.settings.minimapAngle
 
+local ICON_FALLBACK = "Interface\\ChatFrame\\UI-ChatIcon-ArmoryChat"
 local BG = "Interface\\Minimap\\UI-Minimap-Background"
 local HIGHLIGHT = "Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
 local BORDER = "Interface\\Minimap\\MiniMap-TrackingBorder"
 
--- 按存档角度定位到小地图圆周。
 function ADT:ApplyMinimapPosition()
     local b = self.minimapButton
     if not b or not Minimap then return end
@@ -37,6 +36,7 @@ function ADT:SyncMinimapShown()
     end
 end
 
+-- 写存档并同步（链路：Checkbox onChange → SetMinimapShown → state → b:Hide）。
 function ADT:SetMinimapShown(shown)
     self:Set("minimapShown", shown and true or false)
     self:SyncMinimapShown()
@@ -47,7 +47,7 @@ function ADT:ToggleMinimap()
     local shown = not self:Get("minimapShown")
     self:SetMinimapShown(shown)
     self:Print(shown and (L.MSG_MINIMAP_SHOWN or "minimap button shown.")
-                      or (L.MSG_MINIMAP_HIDDEN or "minimap button hidden. Type /atip minimap to show it again."))
+                      or (L.MSG_MINIMAP_HIDDEN or "minimap button hidden. Type /adt minimap to show it again."))
 end
 
 function ADT:ResetMinimapPosition()
@@ -64,9 +64,8 @@ function ADT:CreateMinimapButton()
     b:SetFrameLevel((Minimap.GetFrameLevel and Minimap:GetFrameLevel() or 1) + 8)
     b:EnableMouse(true)
     b:RegisterForDrag("LeftButton")
-    b:RegisterForClicks("LeftButtonUp")
+    b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
-    -- 拖拽期间才挂 OnUpdate，结束时移除。
     local function Follow()
         local cx, cy = GetCursorPosition()
         local scale = UIParent and UIParent:GetEffectiveScale() or 1
@@ -79,8 +78,8 @@ function ADT:CreateMinimapButton()
     b:SetScript("OnDragStart", function(selfButton) selfButton:SetScript("OnUpdate", Follow); Follow() end)
     b:SetScript("OnDragStop", function(selfButton) Follow(); selfButton:SetScript("OnUpdate", nil) end)
 
-    -- 仅左键：开关设置窗口（§八.6；无右键行为）。
-    b:SetScript("OnClick", function()
+    -- 左键/右键均打开设置界面。
+    b:SetScript("OnClick", function(_, mouseButton)
         if GameTooltip and GameTooltip:GetOwner() == b then GameTooltip:Hide() end
         ADT:ToggleOptions()
     end)
@@ -91,8 +90,8 @@ function ADT:CreateMinimapButton()
         GameTooltip:ClearLines()
         local ar, ag, ab = AF.Color("accent")
         GameTooltip:AddLine(L.ADDON_TITLE or "adeTooltip", ar, ag, ab)
-        GameTooltip:AddLine(L.TT_LEFT or "Left-click: open settings", 1, 1, 1)
-        GameTooltip:AddLine(L.TT_DRAG or "Drag to reposition", 0.75, 0.75, 0.75)
+        GameTooltip:AddLine(L.TAB_SETTINGS or "Settings", 1, 1, 1)
+        GameTooltip:AddLine(L.TAB_MINIMAP or "Minimap", 1, 1, 1)
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", function() if GameTooltip then GameTooltip:Hide() end end)
@@ -101,7 +100,6 @@ function ADT:CreateMinimapButton()
     b.background:SetTexture(BG)
     b.background:SetSize(24, 24)
     b.background:SetPoint("CENTER")
-    -- 中心图标取自 TOC 的 ## IconTexture / ## IconAtlas（规划 §3.5：统一由 C_AddOns.GetAddOnMetadata 读取）
     local iconAtlas = C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(ADT.name, "IconAtlas")
     local iconTexture = C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(ADT.name, "IconTexture")
     b.icon = b:CreateTexture(nil, "ARTWORK")
@@ -110,8 +108,8 @@ function ADT:CreateMinimapButton()
     b.icon:SetTexCoord(0, 1, 0, 1)
     if iconAtlas then
         b.icon:SetAtlas(iconAtlas)
-    elseif iconTexture then
-        b.icon:SetTexture(iconTexture)
+    else
+        b.icon:SetTexture(iconTexture or ICON_FALLBACK)
     end
     b:SetHighlightTexture(HIGHLIGHT)
     b.border = b:CreateTexture(nil, "OVERLAY")

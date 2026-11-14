@@ -1,25 +1,20 @@
 ## Interface: 120105
 ## Title: adeTooltip
-## Notes: ADE v6 工具提示美化（MiliUI 蓝本 + Pretty 观感 + Prime 增量）
-## Author: ADE
-## Version: v6-r001-b001
+## Notes: 魔兽世界提示框增强（经典路线优先；预留新版排版接口）
+## Author: ade
+## Version: v6-r001-b009
 ## Dependencies: ade_AddonFramework
 ## SavedVariables: adeTooltipDB
-## Category: User Interface
-## IconTexture: Interface\AddOns\adeTooltip\assets\ade_128
-## X-Localizations: enUS, zhCN, zhTW
-## License: MIT
-## X-Credits: MiliUI_Tooltip（蓝本）; PrettyTooltip（新版观感/双修饰键/羊皮纸）; PrimeTooltip（增量）
+## DefaultState: enabled
+## LoadOnDemand: 0
 
-Locales/enUS.lua
-Locales/zhCN.lua
-Locales/zhTW.lua
+Libs\Secret.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Locales\enUS.lua
 InitDB.lua
 Core.lua
-Colors.lua
+Minimap.lua
+Options.lua
+PreviewSamples.lua
 Hooks.lua
-Modules/Minimap.lua
-Options/Options.lua
-Options/Pages.lua
-Options/PreviewSamples.lua
-Options/Blizzard.lua
