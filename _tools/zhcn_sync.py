@@ -81,9 +81,10 @@ ADDONS = {
         ("Altoholic/DataStore_Quests_zhCN.lua", "DataStore_Quests/Locales/zhCN.lua"),
         ("Altoholic/DataStore_Talents_zhCN.lua", "DataStore_Talents/Locales/zhCN.lua"),
     ],
-    # A-②：镜像已有 zhCN.lua（AceLocale-ish 覆盖层），整体覆盖
+    # A-②：镜像已有 zhCN.lua（覆盖层），整体覆盖
+    # （2.12.2 起 Localization/ 目录改名 Locales/，旧 Localization/zhCN.lua 落点作废）
     "Fitter": [
-        ("Fitter_zhCN.lua", "Fitter/Localization/zhCN.lua"),
+        ("Fitter_zhCN.lua", "Fitter/Locales/zhCN.lua"),
     ],
 }
 

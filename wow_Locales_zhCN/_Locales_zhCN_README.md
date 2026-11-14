@@ -168,15 +168,21 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 
 ### Fitter（A-②：覆盖层补齐 + 译名修正，2026-11-13）
 
-- 机制：`Localization/Localization.lua` 建 `ns.L`，`__index` 回退返回 key；`Localization/enUS.lua`
-  是**字符串清单表**（`local strings = {...}`，311 条，权威 key 清单），各语种文件按 key 覆盖。
-  TOC 已登记 `Localization\zhCN.lua`（清单无需改动）。
-- 原 zhCN 覆盖 251 条，缺 enUS 清单中的 60 条（头衔搜索框、活动宏/Fishing、12 个节日名、
-  角色导出字符串/宏、套装分享与预览四大整块）；本次补齐后 **311=311，0 缺失 / 0 多余 / 0 值相同**。
-- 译名修正：`座骑` → `坐骑`（官方用字，3 处）、favorite 系 → `最爱`（官方坐骑/宠物收藏用词）、
-  `Astral Recall` → `星界回溯`（萨满技能官方译名）。
-- 项目文件 `Fitter_zhCN.lua`（首行 `-- Fitter 2.12.1 · zhCN 本地化（基准 enUS 2.12.1）`）；
-  enUS 基准为清单型，`zhcn_diff_keys.py` 以 `enus_mode="list"` 登记。
+- 机制：`Locales/Localization.lua` 建 `ns.L`，`__index` 回退返回 key；`Locales/enUS.lua`
+  是**字符串清单表**（`local strings = {...}`，权威 key 清单），各语种文件按 key 覆盖。
+  TOC 已登记 `Locales\zhCN.lua`（清单无需改动）。
+- **2.12.2 重构（2026-11-14）**：上游把 `Localization/` 目录改名为 `Locales/`，zhCN 落点变为
+  `Locales\zhCN.lua`（sync 登记已跟着改）。对照 enUS 2.12.2 全量清单 **399 条**补齐 95 条
+  （条件系统/宏/角色导出/分享/后备坐骑/区域情境联动），删除 7 条失效 key（4 条为 2.12.1
+  提取器截断产生的「半截串」、3 条新版已改写），现 **399=399，0 缺失 / 0 多余 / 0 值相同**。
+- 译名修正：`座骑` → `坐骑`（官方用字）、favorite 系 → `最爱`、`Astral Recall` → `星界回溯`、
+  `Nazjatar` → `纳沙塔尔`（原「纳斯雅塔尔」有误，词典 confirmed）。
+- 新增专名核实：G-99 Breakneck → `G-99疾飙飞车`（游戏内官方译名）、Undermine → `安德麦`、
+  Zen Flight → `禅意飞行`（Wowhead CN spell=195197）。
+- 修饰键 `Alt`/`Ctrl`/`Shift` 保留英文同值（官方按键名不翻译）。
+- 格式约定：**每行一个 key**（`["key"] = "value",`），不合并多条到同一行。
+- enUS 基准为清单型，`zhcn_diff_keys.py` 以 `enus_mode="list"` 登记；
+  版本头 `-- Fitter 2.12.2 · zhCN 本地化（基准 enUS 2.12.2）`。
 - 节日名取官方日历用词：新年节 / 爱就在空中 / 贵族花园节 / 儿童周 / 仲夏火焰节 / 美酒节 /
   万圣节 / 亡者节 / 朝圣者的恩赐 / 冬幕节 / 暗月马戏团 / 魔兽世界周年庆。
 
@@ -251,6 +257,12 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
     少一个空格就永不命中；② 拼接串（`date(...)  ·  "recording paused"`、`"(blue) = within the Trail window: " .. 筛选名`）
     必须转 `PrefixRules` 而非写死整串；③ 调试用 `print` 串（`"  game list "`）不是 UI，别塞进字典。
     对策：写完字典后用「Lua 反转义 + 与源码字面量集合比对」的脚本兜底（本轮 98/98 命中）。
+16. **清单表提取器不能截取表体**。`zhcn_diff_keys.py` 的 `list` 模式最初用
+    `local strings = {...}(.*?)^}` 非贪婪截断——表内有行首 `}`（嵌套表/续行）时会提前结束，
+    后面几十条 key 整段漏提（Fitter 2.12.1 实测：实际 ~390 条只提取到 311，且抓到的部分含
+    「跨行拆开的半截串」）。对策：改为全文抓引号字面量 + 去注释行（不依赖行结构，同行多串
+    天然免疫）；**不要重排镜像里的原版 enUS 来"修复"**（镜像只读）。Fitter 2.12.2 升级时由
+    此补回 95 条、删 7 条半截串。
 
 ## 工作流程小结
 

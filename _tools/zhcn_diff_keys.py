@@ -54,8 +54,9 @@ ADDONS = {
         "zhcn": "TLDRMissions_zhCN.lua",
     },
     # enUS 是「字符串清单表」（local strings = {...}），覆盖层按 key 覆盖
+    # （2.12.2 起 Localization/ 目录改名 Locales/）
     "Fitter": {
-        "enus": "Fitter/Localization/enUS.lua",
+        "enus": "Fitter/Locales/enUS.lua",
         "zhcn": "Fitter_zhCN.lua",
         "enus_mode": "list",
     },
@@ -154,10 +155,13 @@ def extract_segment(text: str, locale: str, dotted: str | None) -> dict:
 
 
 def extract_string_list(text: str) -> dict:
-    """list 模式：取 `local strings = { ... }` 内全部字符串字面量作为 key（值记 None）。"""
-    m = re.search(r"local\s+\w+\s*=\s*\{(.*?)^\}", text, re.S | re.M)
-    body = m.group(1) if m else text
-    body = re.sub(r"^\s*--.*$", "", body, flags=re.M)
+    """list 模式：清单表内的全部字符串字面量作为 key（值记 None）。
+
+    不截取表体——直接全文抓取引号字面量（去掉注释行后）。早期版本用
+    `local strings = {...}(.*?)^}` 非贪婪截断到第一个行首 `}`，表内有
+    嵌套表/续行时提前结束，导致整段 key 漏提（Fitter 2.12.1 实测漏 ~90 条）。
+    行内多串不受影响（findall 不依赖行结构）。"""
+    body = re.sub(r"^\s*--.*$", "", text, flags=re.M)
     return {unescape(v): None for v in re.findall(r'"((?:[^"\\]|\\.)*)"', body)}
 
 
