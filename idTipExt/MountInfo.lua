@@ -25,26 +25,12 @@ local mountDataCache = {} -- [mountID] = { collected, source, lore }
 local COLOR_COLLECTED = { 0, 1, 0 }     -- 已收藏：绿色
 local COLOR_NOT_OWNED = { 1, 0.25, 0.25 } -- 未拥有：红色
 
-local function db()
-	return idTipExtDB
-end
+local db = ns.db
 
-local function prefixRGB()
-	return ns.prefixColor()
-end
+local prefixRGB = ns.prefixColor
 
--- 提示框已有该左列文本则不重复写入（postCall 可能同帧触发多次）
-local function hasLeftText(tooltip, name, text)
-	if not name or not text then return false end
-	for index = 1, tooltip:NumLines() do
-		local cell = _G[name .. "TextLeft" .. index]
-		if cell then
-			local ok, current = pcall(cell.GetText, cell)
-			if ok and not ns.isSecret(current) and current == text then return true end
-		end
-	end
-	return false
-end
+-- 提示框行文本查重统一走 Core 公共设施
+local hasLeftText = ns.hasTooltipText
 
 local function addLine(tooltip, name, text, r, g, b, wrap)
 	if not text or text == "" or hasLeftText(tooltip, name, text) then return end
@@ -154,12 +140,10 @@ local function process(tooltip, data, typeID, itemTypes)
 	if db().mountCollectedEnabled then
 		local status = info.collected and L.Collected or L.NotOwned
 		local color = info.collected and COLOR_COLLECTED or COLOR_NOT_OWNED
-		local hex = string.format("ff%02x%02x%02x",
-			math.floor(color[1] * 255 + 0.5), math.floor(color[2] * 255 + 0.5), math.floor(color[3] * 255 + 0.5))
 		if db().style == "single" then
 			-- 单段式整行只支持一个颜色，用色码单独给状态文本着色
 			addLine(tooltip, name,
-				L.CollectedPrefix .. " |c" .. hex .. status .. "|r", pr, pg, pb)
+				L.CollectedPrefix .. " " .. ns.colorize(status, color[1], color[2], color[3]), pr, pg, pb)
 		else
 			addDoubleLine(tooltip, name, L.CollectedPrefix, status,
 				pr, pg, pb, color[1], color[2], color[3])

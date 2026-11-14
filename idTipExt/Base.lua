@@ -10,6 +10,11 @@ local function add(tooltip, id, kind, opts)
 	return ns.add(tooltip, id, kind, opts)
 end
 
+-- 单值 ID setter 钩子：统一 SetX → add 的样板
+local function hookIdSetter(target, method, kind)
+	ns.hook(target, method, function(tooltip, id) add(tooltip, id, kind) end)
+end
+
 local function addItemInfo(tooltip, link)
 	return ns.addItemInfo(tooltip, link)
 end
@@ -120,7 +125,7 @@ if GetActionInfo then
 		local kind, id = GetActionInfo(slot)
 		if kind == "macro" then
 			-- 宏提示解析真实法术ID；12.x 的 GetMacroSpell 直接返回 spellID
-			-- （依据：Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_ActionBar/WoWLabs/ActionButtonOverrides.lua:115）
+			-- （依据：Gethe/wow-ui-source:Interface/AddOns/Blizzard_ActionBar/WoWLabs/ActionButtonOverrides.lua:115）
 			if id then
 				local spellID = GetMacroSpell and GetMacroSpell(id)
 				if type(spellID) == "number" then
@@ -153,22 +158,16 @@ if C_CurrencyInfo and C_CurrencyInfo.GetCurrencyListLink then
 end
 
 -- SetCurrencyToken 只覆盖代币界面，其他货币入口无脚本触发
-ns.hook(GameTooltip, "SetCurrencyByID", function(tooltip, id)
-	add(tooltip, id, "currency")
-end)
+hookIdSetter(GameTooltip, "SetCurrencyByID", "currency")
 
-ns.hook(GameTooltip, "SetCurrencyTokenByID", function(tooltip, id)
-	add(tooltip, id, "currency")
-end)
+hookIdSetter(GameTooltip, "SetCurrencyTokenByID", "currency")
 
 -- 法术：SetSpellByID / 法术书
-ns.hook(GameTooltip, "SetSpellByID", function(tooltip, id)
-	add(tooltip, id, "spell")
-end)
+hookIdSetter(GameTooltip, "SetSpellByID", "spell")
 
 -- 显示施法者：法术ID 的附属选项（unittokenEnabled，独立控制，不与法术ID 开关联动）
 -- 12.x 光环数据由 C_UnitAuras.GetAuraDataByIndex 返回，施法者字段为 auraData.sourceUnit
--- （依据：Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_FrameXMLUtil/AuraUtil.lua:129、Gethe/wow-ui-source:Interface/AddOns/Blizzard_UnitFrame/Shared/TargetFrameAuraContainer.lua:395）
+-- （依据：Gethe/wow-ui-source:Interface/AddOns/Blizzard_FrameXMLUtil/AuraUtil.lua:129、Gethe/wow-ui-source:Interface/AddOns/Blizzard_UnitFrame/Shared/TargetFrameAuraContainer.lua:395）
 if C_UnitAuras and C_UnitAuras.GetAuraDataByIndex then
 	local function addCaster(tooltip, unit, index, filter)
 		if not ns.isEnabled("unittoken") then return end
@@ -223,17 +222,11 @@ if SpellBook_GetSpellBookSlot then
 end
 
 -- 配方：结果物品带 Item 数据，法术只能从这里拿
-ns.hook(GameTooltip, "SetRecipeResultItem", function(tooltip, id)
-	add(tooltip, id, "spell")
-end)
+hookIdSetter(GameTooltip, "SetRecipeResultItem", "spell")
 
-ns.hook(GameTooltip, "SetRecipeRankInfo", function(tooltip, id)
-	add(tooltip, id, "spell")
-end)
+hookIdSetter(GameTooltip, "SetRecipeRankInfo", "spell")
 
-ns.hook(GameTooltip, "SetRecipeReagentItem", function(tooltip, id)
-	add(tooltip, id, "item")
-end)
+hookIdSetter(GameTooltip, "SetRecipeReagentItem", "item")
 
 -- 神器能量：无 TooltipDataType 覆盖，setter 是唯一来源；顺带取法术ID
 if C_ArtifactUI and C_ArtifactUI.GetPowerInfo then
@@ -245,18 +238,12 @@ if C_ArtifactUI and C_ArtifactUI.GetPowerInfo then
 end
 
 -- 天赋：正式服天赋是特质树（TalentDisplayMixin 覆盖），SetTalent/SetPvpTalent 仍存在
-ns.hook(GameTooltip, "SetTalent", function(tooltip, id)
-	add(tooltip, id, "talent")
-end)
+hookIdSetter(GameTooltip, "SetTalent", "talent")
 
-ns.hook(GameTooltip, "SetPvpTalent", function(tooltip, id)
-	add(tooltip, id, "talent")
-end)
+hookIdSetter(GameTooltip, "SetPvpTalent", "talent")
 
 -- 玩具 / 任务奖励物品（12.x 参数捕获修正）
-ns.hook(GameTooltip, "SetToyByItemID", function(tooltip, id)
-	add(tooltip, id, "item")
-end)
+hookIdSetter(GameTooltip, "SetToyByItemID", "item")
 
 if GetQuestItemLink then
 	ns.hook(GameTooltip, "SetQuestItem", function(tooltip, itemType, index)
@@ -365,7 +352,7 @@ if C_PetBattles then
 		if not (ns.isStringOrNumber(id) and ns.isEnabled("ability")) then return end
 		local description = PetBattlePrimaryAbilityTooltip and PetBattlePrimaryAbilityTooltip.Description
 		if not description then return end
-		description:SetText((description:GetText() or "") .. "\r\r" .. ns.kinds.ability .. "|cffffffff " .. id .. "|r")
+		description:SetText((description:GetText() or "") .. "\r\r" .. ns.kinds.ability .. ns.colorize(" " .. id, 1, 1, 1))
 	end
 
 	if C_PetBattles.GetAbilityInfo and C_PetBattles.GetActivePet then
@@ -490,9 +477,7 @@ local function hookAddonTooltip(tooltip)
 			if spellID and spellType ~= "FUTURESPELL" then add(tt, spellID, "spell") end
 		end
 	end)
-	ns.hook(tooltip, "SetSpellByID", function(tt, id)
-		add(tt, id, "spell")
-	end)
+	hookIdSetter(tooltip, "SetSpellByID", "spell")
 	ns.hookScript(tooltip, "OnTooltipSetItem", function(tip)
 		if tip.GetItem then addItemInfo(tip, select(2, tip:GetItem())) end
 	end)
@@ -530,7 +515,7 @@ end)
 
 ----------------------------------------------------------------------------
 -- 声望面板直显（12.x 新版滚动列表）
--- 挂载点依据：Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_UIPanels_Game/Mainline/ReputationFrame.lua:254
+-- 挂载点依据：Gethe/wow-ui-source:Interface/AddOns/Blizzard_UIPanels_Game/Mainline/ReputationFrame.lua:254
 -- ReputationEntryMixin:Initialize(elementData)，self.factionID = elementData.factionID
 -- 旧版 _G["ReputationBar"..i] 帧在 12.x 已不存在
 ----------------------------------------------------------------------------
@@ -601,6 +586,16 @@ local function createOverlayLabel(parent, anchorFrame, point, x, y)
 	return frame
 end
 
+-- 任务ID叠加：有效 ID 写入标签，否则隐藏
+local function updateQuestLabel(overlay, id)
+	if type(id) == "number" and id > 0 then
+		overlay.label:SetText("QuestID: " .. id)
+		overlay:Show()
+	else
+		overlay:Hide()
+	end
+end
+
 local function hookQuestOverlay()
 	-- 面板叠加走独立开关 questOverlay（默认关），不占用 quest 类型的提示框开关
 	if QuestMapFrame and QuestMapFrame.DetailsFrame and not detailLabelFrame then
@@ -610,12 +605,7 @@ local function hookQuestOverlay()
 				detailLabelFrame:Hide()
 				return
 			end
-			if type(questID) == "number" and questID > 0 then
-				detailLabelFrame.label:SetText("QuestID: " .. questID)
-				detailLabelFrame:Show()
-			else
-				detailLabelFrame:Hide()
-			end
+			updateQuestLabel(detailLabelFrame, questID)
 		end)
 	end
 
@@ -624,12 +614,7 @@ local function hookQuestOverlay()
 		ns.hookScript(QuestFrame, "OnShow", function()
 			if not questOverlayEnabled() or not GetQuestID then return end
 			local qid = GetQuestID()
-			if type(qid) == "number" and qid > 0 then
-				dialogLabelFrame.label:SetText("QuestID: " .. qid)
-				dialogLabelFrame:Show()
-			else
-				dialogLabelFrame:Hide()
-			end
+			updateQuestLabel(dialogLabelFrame, qid)
 		end)
 	end
 end

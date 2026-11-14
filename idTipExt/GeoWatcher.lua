@@ -22,11 +22,7 @@ local COLOR_SECRET = { 1, 0.5, 0 }     -- 橙色：secret 受限
 local COLOR_WARN = { 1, 1, 0 }         -- 黄色：副本内未检测
 local COLOR_ERROR = { 1, 0.3, 0.3 }    -- 红色：未检测
 
--- 0~1 RGB → 8 位 AARRGGBB 色码（FontString 单串混色用）
-local function rgbHex(r, g, b)
-	return string.format("ff%02x%02x%02x",
-		math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
-end
+-- 颜色/色码/存档访问统一由 Core.lua 的 ns.rgbHex / ns.colorizeRow / ns.db 提供
 
 -- 前向声明（互相引用的局部函数）
 local resizePanelToContent
@@ -34,9 +30,7 @@ local restartUpdateTimer
 local updateAll
 local updateMapInfoPanel
 
-local function db()
-	return idTipExtDB
-end
+local db = ns.db
 
 -- 面板消息（带插件名蓝色前缀）
 function ns.PrintPanelMsg(msg)
@@ -181,7 +175,7 @@ local function getCurrentZoneID()
 	return nil
 end
 
--- 世界地图当前显示的地图ID（依据：Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.lua:338 走 GetMapID）
+-- 世界地图当前显示的地图ID（依据：Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.lua:338 走 GetMapID）
 local function getCurrentWorldMapID()
 	if WorldMapFrame and WorldMapFrame.IsShown and WorldMapFrame:IsShown() and WorldMapFrame.GetMapID then
 		local ok, mapID = pcall(WorldMapFrame.GetMapID, WorldMapFrame)
@@ -219,7 +213,7 @@ local function formatMapName(name)
 	return utf8Prefix(name, TRUNCATE_CHARS) .. "..."
 end
 
--- 地图名称：C_Map.GetMapInfo 返回 UiMapDetails，name 字段（Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_PTRFeedback/Blizzard_PTRFeedback.lua:428）
+-- 地图名称：C_Map.GetMapInfo 返回 UiMapDetails，name 字段（Gethe/wow-ui-source:Interface/AddOns/Blizzard_PTRFeedback/Blizzard_PTRFeedback.lua:428）
 local function getMapName(mapID)
 	if not mapID or not (C_Map and C_Map.GetMapInfo) then return nil end
 	local ok, info = pcall(C_Map.GetMapInfo, mapID)
@@ -248,6 +242,21 @@ local FLAT_BACKDROP = {
 	insets = { left = 0, right = 0, top = 0, bottom = 0 },
 }
 
+-- 主面板与世界地图信息面板共用同一套扁平外观；hex 的 alpha 位忽略，透明度走独立滑条
+local function applyPanelBackdrop(frame)
+	local data = db()
+	local bg = ns.parseHexColor(data.gwBgColor or ns.DB_DEFAULTS.gwBgColor, 0, 0, 0)
+	local border = ns.parseHexColor(data.gwBorderColor or ns.DB_DEFAULTS.gwBorderColor, 0.4, 0.4, 0.4)
+	frame:SetBackdrop(FLAT_BACKDROP)
+	frame:SetBackdropColor(bg.r, bg.g, bg.b, data.gwBgAlpha or ns.DB_DEFAULTS.gwBgAlpha)
+	frame:SetBackdropBorderColor(border.r, border.g, border.b, data.gwBorderAlpha or ns.DB_DEFAULTS.gwBorderAlpha)
+end
+
+-- 两个面板的整体透明度统一 clamp 到 0.1 ~ 1.0
+local function panelAlpha()
+	return ns.clamp(db().gwAlpha or ns.DB_DEFAULTS.gwAlpha, 0.1, 1.0)
+end
+
 function resizePanelToContent()
 	if not panel then return end
 	local height = 0
@@ -270,12 +279,7 @@ end
 
 local function applyAppearance()
 	if not panel then return end
-	local data = db()
-
-	-- 透明度 clamp 到 0.1 ~ 1.0
-	local alpha = data.gwAlpha or ns.DB_DEFAULTS.gwAlpha
-	if math.clamp then alpha = math.clamp(alpha, 0.1, 1.0) end
-	panel:SetAlpha(alpha)
+	panel:SetAlpha(panelAlpha())
 
 	for _, key in ipairs(ROW_KEYS) do
 		if rows[key] then applyRowFont(rows[key]) end
@@ -284,15 +288,15 @@ local function applyAppearance()
 		dragHint:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
 	end
 
-	-- CreateColorFromHexString 只接受 8 位 AARRGGBB，异常值兜底避免中断外观刷新；
-	-- 透明度走独立滑条（原生色板写回会强制 alpha=ff，hex 的 alpha 位忽略）
-	local bg = CreateColorFromHexString(data.gwBgColor or ns.DB_DEFAULTS.gwBgColor) or CreateColor(0, 0, 0, 1)
-	local border = CreateColorFromHexString(data.gwBorderColor or ns.DB_DEFAULTS.gwBorderColor) or CreateColor(0.4, 0.4, 0.4, 1)
-	panel:SetBackdrop(FLAT_BACKDROP)
-	panel:SetBackdropColor(bg.r, bg.g, bg.b, data.gwBgAlpha or ns.DB_DEFAULTS.gwBgAlpha)
-	panel:SetBackdropBorderColor(border.r, border.g, border.b, data.gwBorderAlpha or ns.DB_DEFAULTS.gwBorderAlpha)
+	applyPanelBackdrop(panel)
 
 	resizePanelToContent()
+end
+
+-- 行宽跟随面板：没有宽度的行 Frame 会让右列字体串整体落到面板外
+local function anchorRowWidth(frame)
+	frame:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	frame:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 end
 
 local function ensureRow(key)
@@ -301,9 +305,7 @@ local function ensureRow(key)
 		local frame = CreateFrame("Frame", nil, panel)
 		frame:SetHeight((db().gwFontSize or ns.DB_DEFAULTS.gwFontSize) + 6)
 		frame:SetFrameLevel(panel:GetFrameLevel() + 2)
-		-- 行宽跟随面板：没有宽度的行 Frame 会让右列字体串整体落到面板外
-		frame:SetPoint("LEFT", panel, "LEFT", 0, 0)
-		frame:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+		anchorRowWidth(frame)
 
 		local prefix = frame:CreateFontString(nil, "OVERLAY")
 		prefix:SetPoint("LEFT", frame, "LEFT", 8, 0)
@@ -330,8 +332,7 @@ local function setRow(key, prefix, valueText, color)
 
 	if db().style == "single" then
 		-- 单段式：前缀与前缀色、值与值色（|c 色码混色，AddLine 单色做不到）
-		row.prefix:SetText("|c" .. rgbHex(pr, pg, pb) .. prefix .. "|r "
-			.. "|c" .. rgbHex(color[1], color[2], color[3]) .. valueText .. "|r")
+		row.prefix:SetText(ns.colorizeRow(prefix, valueText, pr, pg, pb, color[1], color[2], color[3]))
 		row.value:Hide()
 	else
 		row.prefix:SetTextColor(pr, pg, pb, 1)
@@ -354,8 +355,7 @@ local function relayoutRows()
 	for _, row in ipairs(visible) do
 		row.frame:ClearAllPoints()
 		-- ClearAllPoints 会清掉宽度锚点，每次重排都要重设
-		row.frame:SetPoint("LEFT", panel, "LEFT", 0, 0)
-		row.frame:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+		anchorRowWidth(row.frame)
 	end
 
 	if growUp() then
@@ -415,6 +415,12 @@ local function phaseDisplay()
 	return L.NotDetected, COLOR_ERROR
 end
 
+-- 同行地图行：有名称时「名称 (ID)」，否则仅 ID（地图信息面板的 separate 也退化为同行）
+local function inlineMapRow(id, idPrefix, namePrefix, name)
+	if name then return namePrefix, name .. " (" .. id .. ")" end
+	return idPrefix, tostring(id)
+end
+
 -- 统一构建行数据：面板与悬停详细提示共用，保证逐项开关与显示风格一致
 -- 每行 { key, prefix, value, color }；prefix 由调用处按名称模式决定
 local function buildRows()
@@ -436,11 +442,12 @@ local function buildRows()
 	local function pushMap(keyName, keyID, id, idPrefix, namePrefix)
 		if not id then return end
 		local name = mode ~= "none" and getMapName(id) or nil
-		if mode == "inline" and name then
-			push(keyID, namePrefix, name .. " (" .. id .. ")")
-		else
-			if mode == "separate" and name then push(keyName, namePrefix, name) end
+		if mode == "separate" and name then
+			push(keyName, namePrefix, name)
 			push(keyID, idPrefix, id)
+		else
+			local prefix, value = inlineMapRow(id, idPrefix, namePrefix, name)
+			push(keyID, prefix, value)
 		end
 	end
 
@@ -543,10 +550,15 @@ local function toggleLock()
 	ns.PrintPanelMsg(db().gwIsLocked and L.WindowLocked or L.WindowUnlocked)
 end
 
-local function toggleFrame()
-	db().gwShowPanel = not db().gwShowPanel
+-- 面板显隐命令共用：写存档、刷新可见性、打印消息
+local function setPanelShown(show)
+	db().gwShowPanel = show
 	updatePanelVisibility()
-	ns.PrintPanelMsg(db().gwShowPanel and L.WindowShown or L.WindowHidden)
+	ns.PrintPanelMsg(show and L.WindowShown or L.WindowHidden)
+end
+
+local function toggleFrame()
+	setPanelShown(not db().gwShowPanel)
 end
 
 ----------------------------------------------------------------------------
@@ -573,8 +585,8 @@ local function showDetailedTooltip(frame)
 	local pr, pg, pb = ns.prefixColor()
 	local function addRowLine(item)
 		if db().style == "single" then
-			GameTooltip:AddLine("|c" .. rgbHex(pr, pg, pb) .. item.prefix .. "|r "
-				.. "|c" .. rgbHex(item.color[1], item.color[2], item.color[3]) .. item.value .. "|r")
+			GameTooltip:AddLine(ns.colorizeRow(item.prefix, item.value, pr, pg, pb,
+				item.color[1], item.color[2], item.color[3]))
 		else
 			GameTooltip:AddDoubleLine(item.prefix, item.value, pr, pg, pb,
 				item.color[1], item.color[2], item.color[3])
@@ -693,7 +705,7 @@ end
 
 ----------------------------------------------------------------------------
 -- 世界地图信息面板（独立 frame，由 gwWorldMapPanel 单独管控，与 gwShowPanel 无关）
--- 锚点目标：WorldMapFrame.ScrollContainer（Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.xml:12）
+-- 锚点目标：WorldMapFrame.ScrollContainer（Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.xml:12）
 ----------------------------------------------------------------------------
 local mapInfoPanel
 local mapCells = {}
@@ -714,7 +726,7 @@ end
 local function createMapInfoPanel()
 	-- parent 用 UIParent + 手动显隐：WorldMapFrame 有 frameBuffer，子帧锚到 ScrollContainer 外可能被裁
 	mapInfoPanel = CreateFrame("Frame", "idTipExtMapInfoPanel", UIParent, "BackdropTemplate")
-	-- WorldMapFrame 的 strata 由 GameRule 动态设置（Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.lua:349-351），
+	-- WorldMapFrame 的 strata 由 GameRule 动态设置（Gethe/wow-ui-source:Interface/AddOns/Blizzard_WorldMap/Blizzard_WorldMap.lua:349-351），
 	-- 其 BorderFrame 固定 HIGH；信息面板用更高的固定层避免被地图边框盖住
 	mapInfoPanel:SetFrameStrata("FULLSCREEN_DIALOG")
 	mapInfoPanel:SetFrameLevel(100)
@@ -737,12 +749,8 @@ local function layoutMapInfoCells(wsWidth)
 	-- 三组宽度跟随地理监视面板设定值，且不超过面板三分之一避免重叠
 	local available = (wsWidth and wsWidth > 0) and wsWidth or (mapInfoPanel:GetWidth() or 0)
 	local cellWidth = math.min(db().gwPanelWidth or ns.DB_DEFAULTS.gwPanelWidth, math.max(available / 3, 80))
-	
-	local data = db()
-	local alpha = data.gwAlpha or ns.DB_DEFAULTS.gwAlpha
-	
 	mapInfoPanel:SetHeight(fontSize + 10)
-	mapInfoPanel:SetAlpha(alpha)
+	mapInfoPanel:SetAlpha(panelAlpha())
 	for _, key in ipairs(MAP_INFO_KEYS) do
 		local cell = mapCells[key]
 		cell.frame:SetSize(cellWidth, fontSize + 6)
@@ -769,15 +777,15 @@ local function mapInfoCellData(key)
 		local id = getCurrentMapID()
 		if not id then return nil end
 		local name = db().gwMapNameMode ~= "none" and getMapName(id) or nil
-		if name then return L.MapLabel, name .. " (" .. id .. ")", COLOR_VALUE end
-		return L.MapPrefix, tostring(id), COLOR_VALUE
+		local prefix, value = inlineMapRow(id, L.MapPrefix, L.MapLabel, name)
+		return prefix, value, COLOR_VALUE
 	elseif key == "worldmap" then
 		if not db().gwShowWorldMap then return nil end
 		local id = getCurrentWorldMapID()
 		if not id then return nil end
 		local name = db().gwMapNameMode ~= "none" and getMapName(id) or nil
-		if name then return L.WorldMapLabel, name .. " (" .. id .. ")", COLOR_VALUE end
-		return L.WorldMapPrefix, tostring(id), COLOR_VALUE
+		local prefix, value = inlineMapRow(id, L.WorldMapPrefix, L.WorldMapLabel, name)
+		return prefix, value, COLOR_VALUE
 	end
 end
 
@@ -793,12 +801,7 @@ function updateMapInfoPanel()
 	anchorMapInfoPanel(ws)
 	layoutMapInfoCells(ws:GetWidth())
 
-	-- 透明度走独立滑条，与主面板同规则
-	local bg = CreateColorFromHexString(db().gwBgColor or ns.DB_DEFAULTS.gwBgColor) or CreateColor(0, 0, 0, 1)
-	local border = CreateColorFromHexString(db().gwBorderColor or ns.DB_DEFAULTS.gwBorderColor) or CreateColor(0.4, 0.4, 0.4, 1)
-	mapInfoPanel:SetBackdrop(FLAT_BACKDROP)
-	mapInfoPanel:SetBackdropColor(bg.r, bg.g, bg.b, db().gwBgAlpha or ns.DB_DEFAULTS.gwBgAlpha)
-	mapInfoPanel:SetBackdropBorderColor(border.r, border.g, border.b, db().gwBorderAlpha or ns.DB_DEFAULTS.gwBorderAlpha)
+	applyPanelBackdrop(mapInfoPanel)
 
 	local pr, pg, pb = ns.prefixColor()
 	for _, key in ipairs(MAP_INFO_KEYS) do
@@ -809,8 +812,7 @@ function updateMapInfoPanel()
 		else
 			cell.frame:Show()
 			-- 固定单段式：前缀与前缀色、值与行值色分色（|c 色码，AddLine 单色做不到）
-			cell.prefix:SetText("|c" .. rgbHex(pr, pg, pb) .. prefix .. "|r "
-				.. "|c" .. rgbHex(color[1], color[2], color[3]) .. value .. "|r")
+			cell.prefix:SetText(ns.colorizeRow(prefix, value, pr, pg, pb, color[1], color[2], color[3]))
 		end
 	end
 	mapInfoPanel:Show()
@@ -930,16 +932,8 @@ end)
 
 ns.GeoCmd = {
 	Toggle = toggleFrame,
-	Show = function()
-		db().gwShowPanel = true
-		updatePanelVisibility()
-		ns.PrintPanelMsg(L.WindowShown)
-	end,
-	Hide = function()
-		db().gwShowPanel = false
-		updatePanelVisibility()
-		ns.PrintPanelMsg(L.WindowHidden)
-	end,
+	Show = function() setPanelShown(true) end,
+	Hide = function() setPanelShown(false) end,
 	Reset = resetPosition,
 	Clear = clearCache,
 	Hex = function() toggleFormat(true) end,

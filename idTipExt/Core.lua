@@ -142,16 +142,65 @@ local function addUnique(list, value)
 end
 ns.addUnique = addUnique
 
+----------------------------------------------------------------------------
+-- 公共设施：颜色 / 色码 / 存档 / tooltip 行（各模块共用，格式统一为 |c + 8 位 AARRGGBB + |r）
+----------------------------------------------------------------------------
+function ns.rgbHex(r, g, b)
+	return string.format("ff%02x%02x%02x",
+		math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
+end
+
+function ns.colorizeHex(text, hex)
+	return "|c" .. hex .. text .. "|r"
+end
+
+function ns.colorize(text, r, g, b)
+	return ns.colorizeHex(text, ns.rgbHex(r, g, b))
+end
+
+-- 单段式行：前缀与值各用一种色码（AddLine 只能整行一色）
+function ns.colorizeRow(prefix, value, pr, pg, pb, vr, vg, vb)
+	return ns.colorize(prefix, pr, pg, pb) .. " " .. ns.colorize(value, vr, vg, vb)
+end
+
+-- CreateColorFromHexString 只接受 8 位 AARRGGBB；异常值返回兜底色对象
+function ns.parseHexColor(hex, fr, fg, fb)
+	return CreateColorFromHexString(hex) or CreateColor(fr, fg, fb, 1)
+end
+
+-- 存档访问统一入口：函数体内延迟解引用，Core 加载时存档可能尚未注入
+function ns.db()
+	return idTipExtDB
+end
+
+-- 纯 Lua clamp，不依赖客户端是否提供 math.clamp
+function ns.clamp(value, lo, hi)
+	if value < lo then return lo end
+	if value > hi then return hi end
+	return value
+end
+
 local function getTooltipName(tooltip)
 	return tooltip:GetName()
 end
 
-local function cellText(name, side, index)
+function ns.tooltipCell(name, side, index)
 	local frame = _G[name .. "Text" .. side .. index]
-	local text = frame and frame:GetText()
+	if not frame then return nil end
+	local ok, text = pcall(frame.GetText, frame)
 	-- secret 单元格不可读而非致命
-	if isSecret(text) then return nil end
+	if not ok or isSecret(text) then return nil end
 	return text, frame
+end
+local cellText = ns.tooltipCell
+
+-- 提示框已有指定侧文本则不重复写入（postCall 可能同帧触发多次）
+function ns.hasTooltipText(tooltip, name, text, side)
+	if not name or not text then return false end
+	for index = 1, tooltip:NumLines() do
+		if ns.tooltipCell(name, side or "Left", index) == text then return true end
+	end
+	return false
 end
 
 local function inPetBattle()
@@ -173,7 +222,7 @@ local function shouldAdd(id, kind)
 end
 
 -- 职业色：UnitClass(unit) 的第二个返回值是 classFilename
--- （依据：Gethe/wow-ui-source:Gethe/wow-ui-source:Interface/AddOns/Blizzard_SharedXML/ColorUtil.lua:66-81；Warcraft Wiki: API C_ClassColor.GetClassColor）
+-- （依据：Gethe/wow-ui-source:Interface/AddOns/Blizzard_SharedXML/ColorUtil.lua:66-81；Warcraft Wiki: API C_ClassColor.GetClassColor）
 function ns.classColor(unit)
 	if not unit or not UnitClass then return end
 	local ok, _, classFilename = pcall(UnitClass, unit)
@@ -192,8 +241,7 @@ function ns.classColor(unit)
 	end
 	if not r then return end
 
-	local hex = string.format("ff%02x%02x%02x",
-		math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
+	local hex = ns.rgbHex(r, g, b)
 	return r, g, b, hex
 end
 
@@ -204,8 +252,7 @@ function ns.prefixColor(opts)
 		if r then return r, g, b end
 	end
 	-- CreateColorFromHexString 仅接受 8 位 AARRGGBB，异常值兜底白色
-	local color = CreateColorFromHexString(idTipExtDB.prefixColor or ns.DB_DEFAULTS.prefixColor)
-	if not color then return 1, 1, 1 end
+	local color = ns.parseHexColor(idTipExtDB.prefixColor or ns.DB_DEFAULTS.prefixColor, 1, 1, 1)
 	return color.r, color.g, color.b
 end
 
@@ -217,10 +264,8 @@ local function valueText(value, opts, style)
 		vr, vg, vb = opts.valueRGB[1], opts.valueRGB[2], opts.valueRGB[3]
 	end
 	if style == "single" then
-		local hex = opts and opts.valueColorStr
-			or string.format("ff%02x%02x%02x",
-				math.floor(vr * 255 + 0.5), math.floor(vg * 255 + 0.5), math.floor(vb * 255 + 0.5))
-		return "|c" .. hex .. value .. "|r", vr, vg, vb
+		local hex = (opts and opts.valueColorStr) or ns.rgbHex(vr, vg, vb)
+		return ns.colorizeHex(value, hex), vr, vg, vb
 	end
 	return value, vr, vg, vb
 end
