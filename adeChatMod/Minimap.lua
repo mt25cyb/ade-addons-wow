@@ -3,7 +3,7 @@
 -- 通用小地图图标规格见《_docs/plans/ADE-v6-settings-sys-dev-plan.md》§2.8；adeChatMod 适配见《_docs/plans/adeChatMod-dev-plan.md》§5。
 local ACM = _G.adeChatMod
 if not ACM then return end
-local AF = GetFramework("ade_AddonFramework", true)
+local AF = GetFramework("ade_AddonFramework", true, "adeChatMod")
 if not AF then return end
 local L = ACM.L or {}
 

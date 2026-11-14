@@ -8,7 +8,7 @@ local ACM = _G.adeChatMod or {}
 _G.adeChatMod = ACM
 ACM.name = addonName or "adeChatMod"
 ACM.version = "v6-r001-b013"
-ACM.AF = GetFramework("ade_AddonFramework", true)
+ACM.AF = GetFramework("ade_AddonFramework", true, "adeChatMod")
 if not ACM.AF then return end -- 库未加载（理论上 Dependencies 已保证）
 local AF = ACM.AF
 

@@ -6,7 +6,7 @@
 -- 不再需要自维护 accentRefreshers。
 local ACM = _G.adeChatMod
 if not ACM then return end
-local AF = GetFramework("ade_AddonFramework", true)
+local AF = GetFramework("ade_AddonFramework", true, "adeChatMod")
 if not AF then return end
 local L = ACM.L or {}
 
