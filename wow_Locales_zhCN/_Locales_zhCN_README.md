@@ -175,6 +175,8 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   `Locales\zhCN.lua`（sync 登记已跟着改）。对照 enUS 2.12.2 全量清单 **399 条**补齐 95 条
   （条件系统/宏/角色导出/分享/后备坐骑/区域情境联动），删除 7 条失效 key（4 条为 2.12.1
   提取器截断产生的「半截串」、3 条新版已改写），现 **399=399，0 缺失 / 0 多余 / 0 值相同**。
+- **2.12.3（2026-11-14）**：上游纯 bugfix，enUS key 集合不变（399=399 复核通过），
+  仅版本头 bump 与镜像同步。
 - 译名修正：`座骑` → `坐骑`（官方用字）、favorite 系 → `最爱`、`Astral Recall` → `星界回溯`、
   `Nazjatar` → `纳沙塔尔`（原「纳斯雅塔尔」有误，词典 confirmed）。
 - 新增专名核实：G-99 Breakneck → `G-99疾飙飞车`（游戏内官方译名）、Undermine → `安德麦`、
@@ -218,6 +220,11 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
    `zhcn_check_versions.py` 确认版本基线是否随之升高。
 2. **AceLocale 的 enUS 段不是完备基线**（VanasKoS）。AceLocale 对未注册 key 回退为 key 本身，
    zhCN 段里「enUS 没有」的 key 仍会被源码引用并显示中文，绝不可当废弃 key 删除（实测 34 个均在用）。
+   ⚠ 因此 `zhcn_diff_keys.py` 对 VanasKoS（SEGMENT 模式）报的 **「多余」不是死条目，是预期内的
+   正常状态**（VanasKoS 13 + Importer 5 + PvPDataGatherer 15 + Synchronizer 1 = 34 条），比对时只看
+   「缺失」。2026-11-14 曾误当死条目删除，后经源码调用点扫描证实 17 条有直接调用、其余为动态
+   拼接 key（`L[cmd]` / `L["by " .. x]`）无法静态排除，全部恢复——删任何「多余」key 前必须先
+   grep 源码调用点，SEGMENT 模式直接跳过多余项。
 3. **enUS 段的值可能是实际显示文本而非占位**（VanasKoS）。此时必须译「值」而非译 key；
    值内含 `|cFF..|r` 颜色代码时翻译必须保留色码结构。
 4. **缺失标记要连标记行一起删**。`--[[Translation missing --]]` + 被注释的空译文是作者的缺失标记，

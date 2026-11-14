@@ -1,4 +1,4 @@
--- Fitter 2.12.2 · zhCN 本地化（基准 enUS 2.12.2）
+-- Fitter 2.12.3 · zhCN 本地化（基准 enUS 2.12.3）
 -- A-② 类：镜像 Locales/zhCN.lua 整体覆盖同步；本文件为项目主档。
 -- 2026-11-13 2.12.2 重构版：上游 Localization/ 改名 Locales/，落点变为 Locales/zhCN.lua。
 --   ① 对照 enUS 2.12.2 权威清单（399 条）补齐 95 条：条件系统/宏/角色导出/分享/后备坐骑等；
