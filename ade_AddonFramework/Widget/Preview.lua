@@ -19,7 +19,7 @@ function W.CreateTile(parent, opts)
     tile.text:SetFontObject(AF.fontNormal)
     tile.text:SetPoint("CENTER", 0, 0)
     tile.text:SetText(opts.text or "")
-    tile:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    tile:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(tile, "accent")) end)
     tile:SetScript("OnLeave", function() skin:SetBorder(AF.C.EDGE) end)
     return tile
 end

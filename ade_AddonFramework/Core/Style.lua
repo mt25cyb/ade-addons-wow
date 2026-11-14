@@ -76,6 +76,8 @@ function AF.Stylize(frame, fill, border)
     function skin:SetShown(on) self.fill:SetShown(on); self.edges:SetShown(on) end
     function skin:Refresh() self.edges:Refresh() end
     frame._afSkin = skin
+    -- 主题归属：每个控件创建时从 parent 链记自己的主题；换色/定位时统一按归属主题取色（2026-11-14 用户定稿的根因修复）。
+    frame._afTheme = AF.ThemeOf(frame:GetParent()) or AF._activeTheme or AF._defaultTheme
     -- UI 缩放 / 祖先缩放改变后，1px 边会整条消失（Widgets.lua:117-143 实证）
     if frame.HookScript then frame:HookScript("OnShow", function() skin:Refresh() end) end
     return skin

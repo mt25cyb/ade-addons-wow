@@ -2,7 +2,7 @@
 
 ADE v6 的控件库 + 样式库 + 公共函数库。以 **MiliUI 自写库元素风格**为视觉基线，黑白灰固定、强调色只染「勾 / 滑块 / ▼ / 标题类 / hover 边框」；引入 ADE 的单选项页 720 / 多选项页 860 双布局（b009 起按 ADE-v6-FrameDesign：单布局页按钮在标题栏右侧、多布局左栏页脚区放复选框与「打开预览」；b010 起预览区为独立组件 `Template/PreviewPanel`，双布局只留开关位，另有 `onPageChanged` 页切换回调、`Form.enabled` 禁用态与 `ScrollToRow/HighlightRow` 行定位）与 `#EEE4AE` 可调主题色。零第三方依赖。
 
-- 版本：`v6-r001-b001`
+- 版本：`v6-r001-b016`
 - 客户端：12.1.5（`## Interface: 120105`）
 - 规划：`_docs/plans/ade_AddonFramework-dev-plan.md`
 - 演示插件：`../ade_Demo/`

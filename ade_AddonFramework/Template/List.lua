@@ -70,7 +70,7 @@ function W.Create(parent, opts)
         row.value = row:CreateFontString(nil, "OVERLAY")
         row.value:SetFontObject(AF.fontSmall)
         row.value:SetPoint("RIGHT", -6, 0)
-        row:HookScript("OnEnter", function() rs:SetBorder(AF.ColorTable("accent")) end)
+        row:HookScript("OnEnter", function() rs:SetBorder(AF.ThemeColorTable(row, "accent")) end)
         row:HookScript("OnLeave", function()
             if list.selected ~= row.index then rs:SetBorder(AF.C.EDGE) end
         end)
@@ -91,7 +91,7 @@ function W.Create(parent, opts)
             row.icon:SetShown(item.icon ~= nil)
             row.text:SetText(item.text or "")
             row.value:SetText(item.value and tostring(item.value) or "")
-            row.skin:SetBorder(self.selected == i and AF.ColorTable("accent") or AF.C.EDGE)
+            row.skin:SetBorder(self.selected == i and AF.ThemeColorTable(row, "accent") or AF.C.EDGE)
             row:SetScript("OnClick", function(_, button)
                 self.selected = i
                 self:Refresh()
@@ -116,9 +116,9 @@ function W.Create(parent, opts)
             for i, row in ipairs(pool) do
                 if i <= #list.items then
                     if row:IsMouseOver() then
-                        row.skin:SetBorder(AF.ColorTable("accent"))
+                        row.skin:SetBorder(AF.ThemeColorTable(row, "accent"))
                     else
-                        row.skin:SetBorder(list.selected == i and AF.ColorTable("accent") or AF.C.EDGE)
+                        row.skin:SetBorder(list.selected == i and AF.ThemeColorTable(row, "accent") or AF.C.EDGE)
                     end
                 end
             end

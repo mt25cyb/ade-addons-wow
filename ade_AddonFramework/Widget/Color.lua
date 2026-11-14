@@ -46,7 +46,7 @@ function W.Create(parent, opts)
         }
         ColorPickerFrame:SetupColorPickerAndShow(info)
     end)
-    b:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    b:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(b, "accent")) end)
     b:SetScript("OnLeave", function() skin:SetBorder(AF.C.EDGE) end)
     b:SetColor(b.color, true)
     return b

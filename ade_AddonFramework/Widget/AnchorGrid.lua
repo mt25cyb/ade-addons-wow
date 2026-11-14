@@ -48,14 +48,14 @@ function W.Create(parent, opts)
             grid:Refresh()
             if opts.onSelect then opts.onSelect(points[i]) end
         end)
-        b:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+        b:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(b, "accent")) end)
         b:SetScript("OnLeave", function() grid:Refresh() end)
         grid.cells[i] = b
     end
 
     function grid:Refresh()
         for i, b in ipairs(self.cells) do
-            b.skin:SetBorder(points[i] == self.value and AF.ColorTable("accent") or AF.C.EDGE)
+            b.skin:SetBorder(points[i] == self.value and AF.ThemeColorTable(b, "accent") or AF.C.EDGE)
         end
     end
     function grid:SetValue(v) self.value = v; self:Refresh() end

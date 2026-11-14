@@ -41,11 +41,11 @@ function W.Create(parent, opts)
         end
         -- 边框永远保持创建时的暗色，任何变体/hover 都不改（skin:SetBorder 只在创建时调用一次）
         if self.variant == "primary" then
-            skin:SetFill(hover and AF.ColorTable("accent") or AF.ColorTable("accentDim"))
+            skin:SetFill(hover and AF.ThemeColorTable(self, "accent") or AF.ThemeColorTable(self, "accentDim"))
             fs:SetTextColor(unpack(AF.C.TEXT_MAIN))
         elseif self.variant == "accent" then
             -- 静置淡强调色、hover 满强调色（MiliUI "accent" 变体：idle=accent×0.3、hover=accent×0.6）
-            skin:SetFill(hover and AF.ColorTable("accent") or AF.ColorTable("accentDim"))
+            skin:SetFill(hover and AF.ThemeColorTable(self, "accent") or AF.ThemeColorTable(self, "accentDim"))
             AF.Tint(fs, "accent")
         elseif self.variant == "red" then
             skin:SetFill(hover and { 0.6, 0.1, 0.1, 1 } or { 0.6, 0.1, 0.1, 0.6 })

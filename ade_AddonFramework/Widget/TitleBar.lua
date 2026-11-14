@@ -64,26 +64,39 @@ function W.Create(window, opts)
     function bar:SetTitle(text) title:SetText(text or "") end
 
     -- 标题栏右侧按钮区（ADE-v6-FrameDesign，2026-11-13：单布局页切换按钮移入标题栏）。
-    -- 按钮排在 X 关闭钮左侧的 26px 安全区以左；第一颗最靠左，后续按钮链式排其右侧，
-    -- 每加一颗整体随占宽左移，并同步收窄拖拽热区，避免拖拽盖住按钮。
+    -- 倒序锚定（2026-11-14 用户定稿）：以最右一颗的右缘为基准（距 X 关闭钮 26px 安全区），
+    -- 第一颗按钮向左让位——每加一颗，整体随总占宽左移；Visual 顺序 = AddPage 顺序，
+    -- 最后一颗永远紧贴 X 左侧，不会随页数增多溢出窗口右缘。
+    -- （旧实现只按第一颗自身宽度定位、后续链式向右排而不回移，按钮一多直接压出窗外。）
     bar.rightButtons = {}
-    local rightUsed = 0
-    function bar:AddRightButton(btn, height)
-        height = height or 20
-        local w = btn:GetWidth() or 88
-        rightUsed = rightUsed + w + 6
-        btn:SetParent(bar)
-        btn:SetSize(w, height)
-        if #bar.rightButtons == 0 then
-            btn:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -(rightUsed + 26), -4)
-        else
-            btn:SetPoint("TOPLEFT", bar.rightButtons[#bar.rightButtons], "TOPRIGHT", 6, 0)
+    local function RearrangeRightButtons()
+        local n = #bar.rightButtons
+        if n == 0 then return end
+        local offset, total = 26, 0
+        for i = 1, n do
+            local w = bar.rightButtons[i]:GetWidth() or 88
+            total = total + w + 6
+            if i > 1 then offset = offset + w + 6 end
         end
-        btn:SetFrameLevel(bar:GetFrameLevel() + 3)
-        bar.rightButtons[#bar.rightButtons + 1] = btn
+        local first = bar.rightButtons[1]
+        first:ClearAllPoints()
+        first:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -offset, -4)
+        for i = 2, n do
+            local b = bar.rightButtons[i]
+            b:ClearAllPoints()
+            b:SetPoint("TOPLEFT", bar.rightButtons[i - 1], "TOPRIGHT", 6, 0)
+        end
         drag:ClearAllPoints()
         drag:SetPoint("TOPLEFT", 0, 0)
-        drag:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -(rightUsed + 26), 0)
+        drag:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -(total + 26), 0)
+    end
+    function bar:AddRightButton(btn, height)
+        height = height or 20
+        btn:SetParent(bar)
+        btn:SetSize(btn:GetWidth() or 88, height)
+        btn:SetFrameLevel(bar:GetFrameLevel() + 3)
+        bar.rightButtons[#bar.rightButtons + 1] = btn
+        RearrangeRightButtons()
         return btn
     end
     return bar

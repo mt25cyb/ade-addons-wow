@@ -28,7 +28,7 @@ local function EnsureGhost()
     ghost:SetFrameStrata("TOOLTIP")
     local skin = AF.Stylize(ghost, { 0.2, 0.2, 0.2, 0.9 })
     AF.RegisterTheme(ghost, function() skin:SetBorder(AF.ColorTable("accent")) end)
-    skin:SetBorder(AF.ColorTable("accent"))
+    skin:SetBorder(AF.ThemeColorTable(board, "accent"))
     ghost:SetHeight(CHIP_H)
     ghost.text = ghost:CreateFontString(nil, "OVERLAY")
     ghost.text:SetFontObject(AF.fontSmall)
@@ -62,7 +62,7 @@ function W.Create(parent, opts)
     -- 落点示意符：一根随主题色的竖直细条，标出方块将要插入的位置（2026-11-14 用户要求）
     local dropMarker = board:CreateTexture(nil, "OVERLAY")
     dropMarker:SetTexture(AF.WHITE)
-    dropMarker:SetVertexColor(AF.Color("accent"))
+    dropMarker:SetVertexColor(AF.ThemeColor(board, "accent"))
     dropMarker:SetWidth(2)
     dropMarker:Hide()
     local dragState
@@ -288,7 +288,7 @@ function W.Create(parent, opts)
         g:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / s, y / s + 10)
         local rowIndex, anchorData = DropTarget(dragState.kind == "chip" and dragState.frame or nil)
         for _, strip in ipairs(board.strips) do
-            strip.skin:SetBorder(strip.rowIndex == rowIndex and AF.ColorTable("accent") or AF.C.EDGE)
+            strip.skin:SetBorder(strip.rowIndex == rowIndex and AF.ThemeColorTable(strip, "accent") or AF.C.EDGE)
         end
         -- 落点示意符：仅方块拖拽显示，插在锚点方块左侧（无锚点=插到行尾）
         dropMarker:Hide()

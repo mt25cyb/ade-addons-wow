@@ -62,7 +62,7 @@ function W.Create(parent, opts)
 
         row:SetScript("OnClick", function(_, button) if opts.onClick then opts.onClick(item, button, row) end end)
         row:SetScript("OnEnter", function()
-            skin:SetBorder(AF.ColorTable("accent"))
+            skin:SetBorder(AF.ThemeColorTable(row, "accent"))
             if item.tooltip then
                 GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
                 GameTooltip:SetText(item.tooltip, 1, 1, 1, 1, true)

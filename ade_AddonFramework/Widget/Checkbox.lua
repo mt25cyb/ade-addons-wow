@@ -37,7 +37,7 @@ function W.Create(parent, opts)
         Update(self)
         if opts.onChange then opts.onChange(self:GetChecked() and true or false) end
     end)
-    cb:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    cb:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(cb, "accent")) end)
     cb:SetScript("OnLeave", function() skin:SetBorder(AF.C.EDGE) end)
     -- 勾已由 AF.Tint 登记到弱表，主题变更时自动重刷，这里不需要额外订阅
     if opts.checked then cb:SetChecked(true) end

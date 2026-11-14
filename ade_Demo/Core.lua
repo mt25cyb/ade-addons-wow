@@ -2,7 +2,7 @@
 -- 库与宿主各自有独立的 ... 私有命名空间；库的公共接口一律通过 GetFramework() 取。
 local _, DEMO = ...
 
-local AF = GetFramework("ade_AddonFramework", true)
+local AF = GetFramework("ade_AddonFramework", true, "ade_Demo")
 if not AF then return end
 DEMO.AF = AF
 DEMO.L = setmetatable({}, { __index = function(_, key) return key end })

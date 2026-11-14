@@ -88,7 +88,7 @@ function W.Create(parent, opts)
         local m = EnsureMenu()
         if m.owner and m.owner ~= dd then m:Hide() end
         m.owner = dd
-        skin:SetBorder(AF.ColorTable("accent"))
+        skin:SetBorder(AF.ThemeColorTable(dd, "accent"))
         for i, item in ipairs(dd.items) do
             local row = AcquireRow(i)
             row.text:SetText(item.text or "")
@@ -116,7 +116,7 @@ function W.Create(parent, opts)
     dd:SetScript("OnClick", function()
         if EnsureMenu().owner == dd and menuFrame:IsShown() then menuFrame:Hide() else Open() end
     end)
-    dd:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    dd:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(dd, "accent")) end)
     dd:SetScript("OnLeave", function()
         if not (menuFrame and menuFrame:IsShown() and menuFrame.owner == dd) then
             skin:SetBorder(AF.C.EDGE)

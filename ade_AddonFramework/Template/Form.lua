@@ -177,7 +177,7 @@ function F.Build(parent, spec, ctx)
         local row = rowByKey[key]
         if not row then return false end
         if not row._afHighlight then
-            local hl = AF.Fill(row, AF.ColorTable("accent"), "BACKGROUND", 0)
+            local hl = AF.Fill(row, AF.ThemeColorTable(row, "accent"), "BACKGROUND", 0)
             hl:SetAllPoints()
             hl:SetAlpha(0.12)
             row._afHighlight = hl

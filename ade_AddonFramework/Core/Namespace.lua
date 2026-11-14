@@ -49,7 +49,10 @@ function _G.ResolveNamespace(major, minor)
 end
 
 --- 宿主取值：优先 LibStub 静默探测，否则用自带注册表。
-function _G.GetFramework(major, silent)
+-- 第三参数 addonName：传入则返回一个「按插件隔离」的主题门面（独立 accent 派生 + 着色登记，
+--   控件/模板创建时把该插件主题设为活动主题，控件内部 AF.Color/AF.Tint/AF.RegisterTheme 自动落入本主题，
+--   实现「每插件独立主题色」）；不传则返回裸库（共享全局默认主题，向后兼容旧调用）。
+function _G.GetFramework(major, silent, addonName)
     major = major or MAJOR
     local lib
     if _G.LibStub then
@@ -60,7 +63,13 @@ function _G.GetFramework(major, silent)
     if not lib and not silent then
         error("ade_AddonFramework: 库尚未加载", 2)
     end
-    return lib
+    if not lib then return nil end
+    if not addonName then return lib end
+    _G.AF_FACADES = _G.AF_FACADES or {}
+    if _G.AF_FACADES[addonName] then return _G.AF_FACADES[addonName] end
+    local F = (type(lib.MakeFacade) == "function" and lib:MakeFacade(addonName)) or lib
+    _G.AF_FACADES[addonName] = F
+    return F
 end
 
 local lib = _G.ResolveNamespace(MAJOR, MINOR)

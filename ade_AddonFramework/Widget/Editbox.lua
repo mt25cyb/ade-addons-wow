@@ -7,7 +7,7 @@ local W = {}
 AF.Widget.Editbox = W
 
 local function FocusBorder(target, skin)
-    target:SetScript("OnEditFocusGained", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    target:SetScript("OnEditFocusGained", function() skin:SetBorder(AF.ThemeColorTable(target, "accent")) end)
     target:SetScript("OnEditFocusLost", function() skin:SetBorder(AF.C.EDGE) end)
 end
 

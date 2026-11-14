@@ -37,7 +37,7 @@ function W.Create(parent, opts)
         Place(sw.on)
         if opts.onChange then opts.onChange(sw.on) end
     end)
-    sw:SetScript("OnEnter", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    sw:SetScript("OnEnter", function() skin:SetBorder(AF.ThemeColorTable(sw, "accent")) end)
     sw:SetScript("OnLeave", function() skin:SetBorder(AF.C.EDGE) end)
     function sw:SetChecked(on) sw.on = on and true or false; Place(sw.on) end
     function sw:GetChecked() return sw.on end

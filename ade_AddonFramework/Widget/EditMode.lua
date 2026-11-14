@@ -31,10 +31,11 @@ function W.Attach(frame, opts)
     overlay:SetFrameStrata("DIALOG")
     overlay:SetAllPoints(frame)
     overlay:EnableMouse(true)
+    overlay._afTheme = AF.ThemeOf(frame) or AF._activeTheme or AF._defaultTheme
     local fill = AF.Fill(overlay, { 0, 0, 0, 0.12 }, "BACKGROUND", 0)
-    fill:SetVertexColor(AF.Color("accent", 0.12))
+    fill:SetVertexColor(AF.ThemeColor(frame, "accent", 0.12))
     AF.Tint(fill, "accent", 0.12)
-    local skin = AF.Edges(overlay, AF.ColorTable("accent"), "OVERLAY")
+    local skin = AF.Edges(overlay, AF.ThemeColorTable(frame, "accent"), "OVERLAY")
     overlay.skin = skin
     if opts.label then
         local fs = overlay:CreateFontString(nil, "OVERLAY")

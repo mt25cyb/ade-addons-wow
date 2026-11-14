@@ -19,7 +19,7 @@ function W.Create(parent, opts)
     eb:SetAutoFocus(false)
     eb:SetTextInsets(2, 2, 0, 0)
     eb:SetScript("OnEscapePressed", function(self) self:SetText(""); self:ClearFocus() end)
-    eb:SetScript("OnEditFocusGained", function() skin:SetBorder(AF.ColorTable("accent")) end)
+    eb:SetScript("OnEditFocusGained", function() skin:SetBorder(AF.ThemeColorTable(eb, "accent")) end)
     eb:SetScript("OnEditFocusLost", function() skin:SetBorder(AF.C.EDGE) end)
 
     local placeholder = bar:CreateFontString(nil, "OVERLAY")

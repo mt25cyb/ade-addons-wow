@@ -44,6 +44,9 @@ function W.Create(opts)
     local skin = AF.Stylize(frame, AF.C.PANEL, AF.ColorTable("accent"))
     AF.RegisterTheme(frame, function() skin:SetBorder(AF.ColorTable("accent")) end)
     frame.skin = skin
+    -- 记录创建时的活动主题（来自插件门面）；后续 AddPage/ShowPage/页脚在门面包裹作用域之外被插件直接调用，
+    -- 重建控件时据此沿用本插件主题（否则落全局默认主题，导致标题栏页签按钮/侧栏页脚不跟色）。
+    frame._afTheme = AF._activeTheme
 
     frame.titleBar = AF.Widget.TitleBar.Create(frame, {
         title = opts.title or "ade_AddonFramework",
@@ -140,6 +143,7 @@ function W.Create(opts)
         else
             -- 单布局：页按钮入标题栏右侧（先加的保持最左，Visual 顺序 = AddPage 顺序）。
             -- FitButton 按译文撑宽：译文比基准宽的语系自动让位（Button.lua §十.2）。
+            -- 主题色随控件层级自动传递（Stylize 给每个控件记 parent 链主题），无需在此手动置活动主题。
             local b = AF.Widget.Button.Create(frame.titleBar, {
                 text = label, width = 88, height = 20,
                 onClick = function() self:ShowPage(id) end,
