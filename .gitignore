@@ -63,6 +63,7 @@ logs/
 
 # 工作区辅助目录（与 dev 工作区约定一致，不属于发布内容）
 _docs/
+_release_package/
 _backup/
 _temp/
 wow-textures
