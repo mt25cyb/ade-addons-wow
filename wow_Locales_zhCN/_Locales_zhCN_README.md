@@ -86,6 +86,22 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 
 ## 各插件本地化机制与处理记录
 
+### QuestPrism（A-①：全局共享表点号赋值，2026-11-15）
+
+- 机制：**非 AceLocale**。`Locales/enUS.lua` 建 `QuestPrism_L = {}` 全局共享表并直接
+  `L.KEY = "value"` 点号赋值；TOC 只登记 enUS，**无 GetLocale 分发**。
+- 落地：新建 `Locales/zhCN.lua`（GetLocale 守卫 + 同表覆盖，未覆盖 key 回退英文）+
+  TOC 在 enUS 之后登记一行（镜像写入例外）。enUS 之后加载是关键——若放前面会被
+  enUS 全量覆盖（同一张表）。
+- 特殊结构：`L.HELP_LINES = {...}`（表值）与 3 个 `BINDING_*` `_G` 全局赋值。
+  BINDING 保留插件名 `QuestPrism` 英文（值相同 2 条为刻意）。
+- 任务分类八类术语：战役 / 重要 / 传说 / 综合（Meta）/ 可重复 / 本地故事 / 活动（Events）/
+  低级任务（Trivial）+ 世界任务；指南（guide）支持 Zygor / RestedXP / BtWQuests。
+- 已完成文件：`QuestPrism_zhCN.lua`（143 键齐平 0 缺失 0 多余；源码调用点扫描 136 个
+  key 全部被 enUS 定义覆盖，无遗漏）。
+- 工具适配：`zhcn_diff_keys.py` 登记 `dotted: L\.\w+|BINDING_\w+`（点号型首个 BINDING
+  全局混合用例）；`L.HELP_LINES` 表值被 extract 的字符串值过滤跳过，两侧一致不影响齐平。
+
 ### ReputationGuide（A-②：已有 zhCN 但缺失 / 大量未译，全局变量赋值型）
 
 - 语言文件位置：`ReputationGuide/locales/`（小写 `locales/`；清单 `locales/locale.xml` 已含

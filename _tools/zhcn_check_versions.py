@@ -27,6 +27,7 @@ BASELINE_OVERRIDE = {
 
 # 插件名 -> 项目侧代表文件（用于读首行版本头）
 HEADER_FILES = {
+    "QuestPrism": "QuestPrism_zhCN.lua",
     "ReputationGuide": "ReputationGuide_zhCN.lua",
     "Krowi_AchievementFilter_Khamuls_ExpMetaAchievementFilter":
         "Krowi_AchievementFilter_Khamuls_ExpMetaAchievementFilter_zhCN.lua",

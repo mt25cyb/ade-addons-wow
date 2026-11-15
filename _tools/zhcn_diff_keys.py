@@ -60,6 +60,13 @@ ADDONS = {
         "zhcn": "Fitter_zhCN.lua",
         "enus_mode": "list",
     },
+    # QuestPrism_L 全局共享表 + 点号赋值（L.KEY = "value"）；BINDING_* 为 _G 全局。
+    # L.HELP_LINES 表值非字符串，extract 的值过滤会跳过，两侧一致不影响齐平。
+    "QuestPrism": {
+        "enus": "QuestPrism/Locales/enUS.lua",
+        "zhcn": "QuestPrism_zhCN.lua",
+        "dotted": r"L\.\w+|BINDING_\w+",
+    },
 }
 
 # Altoholic / DataStore 套件（AddonFactory:SetLocale 注册表型，L["KEY"] 方括号写法）。
