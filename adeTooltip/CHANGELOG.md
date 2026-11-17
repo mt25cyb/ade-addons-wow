@@ -1,5 +1,17 @@
 # adeTooltip 更新日志
 
-当前版本：**v6-r001-b009**（2026-11-14）
+当前版本：**v6-r001-b016**（2026-11-16）
 
+- v6-r001-b016 **改走参考源主力路径（Panel 重绘）**：按 v3 计划逐文件精工适配 MiliUI_Tooltip 的 Panel 主力路径，旧样式（panel=false）保留不动、零回归。新增 Panel 数据/视图层：`Panel/UnitInfo.lua`（GetPanelInfo + 观察装等/成就异步缓存 + CheckFilter/ModifierShowAll/FillMount）、`ViewUnit`（含阵营/龙浮水印）、`ReadSpell`/`ViewSpell`（法术四格 strip）、`ReadItem`/`ViewItem`（含套装/宝石/材料/比价）；移植媒体图标到 `adeTooltip/Media`。`Hooks.lua` 重写为参考源主力结构（TrackTip/Install + TooltipDataProcessor 注册 Unit/Item/Spell/UnitAura/Macro post-call + ApplyAll + OnFadeOut + ns.RefreshUnitTip），旧样式作为 panel 关/失败兜底。补 `ns.playerClass`、三语 `L["unknown"]` 及 Panel 标签键。全量 lint 零 ERROR。待实机验证单位/物品/法术 tooltip。
+- v6-r001-b015 **实机截图三项修复**：① 行2 裸数字泄漏——`ApplyPlayer` 的 gender 插入无开关守卫，UnitSex 明文数字（2/3）直接写进行2（截图实录「3」）；改为 `el.gender == true` 显式开启才显示（C1 未暴露该开关，对齐参考源默认），并经 `GetGender` 转文本。② `UnitSex` 映射纠正：返回 1=neuter/2=male/3=female，原 2/3 映射写反。③ 目标行重复——暴雪原生「目标:」行晚于 post-call 才填充，`Lines.Find` 复用机制扑空后 `AddLine` 追加，与原生行并存（截图实录两条目标行）；`UpdateTargetLine` 增加清扫，把非自己的「目标:」行清掉（秘密文本自动跳过）。
+
+- v6-r001-b014 **对照 MiliUI 补齐 C1 专精行机制与秘密值串接**：新增 `GetOriginalSpecLine`/`HideOriginalSpecLine`（第一轮 post-call 抓出暴雪原生「專精 職業」行当 className 用并清掉该行，relayout 吃第一轮快照，对照 MiliUI UnitLines.lua:145-180/221-238）；`UnitClass` 返回位修正（第 1 返回是本地化职业名，此前误取英文文件名导致专精行匹配永远落空；英文文件名另存 `data.class` 供上色，对照 MiliUI UnitInfo.lua:660）；`GetGuildInfo` 补取第 4 返回值 `guildRealm`（跨服公会，对照 MiliUI UnitInfo.lua:663）；`ApplyPlayer/ApplyNpc` 的 `table.concat` 全部替换为逐段 `format`+`pcall` 的安全串接（秘密字串喂进 C 函数会整列消失且不报错，对照 MiliUI UnitInfo.lua:924-954 玩家实录教训）。
+
+- v6-r001-b013 **Colors 崩溃修复**：`Colors.ReactionColor` 索引不存在的全局表 `UnitReactionColor`（12.x 无此 API）导致 `attempt to index global 'UnitReactionColor' (a nil value)`，NPC 单位悬停即报错。改用 `FACTION_BAR_COLORS[reaction]`（对照 MiliUI Core/Colors.lua:96），并对表本身加存在性守卫。
+
+- v6-r001-b012 **C1 行重写失效修复**：实机发现单位 tooltip 仍显示原生「等级/职业/阵营」行（设置里这些字段已关），根因是内容处理挂在 `HookScript("OnTooltipSetUnit")`——时机早于暴雪 ProcessInfo，写入的 `SetText` 被重置（只有 `AddLine` 的目标行存活）。改为官方 `TooltipDataProcessor.AddTooltipPostCall(T.Unit, OnUnit)` 入口（对照 MiliUI Core/Hooks.lua）；同时修正 `GetUnit` 返回位（unit token 是 pcall 第三返回而非第一）；`UnitLines.ApplyPlayer/ApplyNpc` 补回 `HideRange`/`Hide` 原生等级/阵营/PVP 行（对照 MiliUI UnitLines.lua:252-256,316-317）。
+
+- v6-r001-b011 **C1 加载崩溃修复**：11 个模块文件的 `ns` 误取 `...` 首参（插件名字符串），触发 `attempt to perform indexed assignment on local 'ns'`；统一改为 `_G.adeTooltip` 命名空间表。TOC 补齐 9 个未加载的 C1 核心文件（Skin / Bar / Colors / Media / Metro / P / UnitInfo / UnitLines / Target），并按 `Secret → Locales → InitDB → Core → P/Metro/Media → Colors → Skin → Bar → UnitInfo → UnitLines → Target → UI → Hooks` 依赖顺序排列。补上被 Skin/Bar 调用却未定义的 `ns.ReportError`；修正 `UnitInfo` 中 `Colors_LevelColor` 定义在调用点之后（Lua local 不提升）的 nil 隐患。
+
+- v6-r001-b010 **C1 单位经典路线 · 设置页与收尾**：新增「单位」设置页（`Options.BuildUnit`，仅暴露已接线开关：玩家/NPC 边框着色、背景着色与不透明度、死亡置灰、目标行/被关注、显示字段开关、血条外观与文字/位置/颜色/字号/战斗隐藏），并在选项窗口注册该页。修正 `statusbar.customColor` 改为 ADE 统一的 `{red,green,blue}` 格式（与框架 Color 控件一致），`Bar.ColorBar` 读取兼容两种格式；`EnsureProfile` 改为递归合并默认值，补齐旧配置档缺失的深层键（如 `unit.*.elements`）。
 - v6-r001-b009 **推倒重做 · C0 骨架（经典路线优先）**：按开发计划 v2 推倒重做，物理删除原目录、从零重建。路线改为「经典优先」——`useNewLayout` 默认 `false`（经典路线：原地修饰原生提示），新版排版降为后续 N 阶段并预留接口。C0 落地：TOC / Core / InitDB（双存档层 `profiles`+`state`）/ Locales（zhCN/zhTW/enUS）/ Minimap（修正「取消不立即隐藏」链路）/ Options（真实框架 `AF.Form.Build`+`TabbedFrame`，仅暴露已落地设置）/ PreviewSamples（修正旧版 `UnitAura` 第 3 返回位误取 spellId 的崩溃）/ Hooks（双闸门 `ShouldClassic`/`ShouldNewLayout` 分发骨架）/ Libs/Secret（移植 MiliUI 秘密值守卫，命脉）。C1–C7（经典路线各类型原地修饰）与 N 阶段（新版排版）待逐期实机落地。

@@ -7,7 +7,10 @@ local addonName = ...
 local ADT = _G.adeTooltip or {}
 _G.adeTooltip = ADT
 ADT.name = addonName or "adeTooltip"
-ADT.version = "v6-r001-b009"
+ADT.version = "v6-r001-b016"
+-- 玩家職業英文文件名（player token 不受 12.1 身分限制；Panel/Render.lua、Frame.lua、
+-- ViewSpell 的數字著色都讀它）。對照 MiliUI Core/Init.lua:18。
+ADT.playerClass = select(2, UnitClass("player"))
 ADT.AF = GetFramework("ade_AddonFramework", true, "adeTooltip")
 if not ADT.AF then return end -- 库未加载（理论上 Dependencies 已保证）
 local AF = ADT.AF
@@ -31,22 +34,18 @@ end
 ---------------------------------------------------------------------------
 -- 设置读写（支持 "table.key" 点号路径；状态键走 db.state，其余走当前配置档）
 ---------------------------------------------------------------------------
-local function SplitKey(key)
-    return key:match("^([^%.]+)%.(.+)$")
-end
-
 local function ReadPath(t, key)
     if type(t) ~= "table" then return nil end
-    local first, rest = SplitKey(key)
-    if rest then return t[first] and t[first][rest] end
+    local first, rest = key:match("^([^%.]+)%.(.+)$")
+    if first then return ReadPath(t[first], rest) end
     return t[key]
 end
 
 local function WritePath(t, key, value)
-    local first, rest = SplitKey(key)
-    if rest then
+    local first, rest = key:match("^([^%.]+)%.(.+)$")
+    if first then
         if type(t[first]) ~= "table" then t[first] = {} end
-        t[first][rest] = value
+        WritePath(t[first], rest, value)
     else
         t[key] = value
     end
@@ -85,20 +84,23 @@ end
 ---------------------------------------------------------------------------
 -- 默认值合并 + RANGES 限幅 + CHOICES 校验（对任意设置表执行；配置档切换/导入/重置复用）
 ---------------------------------------------------------------------------
-function ADT:EnsureProfile(tbl)
-    if type(tbl) ~= "table" then return end
-    for key, value in pairs(ADT.DEFAULTS.settings) do
+-- 递归合并默认值：缺失的嵌套键（如 unit.*.elements）也会被补齐，
+-- 仅填充缺失项、绝不删除用户已存值（修复旧配置档缺少深层默认键的问题）。
+local function MergeDefaults(tbl, defaults)
+    if type(tbl) ~= "table" or type(defaults) ~= "table" then return end
+    for key, value in pairs(defaults) do
         if type(value) == "table" then
             if type(tbl[key]) ~= "table" then tbl[key] = {} end
-            for subKey, subValue in pairs(value) do
-                if type(tbl[key][subKey]) ~= type(subValue) then
-                    tbl[key][subKey] = subValue
-                end
-            end
+            MergeDefaults(tbl[key], value)
         elseif type(tbl[key]) ~= type(value) then
             tbl[key] = value
         end
     end
+end
+
+function ADT:EnsureProfile(tbl)
+    if type(tbl) ~= "table" then return end
+    MergeDefaults(tbl, ADT.DEFAULTS.settings)
     for key, range in pairs(ADT.RANGES) do
         local v = ReadPath(tbl, key)
         if type(v) == "number" then WritePath(tbl, key, self.Clamp(v, range[1], range[2])) end
@@ -128,6 +130,7 @@ function ADT:InitDB()
         if type(db.state[key]) ~= type(value) then db.state[key] = value end
     end
     self.db = db
+    self.settings = self:CurrentSettings()
     self:EnsureProfile(self:CurrentSettings())
     self:ApplyAccent()
 
@@ -135,16 +138,19 @@ function ADT:InitDB()
         serialize = AF.DB.Encode,
         deserialize = AF.DB.Decode,
         onSwitch = function()
+            ADT.settings = ADT:CurrentSettings()
             ADT:EnsureProfile(ADT:CurrentSettings())
             ADT:ApplyAccent()
             ADT:ApplyAll()
         end,
         onReset = function()
+            ADT.settings = ADT:CurrentSettings()
             ADT:EnsureProfile(ADT:CurrentSettings())
             ADT:ApplyAccent()
             ADT:ApplyAll()
         end,
         onImport = function()
+            ADT.settings = ADT:CurrentSettings()
             ADT:EnsureProfile(ADT:CurrentSettings())
             ADT:ApplyAccent()
             ADT:ApplyAll()
@@ -187,6 +193,11 @@ function ADT:Print(msg)
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage(AF.AccentHex() .. "adeTooltip|r: " .. tostring(msg))
     end
+end
+
+-- Skin/Bar 的错误汇聚路径以点号调用（ns.ReportError(err)），故此处同样用点号定义。
+function ADT.ReportError(err)
+    ADT:Print("|cffff5555error:|r " .. tostring(err))
 end
 
 ---------------------------------------------------------------------------

@@ -62,6 +62,111 @@ function ADT:BuildMinimap(content)
     self.options.scroll:SetContentHeight(self.form.height)
 end
 
+local function Items(pairsList)
+    local t = {}
+    for _, kv in ipairs(pairsList) do
+        t[#t + 1] = { value = kv[1], text = kv[2] }
+    end
+    return t
+end
+
+-- C1 单位经典路线设置页：仅暴露已接线（wired）的真实开关，不暴露未实现项。
+function ADT:BuildUnit(content)
+    local L = ADT.L
+    local function PlayerField(key, label)
+        return { type = "toggle", label = label, key = "unit.player.elements." .. key,
+            default = ADT:GetDefault("unit.player.elements." .. key), reset = "changed" }
+    end
+    local function NpcField(key, label)
+        return { type = "toggle", label = label, key = "unit.npc.elements." .. key,
+            default = ADT:GetDefault("unit.npc.elements." .. key), reset = "changed" }
+    end
+
+    local borderItems = Items({ { "class", L.VAL_CLASS }, { "reaction", L.VAL_REACTION }, { "default", L.VAL_DEFAULT } })
+    local bgItems = Items({ { "default", L.VAL_DEFAULT }, { "class", L.VAL_CLASS }, { "reaction", L.VAL_REACTION } })
+    local sbColorItems = Items({ { "auto", L.VAL_AUTO }, { "custom", L.VAL_CUSTOM } })
+    local sbPosItems = Items({ { "bottom", L.VAL_BOTTOM }, { "top", L.VAL_TOP } })
+    local sbTextItems = Items({ { "percent", L.VAL_PERCENT }, { "healthmax", L.VAL_HEALTHMAX }, { "healthmaxpercent", L.VAL_HEALTHMAXPERCENT }, { "none", L.VAL_NONE } })
+
+    local spec = {
+        { type = "header", label = L.HEADING_UNIT_PLAYER },
+        { type = "dropdown", label = L.LABEL_COLORED_BORDER, key = "unit.player.coloredBorder", items = borderItems,
+            default = ADT:GetDefault("unit.player.coloredBorder"), reset = "changed" },
+        { type = "dropdown", label = L.LABEL_BG_COLORFUNC, key = "unit.player.background.colorfunc", items = bgItems,
+            default = ADT:GetDefault("unit.player.background.colorfunc"), reset = "changed" },
+        { type = "slider", label = L.LABEL_BG_ALPHA, key = "unit.player.background.alpha", min = 0, max = 1, step = 0.05, suffix = "value",
+            default = ADT:GetDefault("unit.player.background.alpha"), reset = "changed",
+            enabled = function() return ADT:Get("unit.player.background.colorfunc") ~= "default" end },
+        { type = "toggle", label = L.LABEL_GRAY_FOR_DEAD, key = "unit.player.grayForDead",
+            default = ADT:GetDefault("unit.player.grayForDead"), reset = "changed" },
+        { type = "toggle", label = L.LABEL_SHOW_TARGET, key = "unit.player.showTarget",
+            default = ADT:GetDefault("unit.player.showTarget"), reset = "changed" },
+        { type = "toggle", label = L.LABEL_SHOW_TARGETED_BY, key = "unit.player.showTargetBy",
+            default = ADT:GetDefault("unit.player.showTargetBy"), reset = "changed" },
+
+        { type = "header", label = L.HEADING_UNIT_FIELDS },
+        PlayerField("status", L.FIELD_STATUS),
+        PlayerField("title", L.FIELD_TITLE),
+        PlayerField("className", L.FIELD_CLASSNAME),
+        PlayerField("level", L.FIELD_LEVEL),
+        PlayerField("race", L.FIELD_RACE),
+        PlayerField("guild", L.FIELD_GUILD),
+
+        { type = "header", label = L.HEADING_UNIT_NPC },
+        { type = "dropdown", label = L.LABEL_COLORED_BORDER, key = "unit.npc.coloredBorder", items = borderItems,
+            default = ADT:GetDefault("unit.npc.coloredBorder"), reset = "changed" },
+        { type = "dropdown", label = L.LABEL_BG_COLORFUNC, key = "unit.npc.background.colorfunc", items = bgItems,
+            default = ADT:GetDefault("unit.npc.background.colorfunc"), reset = "changed" },
+        { type = "slider", label = L.LABEL_BG_ALPHA, key = "unit.npc.background.alpha", min = 0, max = 1, step = 0.05, suffix = "value",
+            default = ADT:GetDefault("unit.npc.background.alpha"), reset = "changed",
+            enabled = function() return ADT:Get("unit.npc.background.colorfunc") ~= "default" end },
+        { type = "toggle", label = L.LABEL_GRAY_FOR_DEAD, key = "unit.npc.grayForDead",
+            default = ADT:GetDefault("unit.npc.grayForDead"), reset = "changed" },
+        { type = "toggle", label = L.LABEL_SHOW_TARGET, key = "unit.npc.showTarget",
+            default = ADT:GetDefault("unit.npc.showTarget"), reset = "changed" },
+        { type = "toggle", label = L.LABEL_SHOW_TARGETED_BY, key = "unit.npc.showTargetBy",
+            default = ADT:GetDefault("unit.npc.showTargetBy"), reset = "changed" },
+
+        { type = "header", label = L.HEADING_UNIT_FIELDS },
+        NpcField("status", L.FIELD_STATUS),
+        NpcField("title", L.FIELD_TITLE),
+        NpcField("className", L.FIELD_CLASSNAME),
+        NpcField("level", L.FIELD_LEVEL),
+        NpcField("race", L.FIELD_RACE),
+        NpcField("guild", L.FIELD_GUILD),
+        NpcField("classColoredLevel", L.FIELD_CLASSCOLORED_LEVEL),
+        NpcField("factionBig", L.FIELD_FACTIONBIG),
+
+        { type = "header", label = L.HEADING_STATUSBAR },
+        { type = "toggle", label = L.LABEL_STATUSBAR, key = "statusbar.enable",
+            default = ADT:GetDefault("statusbar.enable"), reset = "changed" },
+        { type = "dropdown", label = L.LABEL_STATUSBAR_COLOR, key = "statusbar.color", items = sbColorItems,
+            default = ADT:GetDefault("statusbar.color"), reset = "changed" },
+        { type = "color", label = L.LABEL_STATUSBAR_CUSTOMCOLOR, key = "statusbar.customColor",
+            default = ADT:GetDefault("statusbar.customColor"), reset = "changed",
+            enabled = function() return ADT:Get("statusbar.color") == "custom" end },
+        { type = "slider", label = L.LABEL_STATUSBAR_HEIGHT, key = "statusbar.height", min = 1, max = 20, step = 1, suffix = "value",
+            default = ADT:GetDefault("statusbar.height"), reset = "changed" },
+        { type = "slider", label = L.LABEL_STATUSBAR_FONTSIZE, key = "statusbar.fontSize", min = 8, max = 16, step = 1, suffix = "value",
+            default = ADT:GetDefault("statusbar.fontSize"), reset = "changed" },
+        { type = "dropdown", label = L.LABEL_STATUSBAR_POS, key = "statusbar.position", items = sbPosItems,
+            default = ADT:GetDefault("statusbar.position"), reset = "changed" },
+        { type = "dropdown", label = L.LABEL_STATUSBAR_TEXT, key = "statusbar.textFormat", items = sbTextItems,
+            default = ADT:GetDefault("statusbar.textFormat"), reset = "changed" },
+        { type = "toggle", label = L.LABEL_STATUSBAR_HIDECOMBAT, key = "statusbar.hideInCombat",
+            default = ADT:GetDefault("statusbar.hideInCombat"), reset = "changed" },
+    }
+    self.form = AF.Form.Build(content, spec, {
+        get = function(key) return self:Get(key) end,
+        set = function(key, value)
+            self:Set(key, value)
+            self:ApplyAll()
+        end,
+        width = AF.LAYOUT.contentW,
+    })
+    self.options.scroll:SetContentHeight(self.form.height)
+end
+
 function ADT:BuildAbout(content)
     return AF.Template.AboutPage.Build(content, {
         L = L,
@@ -93,6 +198,7 @@ function ADT:CreateOptions()
     })
     self.options = frame
     frame:AddPage("settings", L.TAB_SETTINGS or "Settings", function(content) self:BuildSettings(content) end)
+    frame:AddPage("unit", L.TAB_UNIT or "Unit", function(content) self:BuildUnit(content) end)
     frame:AddPage("minimap", L.TAB_MINIMAP or "Minimap", function(content) self:BuildMinimap(content) end)
     frame:AddPage("preview", L.TAB_PREVIEW or "Preview", function(content) self:PreviewSamplesBuild(content) end)
     frame:AddPage("about", L.TAB_ABOUT or "About", function(content)
