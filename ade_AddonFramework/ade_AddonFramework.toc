@@ -1,7 +1,7 @@
 ## Interface: 120105
 ## Title: ade_AddonFramework
 ## Notes: ADE v6 控件库 / 样式库 / 公共函数库（MiliUI 元素风格基线）
-## Author: ADE
+## Author: ADE 阿德
 ## Version: v6-r001-b016
 ## Category: Libraries
 ## IconTexture: Interface\AddOns\ade_AddonFramework\assets\ade_128
