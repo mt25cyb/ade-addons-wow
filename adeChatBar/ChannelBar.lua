@@ -1,16 +1,16 @@
--- adeChatMod — 聊天频道快捷条（业务逻辑来自 ChannelBar，未改写行为）。
--- 相对原插件的改动：配置改由 ACM:Get 提供（只读代理，b013 起路由到当前配置档）、废弃 API 迁移、
--- 新增 ACM.RefreshBar / SetBarShown / ToggleBar 供设置界面与小地图按钮调用。
--- 见《_docs/plans/ADE-v6-settings-sys-dev-plan.md》§3.1（版本/InitDB 规范）；adeChatMod 专属见《_docs/plans/adeChatMod-dev-plan.md》§3（数据层）/ §5（小地图）。
-local ACM = _G.adeChatMod
-local addonName = ACM.name
+-- adeChatBar — 聊天频道快捷条（业务逻辑来自 ChannelBar，未改写行为）。
+-- 相对原插件的改动：配置改由 ACB:Get 提供（只读代理，b013 起路由到当前配置档）、废弃 API 迁移、
+-- 新增 ACB.RefreshBar / SetBarShown / ToggleBar 供设置界面与小地图按钮调用。
+-- 见《_docs/plans/ADE-v6-settings-sys-dev-plan.md》§3.1（版本/InitDB 规范）；adeChatBar 专属见《_docs/plans/adeChatBar-dev-plan.md》§3（数据层）/ §5（小地图）。
+local ACB = _G.adeChatBar
+local addonName = ACB.name
 
 local ChannelBar = CreateFrame("Frame", nil, UIParent)
 
--- 配置只读代理：业务代码保持 config.xxx 写法，实际读 ACM:Get（当前配置档；b013 路由）。
+-- 配置只读代理：业务代码保持 config.xxx 写法，实际读 ACB:Get（当前配置档；b013 路由）。
 local config = setmetatable({}, {
     __index = function(_, key)
-        return ACM.Get and ACM:Get(key) or nil
+        return ACB.Get and ACB:Get(key) or nil
     end,
 })
 
@@ -361,7 +361,7 @@ end
 
 -- 初始化.总入口：按依赖顺序执行 建查找表 → 建 UI → 定位
 function initManager:initializeAll()
-    if not ACM.db then ACM:InitDB() end
+    if not ACB.db then ACB:InitDB() end
     channelManager:initialize()
     self:initializeUI()
     self:initializePosition()
@@ -400,18 +400,18 @@ ChannelBar:SetScript("OnEvent", onEvent)
 ChannelBar:RegisterEvent("ADDON_LOADED")
 
 -- 设置界面统一应用入口（对应 PT:ApplyAll）
-function ACM:RefreshBar()
+function ACB:RefreshBar()
     uiManager:refreshButtons(ChannelBar)
     initManager:initializePosition()
 end
 
 -- 小地图按钮左键：显示/隐藏快捷条（显隐状态写入 settings.barShown，重载后保留）。
-function ACM:SetBarShown(shown)
-    ACM:Set("barShown", shown and true or false)
-    if ACM:Get("barShown") then ChannelBar:Show() else ChannelBar:Hide() end
+function ACB:SetBarShown(shown)
+    ACB:Set("barShown", shown and true or false)
+    if ACB:Get("barShown") then ChannelBar:Show() else ChannelBar:Hide() end
 end
 
-function ACM:ToggleBar()
-    ACM:SetBarShown(not ACM:Get("barShown"))
-    if ACM.RefreshOptions then ACM:RefreshOptions() end
+function ACB:ToggleBar()
+    ACB:SetBarShown(not ACB:Get("barShown"))
+    if ACB.RefreshOptions then ACB:RefreshOptions() end
 end

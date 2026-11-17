@@ -1,0 +1,21 @@
+## Interface: 120105
+## Title: adeChatBar
+## Notes: 聊天频道快捷条（设置界面基于 ade_BlizzOptionsFrame v6.5）
+## Author: ADE 阿德
+## Version: v6.5-r001
+## IconAtlas: communities-icon-chat
+## Dependencies: ade_BlizzOptionsFrame
+## SavedVariables: adeChatBarDB
+## Category: Chat
+## X-Localizations: enUS, zhCN, zhTW
+## License: MIT
+## X-Credits: ChannelBar by CHANGEEN (MIT); 设置窗口由 ade_BlizzOptionsFrame 提供
+
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+Core.lua
+InitDB.lua
+ChannelBar.lua
+Minimap.lua
+Options.lua
