@@ -1,5 +1,5 @@
 -- adeChatBar — 核心层：存档、设置数据、统一应用与 slash 入口。
--- 设置窗口基于 ade_BlizzOptionsFrame v6.5；零 ade_AddonFramework 依赖。
+-- 设置窗口基于 ade_UIKit v6.5；零 ade_AddonFramework 依赖。
 -- 主题色按既定口径硬编码 ADE #EEE4AE，不设颜色选项、配置档与关于页。
 local addonName = ...
 local ACB = _G.adeChatBar or {}

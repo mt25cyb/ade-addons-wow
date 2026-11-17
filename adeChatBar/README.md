@@ -1,10 +1,10 @@
 # adeChatBar
 
-聊天频道快捷条。由 `adeChatMod` 改造而来：**设置窗口改用 `ade_BlizzOptionsFrame`（ADE v6.5）原生 Tab/控件**，并**移除频道名缩写功能**。
+聊天频道快捷条。由 `adeChatMod` 改造而来：**设置窗口改用 `ade_UIKit`（ADE v6.5）原生 Tab/控件**，并**移除频道名缩写功能**。
 
 - 版本：`v6.5-r001`
 - 客户端：12.1.5（`## Interface: 120105`）
-- 依赖：`ade_BlizzOptionsFrame`（强依赖；零 `ade_AddonFramework` 依赖）
+- 依赖：`ade_UIKit`（强依赖；零 `ade_AddonFramework` 依赖）
 - 开发计划：[`_docs/plans/adeChatBar-dev-plan.md`](../_docs/plans/adeChatBar-dev-plan.md)
 
 ## 功能
@@ -16,7 +16,7 @@
 
 ## 设置界面
 
-基于 `ade_BlizzOptionsFrame` 的 `RegisterTab`，两个分组、五个分区：界面（外观 / 频道）、位置与小地图（位置 / 备用位置 / 小地图按钮）。按已确认口径**不提供配置档管理页、关于页与主题色选项**；主题色固定 ADE `#EEE4AE`。各分区支持「恢复默认」（逐分区 `resetSection`）。
+基于 `ade_UIKit` 的 `RegisterTab`，两个分组、五个分区：界面（外观 / 频道）、位置与小地图（位置 / 备用位置 / 小地图按钮）。按已确认口径**不提供配置档管理页、关于页与主题色选项**；主题色固定 ADE `#EEE4AE`。各分区支持「恢复默认」（逐分区 `resetSection`）。
 
 ## 命令
 

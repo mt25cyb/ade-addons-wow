@@ -1,4 +1,4 @@
--- adeChatBar — 设置窗口：基于 ade_BlizzOptionsFrame（v6.5）原生 Tab/elements。
+-- adeChatBar — 设置窗口：基于 ade_UIKit（v6.5）原生 Tab/elements。
 -- 按已确认口径裁剪：只保留设置页；不设配置档管理、关于页与主题色选项。
 -- 主题色走 ADE 固定色 #EEE4AE（ACB.ACCENT），不由本页修改。
 local ACB = _G.adeChatBar
@@ -7,9 +7,9 @@ local L = ACB.L or {}
 
 -- 库解析延迟到命令/构建时，避免加载顺序导致顶层 return 后连 slash 都没注册。
 local function GetOF()
-    local lib = GetBlizzOptionsFrame and GetBlizzOptionsFrame("ade_BlizzOptionsFrame", true)
+    local lib = GetBlizzOptionsFrame and GetBlizzOptionsFrame("ade_UIKit", true)
     if lib then return lib end
-    return BOF_LIBS and BOF_LIBS["ade_BlizzOptionsFrame"]
+    return BOF_LIBS and BOF_LIBS["ade_UIKit"]
 end
 
 local function CopyValue(v)
@@ -156,7 +156,7 @@ end
 function ACB:ToggleOptions()
     local registered = Build()
     if not registered then
-        self:Print("ade_BlizzOptionsFrame 未加载：请确认该插件已勾选。")
+        self:Print("ade_UIKit 未加载：请确认该插件已勾选。")
         return
     end
     registered:Toggle("appearance")
