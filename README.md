@@ -47,11 +47,13 @@
 
 | 插件 | 版本 | 说明 |
 |---|---|---|
-| [`adeChatMod`](adeChatMod/README.md) | `v6-r001-b013` | 聊天频道快捷条 + 频道名缩写 + 小地图按钮；设置界面强依赖 `ade_AddonFramework`（标题栏页按钮「设置/配置管理/关于」+ 配置档 ProfilePage，源自 PT 行为规格） |
+| [`adeChatBar`](adeChatBar/README.md) | `v6.5-r001` | 聊天频道快捷条（原 `adeChatMod` 去掉频道名缩写）；设置界面基于 `ade_UIKit` v6.5 |
 | [`ade_FontPack`](ade_FontPack/README.md) | `v6-r001-b001` | 共享字体库（LibSharedMedia-3.0，自有精选 + mMT/Blizzlike/ToriWhite/Visitor/Mono/ElvUI 六方来源；自带 LSM，独立运行） |
 | [`ade_MediaPack`](ade_MediaPack/README.md) | `v6-r001-b001` | 共享材质库（状态条/边框/背景/音效 + BigWigs/DBM 计时条皮肤；自带 LSM，独立运行） |
-| [`ade_AddonFramework`](ade_AddonFramework/README.md) | `v6-r001-b010` | 控件库 + 样式库 + 公共函数库（MiliUI 元素风格、收窄着色、双布局、双形态；规划见 [`ade_AddonFramework-dev-plan.md`](_docs/plans/ade_AddonFramework-dev-plan.md)） |
-| [`ade_Demo`](ade_Demo/README.md) | `v6-r001-b010` | `ade_AddonFramework` 八页控件画廊与功能自测（`## Dependencies`，三语本地化） |
+| [`ade_UIKit`](ade_UIKit/README.md) | `v6.5-r001-b014` | ADE 系列共享控件库 + 样式库 + 公共函数库（当前实现：从 KAF `Krowi_Options` 2.0 复刻的原生选项窗口，两栏 / 多插件 Tab / 原生控件 / 双层行池 / KAF 特色标记），零第三方与零 AF 依赖；唯一开发计划见 [`ade_UIKit-dev-plan.md`](_docs/plans/ade_UIKit-dev-plan.md) |
+| [`adeBlizzDemo`](adeBlizzDemo/README.md) | `v6.5-r001-b014` | `ade_UIKit` 控件画廊与功能自测（`/bofdemo`），双 Tab、双分组、真实键位绑定 |
+
+> v6 线的 `ade_AddonFramework`、`ade_Demo`、未完成开发的 `adeTooltip`，以及改造前的 `adeChatMod` 已移入 `_backup/`（2026-11-17），工作区不再保留原目录。
 
 ## 同步流程（手动）
 
