@@ -1,7 +1,7 @@
 ## Interface: 120105
 ## Title: adeChatMod
 ## Notes: 聊天频道快捷条 + 频道名缩写 + ADE 风格设置界面
-## Author: ADE
+## Author: ADE 阿德
 ## Version: v6-r001-b013
 ## IconAtlas: communities-icon-chat
 ## Dependencies: ade_AddonFramework

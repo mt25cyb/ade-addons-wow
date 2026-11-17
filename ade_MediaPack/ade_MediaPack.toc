@@ -2,7 +2,7 @@
 ## Title: |cff00AAFF[ADE]|r MediaPack
 ## Title-zhCN: |cff00AAFF[ADE]|r 媒体库
 ## Title-zhTW: |cff00AAFF[ADE]|r 媒體庫
-## Author: ADE
+## Author: ADE 阿德
 ## Version: v6-r001-b001
 ## Notes: Shared media library for the ADE suite. Bundles textures, sounds and borders, plus timer bar skins for BigWigs and DBM. Ships its own LSM copy and runs standalone. Fonts live in the separate ade_FontPack addon.
 ## Notes-zhCN: ADE 套件共享材质库，整合纹理、音效与边框，并附带 BigWigs 与 DBM 计时条皮肤；自带 LSM 副本，可独立运行；字体位于独立插件 ade_FontPack。

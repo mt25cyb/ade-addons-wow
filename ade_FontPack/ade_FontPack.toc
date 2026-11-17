@@ -2,7 +2,7 @@
 ## Title: |cff00AAFF[ADE]|r FontPack
 ## Title-zhCN: |cff00AAFF[ADE]|r 字体库
 ## Title-zhTW: |cff00AAFF[ADE]|r 字型庫
-## Author: ADE
+## Author: ADE 阿德
 ## Version: v6-r001-b001
 ## Notes: Font library for the ADE suite. Registers shared fonts into LibSharedMedia-3.0 (curated picks plus mMT / Blizzlike / ToriWhite / Visitor / Mono / ElvUI sources). Ships its own LSM copy and runs standalone.
 ## Notes-zhCN: ADE 套件共享字体库，向 LibSharedMedia-3.0 注册共享字体（自有精选 + mMT / Blizzlike / ToriWhite / Visitor / Mono / ElvUI 六方来源）；自带 LSM 副本，可独立运行。
