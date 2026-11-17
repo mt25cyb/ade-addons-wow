@@ -1,0 +1,13 @@
+## Interface: 120105
+## Title: MapPinEnhanced Fix - Tracker Position Patch
+## Title-zhCN: MapPinEnhanced 修复 - 追踪器位置补丁
+## Notes: Fixes the MapPinEnhanced tracker drifting after /reload by keeping an absolute UIParent-anchored snapshot and re-applying it after every restore path of MPE.
+## Notes-zhCN: 修复 MapPinEnhanced 追踪器重载后位置偏移：自持一份 UIParent 绝对锚点快照，在 MPE 每条还原路径之后强制回放。
+## Author: ADE 阿德
+## Version: 1.1.0
+## Category: Map
+## Dependencies: MapPinEnhanced
+## SavedVariables: MapPinEnhancedFixTrackerPatchDB
+
+Locales.lua
+Core.lua

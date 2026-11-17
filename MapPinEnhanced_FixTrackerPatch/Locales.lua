@@ -1,0 +1,62 @@
+-- MapPinEnhanced_FixTrackerPatch — 用户可见文本。
+-- enUS 为默认表，zhCN / zhTW 按 GetLocale() 覆盖。
+local _, ns = ...
+
+ns.L = {
+	enUS = {
+		addonTag = "MapPinEnhanced FixTrackerPatch",
+		resetDone = "Tracker position snapshot cleared. It will be re-captured the next time the tracker is shown (or when you drag it).",
+		usage = "Usage: /mpefixpos status | /mpefixpos reset",
+		unknown = "unknown",
+		found = "found",
+		missing = "NOT FOUND",
+		installed = "installed",
+		notInstalled = "NOT installed",
+		enforceOn = "enabled",
+		enforceOff = "DISABLED (repeated enforcement failed)",
+		snapshotNone = "none",
+		statusMpe = "MPE version: %s",
+		statusFrame = "Position frame: %s",
+		statusHooks = "SetPoint hook: %s | header hooks: %s | enforcement: %s (failures: %d)",
+		statusSnapshot = "Snapshot: %s",
+		statusDeviation = "Current deviation: %s",
+	},
+	zhCN = {
+		addonTag = "MapPinEnhanced FixTrackerPatch",
+		resetDone = "已清除追踪器位置快照，将在追踪器下次显示或拖动时重新捕获。",
+		usage = "用法：/mpefixpos status | /mpefixpos reset",
+		unknown = "未知",
+		found = "已找到",
+		missing = "未找到",
+		installed = "已安装",
+		notInstalled = "未安装",
+		enforceOn = "已启用",
+		enforceOff = "已停用（连续回放未收敛）",
+		snapshotNone = "无",
+		statusMpe = "MPE 版本：%s",
+		statusFrame = "位置宿主框：%s",
+		statusHooks = "SetPoint 钩子：%s | 头部钩子：%s | 位置回放：%s（失败次数：%d）",
+		statusSnapshot = "快照：%s",
+		statusDeviation = "当前偏差：%s",
+	},
+	zhTW = {
+		addonTag = "MapPinEnhanced FixTrackerPatch",
+		resetDone = "已清除追蹤器位置快照，將在追蹤器下次顯示或拖動時重新擷取。",
+		usage = "用法：/mpefixpos status | /mpefixpos reset",
+		unknown = "未知",
+		found = "已找到",
+		missing = "未找到",
+		installed = "已安裝",
+		notInstalled = "未安裝",
+		enforceOn = "已啟用",
+		enforceOff = "已停用（連續回放未收斂）",
+		snapshotNone = "無",
+		statusMpe = "MPE 版本：%s",
+		statusFrame = "位置宿主框：%s",
+		statusHooks = "SetPoint 鉤子：%s | 頭部鉤子：%s | 位置回放：%s（失敗次數：%d）",
+		statusSnapshot = "快照：%s",
+		statusDeviation = "當前偏差：%s",
+	},
+}
+
+ns.currentL = ns.L[GetLocale()] or ns.L.enUS
