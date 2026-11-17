@@ -1,10 +1,10 @@
--- ade_BlizzOptionsFrame 全控件画廊：/bofdemo
+-- ade_UIKit 全控件画廊：/bofdemo
 -- 库解析延迟到命令执行时：避免插件加载顺序导致顶层 return 后连斜杠命令都没注册。
 local function GetOF()
-    local lib = GetBlizzOptionsFrame and GetBlizzOptionsFrame("ade_BlizzOptionsFrame", true)
+    local lib = GetBlizzOptionsFrame and GetBlizzOptionsFrame("ade_UIKit", true)
     if lib then return lib end
     -- 库入口函数若因加载顺序尚未就绪，仍可从自带注册表取同一张表。
-    return BOF_LIBS and BOF_LIBS["ade_BlizzOptionsFrame"]
+    return BOF_LIBS and BOF_LIBS["ade_UIKit"]
 end
 
 local function Print(text)
@@ -269,7 +269,7 @@ end
 SLASH_ADEBLIZZDEMO1 = "/bofdemo"
 SlashCmdList.ADEBLIZZDEMO = function()
     if not GetOF() then
-        Print("ade_BlizzOptionsFrame 未加载：请确认该插件已勾选且客户端版本匹配。")
+        Print("ade_UIKit 未加载：请确认该插件已勾选且客户端版本匹配。")
         return
     end
     local registered = Build()

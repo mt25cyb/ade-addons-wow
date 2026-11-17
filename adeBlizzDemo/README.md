@@ -1,9 +1,9 @@
 # adeBlizzDemo
 
-`ade_BlizzOptionsFrame` v6.5 的控件演示插件。输入 `/bofdemo` 打开选项窗，两页分别展示基础控件与 KAF 式事件矩阵。
+`ade_UIKit` v6.5 的控件演示插件。输入 `/bofdemo` 打开选项窗，两页分别展示基础控件与 KAF 式事件矩阵。
 
 - 版本：`v6.5-r001-b014`
-- 依赖：`ade_BlizzOptionsFrame`
+- 依赖：`ade_UIKit`
 - 客户端：12.1.5
 
 演示内容（三页，覆盖 KAF 全部 14 种 Kind 与 6 种 option 类型）：

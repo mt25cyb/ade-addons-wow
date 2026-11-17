@@ -1,10 +1,12 @@
 ## Interface: 120105
-## Title: adeBlizzDemo
-## Notes: ade_BlizzOptionsFrame 全控件演示
+## Title: |cff00AAFF[ADE]|r BlizzDemo
+## Notes: ade_UIKit 全控件演示
 ## Author: ADE 阿德
 ## Version: v6.5-r001-b014
-## Dependencies: ade_BlizzOptionsFrame
+## Dependencies: ade_UIKit
 ## IconTexture: Interface\AddOns\adeBlizzDemo\assets\ade_128
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
 ## X-License: MIT
 
 InitDB.lua
