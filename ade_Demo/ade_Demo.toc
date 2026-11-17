@@ -1,7 +1,7 @@
 ## Interface: 120105
 ## Title: ade_Demo
 ## Notes: ade_AddonFramework 控件画廊与功能自测
-## Author: ADE
+## Author: ADE 阿德
 ## Version: v6-r001-b010
 ## Dependencies: ade_AddonFramework
 ## SavedVariables: ade_DemoDB
