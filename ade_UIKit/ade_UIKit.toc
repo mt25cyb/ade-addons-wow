@@ -1,0 +1,26 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r UIKit
+## Notes: ADE 系列插件共享控件库 + 样式库 + 公共函数库（原生选项窗口 / 两栏布局 / 多插件 Tab / 原生控件优先）
+## Author: ADE 阿德
+## Version: v6.5-r001-b014
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## IconTexture: Interface\AddOns\ade_UIKit\assets\ade_128
+## X-Localizations: enUS, zhCN, zhTW
+## X-License: MIT
+
+Core/Namespace.lua
+Core/Callbacks.lua
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+Core/Config.lua
+Core/API.lua
+Widget/Kinds.lua
+Widget/RowFrames.lua
+Widget/RowMixins.lua
+Widget/WindowFrame.lua
+Widget/WindowLayout.lua
+Widget/WindowMixin.lua
+Widget/Search.lua
+Widget/Tooltip.lua

@@ -1,0 +1,37 @@
+-- zhCN（库自身可见文本；缺译文时回显 key）
+local lib = ResolveBOFNamespace("ade_UIKit")
+if not lib then return end
+if GetLocale() ~= "zhCN" then return end
+lib.L = lib.L or setmetatable({}, { __index = function(_, key) return key end })
+local L = lib.L
+
+L["BOF_SETTINGS"] = "设置"
+L["BOF_CLOSE"] = "关闭"
+L["BOF_DEFAULTS"] = "恢复默认"
+L["BOF_YES"] = "是"
+L["BOF_CANCEL"] = "取消"
+L["BOF_RESET_CONFIRM"] = "将「%s」中的所有选项恢复为默认值？"
+L["BOF_CHANGED_COUNT"] = "已更改 %d 项"
+L["BOF_NEEDS_RELOAD"] = "需要重载界面"
+L["BOF_RELOAD_NOW"] = "立即重载"
+L["BOF_RESET_OPTION"] = "恢复此选项的默认值"
+L["BOF_SEARCH"] = "搜索"
+L["BOF_NO_RESULTS"] = "未找到结果。"
+L["BOF_ADD"] = "添加"
+L["BOF_REMOVE"] = "移除"
+L["BOF_MOVE_UP"] = "上移"
+L["BOF_MOVE_DOWN"] = "下移"
+L["BOF_UNDO"] = "撤销"
+L["BOF_NOT_BOUND"] = "未绑定"
+L["BOF_PRESS_A_KEY"] = "请按键"
+L["BOF_OVERVIEW"] = "概览"
+L["BOF_LIST_EMPTY"] = "暂无条目。"
+L["BOF_DETAILS"] = "详细说明"
+L["BOF_ALL"] = "全部"
+L["BOF_NONE"] = "无"
+L["BOF_SEARCH_RESULTS"] = "搜索结果"
+L["BOF_SEARCH_ALL"] = "搜索全部标签页"
+L["BOF_SEARCH_BROAD"] = "搜索描述"
+L["BOF_RESET_SECTION"] = "将「%s」的所有选项恢复默认值？"
+L["BOF_RELOAD_TEXT"] = "部分更改在重载后生效"
+L["BOF_DEFAULT"] = "默认值：%s"

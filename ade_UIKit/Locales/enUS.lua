@@ -1,0 +1,37 @@
+-- enUS（库自身可见文本；缺译文时回显 key）
+local lib = ResolveBOFNamespace("ade_UIKit")
+if not lib then return end
+if GetLocale() ~= "enUS" then return end
+lib.L = lib.L or setmetatable({}, { __index = function(_, key) return key end })
+local L = lib.L
+
+L["BOF_SETTINGS"] = "Settings"
+L["BOF_CLOSE"] = "Close"
+L["BOF_DEFAULTS"] = "Defaults"
+L["BOF_YES"] = "Yes"
+L["BOF_CANCEL"] = "Cancel"
+L["BOF_RESET_CONFIRM"] = "Set every option of %s back to its default?"
+L["BOF_CHANGED_COUNT"] = "%d changed"
+L["BOF_NEEDS_RELOAD"] = "Requires a reload"
+L["BOF_RELOAD_NOW"] = "Reload now"
+L["BOF_RESET_OPTION"] = "Reset this option"
+L["BOF_SEARCH"] = "Search"
+L["BOF_NO_RESULTS"] = "Nothing found."
+L["BOF_ADD"] = "Add"
+L["BOF_REMOVE"] = "Remove"
+L["BOF_MOVE_UP"] = "Move up"
+L["BOF_MOVE_DOWN"] = "Move down"
+L["BOF_UNDO"] = "Undo"
+L["BOF_NOT_BOUND"] = "Not bound"
+L["BOF_PRESS_A_KEY"] = "Press a key"
+L["BOF_OVERVIEW"] = "Overview"
+L["BOF_LIST_EMPTY"] = "No entries."
+L["BOF_DETAILS"] = "Details"
+L["BOF_ALL"] = "All"
+L["BOF_NONE"] = "None"
+L["BOF_SEARCH_RESULTS"] = "Search results"
+L["BOF_SEARCH_ALL"] = "Search all tabs"
+L["BOF_SEARCH_BROAD"] = "Search descriptions"
+L["BOF_RESET_SECTION"] = "Set every option of %s back to its default?"
+L["BOF_RELOAD_TEXT"] = "Some changes take effect after a reload"
+L["BOF_DEFAULT"] = "Default: %s"
