@@ -24,6 +24,12 @@ MIRROR_DIR = TOOLS_DIR.parent / "z-ref_retail_Interface_AddOns"
 # A 类通常为「项目文件 -> 插件内 zhCN 槽位」；B 类为「项目文件 -> 整体覆盖的插件原文件」。
 # 套件子目录（如 VanasKoS）的镜像侧结构必须与项目侧逐文件对应。
 ADDONS = {
+    "Prat-3.0": [
+        ("Prat-3.0_zhCN.lua", "Prat-3.0/locales/zhCN.lua"),
+    ],
+    "MapPinEnhanced": [
+        ("MapPinEnhanced_zhCN.lua", "MapPinEnhanced/locales/zhCN.lua"),
+    ],
     "QuestPrism": [
         ("QuestPrism_zhCN.lua", "QuestPrism/Locales/zhCN.lua"),
     ],
@@ -42,6 +48,9 @@ ADDONS = {
     ],
     "TLDRMissions": [
         ("TLDRMissions_zhCN.lua", "TLDRMissions/Locales/zhcn.lua"),  # 落点全小写，作者命名如此
+    ],
+    "CooldownManagerCentered": [
+        ("CooldownManagerCentered_zhCN.lua", "CooldownManagerCentered/locales/zhCN.lua"),
     ],
     "VanasKoS": [
         ("VanasKoS/VanasKoS_Locale.lua", "VanasKoS/VanasKoS_Locale.lua"),

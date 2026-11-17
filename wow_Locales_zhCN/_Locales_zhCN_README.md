@@ -86,6 +86,63 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 
 ## 各插件本地化机制与处理记录
 
+### MapPinEnhanced（A-②：Phanx 覆盖层补齐，2026-11-15）
+
+- 机制：**Phanx 方法**——`locales/locales.lua` 建 `MapPinEnhanced.L`（metatable 回退返回 key），
+  `_imports.xml` 先加载 enUS 全量默认，再按 `[TextLocale]` 加载覆盖文件；
+  `locales/zhCN.lua` 上游自带（38KB，机翻底子），有 GetLocale 守卫。
+- 落地：复制镜像 zhCN 为项目主档 `MapPinEnhanced_zhCN.lua`（加版本头）→ 补齐 19 条、
+  删除 4 条上游改名死条目（`Navigation.Minimap/WorldMap_*` → 4.0.2 改为
+  `Navigation.Lock_*` / `Navigation.RouteMaps_*`）→ **600=600，0 缺失 / 0 多余**。
+- 新增专名核实：`Shadowforge City` → `暗炉城`（中文维基）、`Xibala` → `希巴拉`、
+  `Zalamar` → `扎拉玛`（8.0 官方地图用字）；`The Masonary` → `石匠坊`（无官方流通译名，
+  黑石铸造厂分区，社区译法）；Mole Machine 条目值 = 纯地点名（沿用既有风格）。
+- 刻意保留（3 条）：`'%s - %s'`（占位格式）、`X` / `Y`（坐标轴）。
+  `Location Lexicon` → `地址簿`（MPE 自有词条、非暴雪术语，用户指定译名；无需词典入库）。
+- **官方术语对照修正（2026-11-15，用户确认）**：`Dungeon` → `地下城`（原「地牢」）、
+  `Raid` → `团队副本`（原「突袭」）、`Vignette` → `小场景`（原「缩略图」）、
+  `Whisper` → `密语`（原「低语/耳语」）、`Instance` → `副本`（原「实例」）、
+  `Hearthstone` → `炉石`（原「归家石/炉石传说」——**如有特地说明才译为「炉石传说」**）；
+  连带修正描述用词 3 处（`请输入城市、地下城…` 等）。六条已入 `wow_dict` term 分类。
+- **第二轮术语修正（2026-11-15，用户确认）**：`Track` 系 → `追踪`（本插件无音轨语境；
+  原「曲目/赛道/按订单查询/跟踪」均错，`Track by Order` 的 Order=顺序）、`Atlas` → `素材集`
+  （游戏素材集合）、`Name` → `名称`；导航方式 `Item=道具 / Flight Taxi=飞行管理员 /
+  Phase Change=相位传送 / Tram=矿道地铁`（连带 Tram 乘句式 4 条）。以上已追加进
+  `wow_dict` 术语规范与记忆。
+- **第三轮术语修正（2026-11-15，用户确认）**：Lexicon 地点搜索的 NPC 服务类型与专业词 19 条
+  （Bag Vendor=背包商人、Reagent Vendor=施法材料商、Class Trainer=职业训练师、Blacksmithing=锻造、
+  Enchanting=附魔、Tailoring=裁缝、Stable Master=兽栏管理员、Point of interest=兴趣点、Town=城镇、
+  Inn=旅店等，全表见 `wow_dict` term 分类 id 94212-94230 与记忆术语表）——原机翻
+  「包包摊主/班级培训师/迷人的/量身定制」等全部纠正。Spell/Walking/Flight 系/Portal/Walking 修正见上轮。
+  ⚠ 仍存明显机翻（用户未指示、暂保留）：`Ammunition Vendor=弹药供应商`、`Food Vendor=食品摊贩`、
+  `Weapon Vendor=武器商人`、`Riding=骑行`（官方技能名「骑术」）、部分条目的「引脚」（Pin 官方语境
+  更常用「图钉」）。
+- 尺寸档：Tiny → `特小号`（对齐既有 Small=小号 / Default=默认 / Large=大号）。
+- 已完成文件：`MapPinEnhanced_zhCN.lua`（同步至镜像 `locales/zhCN.lua`）。
+
+### Prat-3.0（A-②：PRAT_L 全局共享表补齐，2026-11-17）
+
+- 机制：与 QuestPrism 同族但已有社区覆盖层——`locales/enUS.lua` 建 `local L = {}` 并挂
+  `PRAT_L` 全局表，其余语言文件 GetLocale 守卫 + 同表覆盖，`locales/includes.xml` 分发。
+  上游 zhCN.lua 60.5KB（社区汉化底子），enUS 70.9KB。
+- 落地：复制镜像 zhCN 为主档 `Prat-3.0_zhCN.lua` → 补齐 **119 条**（ChatTabs 闪烁/高亮、
+  CopyChat 透明度、DebugModules、Filtering AI 反垃圾、Font/Frames 透明度、Highlight 公会/自己、
+  History 存储位置与回卷时长、LinkInfoIcons 链接信息、Mentions @提及、NewcomersChat 导师/新人、
+  PlayerNames 战网客户端图标、Search、ServerNames、SideTabs 侧边标签整块、Timestamps 日期格式）、
+  删除 1 条死条目（`AltNames/No arg string given to :addAlt()`——全源码无调用点）。
+- 现 **enUS 981 / zhCN 982，缺失 0**。多余 1 条 `Substitutions/current-prompt` 为**活翻译**
+  （Substitutions.lua:94 直接 `PL["current-prompt"]:format(...)`，enUS 基线不完备——踩坑 #2
+  同款情形，diff 的「多余」是预期状态）。
+- 刻意保留（值相同 5 条）：`prat`、`AltNames/.*[Aa]lts?$`（正则模式）、
+  `AltNames/.*[Tt]wink.*$`（正则模式）、`CustomFilters/<string>`、`TellTarget//tt`（命令字面量）。
+- 译名惯例沿用社区版：alt=马甲、main=本尊、Scrollback=回卷、module_name 译中文
+  （侧边标签/链接信息图标/提及/新人聊天/调试模块）；时间戳格式串译法沿用
+  「时:分 上午(12-小时)」（格式串仅作显示标签，真实格式在代码 `DATE_FORMATS` 的 key 中，
+  已核对 Timestamps.lua:42-48 确认翻译安全）。
+- 新人频道官方词：Guide=导师、Newcomer=新人。
+- 工具登记：diff_keys / sync / check_versions 三处，落点 `Prat-3.0/locales/zhCN.lua`，
+  版本基线 3.9.117 MATCH。
+
 ### QuestPrism（A-①：全局共享表点号赋值，2026-11-15）
 
 - 机制：**非 AceLocale**。`Locales/enUS.lua` 建 `QuestPrism_L = {}` 全局共享表并直接
@@ -193,6 +250,9 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   提取器截断产生的「半截串」、3 条新版已改写），现 **399=399，0 缺失 / 0 多余 / 0 值相同**。
 - **2.12.3（2026-11-14）**：上游纯 bugfix，enUS key 集合不变（399=399 复核通过），
   仅版本头 bump 与镜像同步。
+- **2.13.0（2026-11-17，镜像更新后复查）**：enUS 新增 4 条「坐下（Sit）」活动词条
+  （含德鲁伊坐骑宏替换长串 1 条），已补译；现 **403=403，0 缺失 / 0 多余**，
+  版本头 bump 与镜像同步（重装被抹后已重跑 sync 恢复）。
 - 译名修正：`座骑` → `坐骑`（官方用字）、favorite 系 → `最爱`、`Astral Recall` → `星界回溯`、
   `Nazjatar` → `纳沙塔尔`（原「纳斯雅塔尔」有误，词典 confirmed）。
 - 新增专名核实：G-99 Breakneck → `G-99疾飙飞车`（游戏内官方译名）、Undermine → `安德麦`、
@@ -203,6 +263,18 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   版本头 `-- Fitter 2.12.2 · zhCN 本地化（基准 enUS 2.12.2）`。
 - 节日名取官方日历用词：新年节 / 爱就在空中 / 贵族花园节 / 儿童周 / 仲夏火焰节 / 美酒节 /
   万圣节 / 亡者节 / 朝圣者的恩赐 / 冬幕节 / 暗月马戏团 / 魔兽世界周年庆。
+
+### CooldownManagerCentered（A-②：AceLocale 覆盖层，社区汉化底子 + 5.12.2 新增，2026-11-17）
+
+- 语言文件位置：`locales/zhCN.lua`（小写 `locales/`；根目录 `local.xml` 已登记，无需改动）。
+- 机制：A 类 + AceLocale（enUS `NewLocale(..., "enUS", true)` 为默认，zhCN 覆盖层缺 key 回退）。
+- 译文底子：**社区爱好者汉化**（`_temp/CooldownManagerCentered_CN`，基于 5.12.1，510 条无死条目），
+  按其原有风格（半角标点、`%s` 紧贴中文）沿用；未做全局标点重排。
+- **5.12.1 → 5.12.2 新增 5 条**（编辑模式锚定 / 暴雪可见性设置冲突提示，`core/anchoring.lua` +
+  `modules/visibility.lua`，均为 `%s` 格式串，`%s` 实参为查看器名 / 高亮的暴雪设置名 / 蓝色高亮的
+  `HUD_EDIT_MODE_MENU`（官译「编辑模式」），色码结构已保留），插入位置对齐 enUS 行序。
+- 刻意保留（1 条）：`Slug`（自定义字体 flag 名，各语言版本均同值）。
+- 已完成文件：`CooldownManagerCentered_zhCN.lua`（515 键齐平，同步至镜像 `locales/zhCN.lua`）。
 
 ### Questwise（已停止支持，2026-11-13）
 
@@ -297,3 +369,12 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
    （术语译法与官方译名核实走 [`../_docs/Localization-Terminology-Workflow.md`](../_docs/Localization-Terminology-Workflow.md)
    与 `_tools/wow_dict` 词典库）。
 5. 进游戏重载（`/reload`）验证中文生效。
+
+## 2026-11-17 插件更新/重装复查小结
+
+- `zhcn_check_versions.py` 全量核对：除下述两例外全部 MATCH；
+- **Fitter 2.12.3 → 2.13.0**：补 4 条新增（坐下活动），403=403，已同步；
+- **MapPinEnhanced / MouseoverActionSettings / Retrace_LocalesPatch**：重装被抹，sync 恢复；
+- 新登记 **CooldownManagerCentered**（见上文条目）；
+- 其余（QuestPrism / ReputationGuide / Krowi 元成就 / MinimalArchaeology / TLDRMissions / VanasKoS /
+  Altoholic + DataStore 17 模块）全部 EQUAL 无需动作。

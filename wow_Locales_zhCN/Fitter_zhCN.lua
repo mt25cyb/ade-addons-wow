@@ -1,4 +1,4 @@
--- Fitter 2.12.3 · zhCN 本地化（基准 enUS 2.12.3）
+-- Fitter 2.13.0 · zhCN 本地化（基准 enUS 2.13.0）
 -- A-② 类：镜像 Locales/zhCN.lua 整体覆盖同步；本文件为项目主档。
 -- 2026-11-13 2.12.2 重构版：上游 Localization/ 改名 Locales/，落点变为 Locales/zhCN.lua。
 --   ① 对照 enUS 2.12.2 权威清单（399 条）补齐 95 条：条件系统/宏/角色导出/分享/后备坐骑等；
@@ -387,6 +387,12 @@ local translations = {
     ["No outfit has the Fishing activity, so this only casts Fishing."] = "没有套装配置钓鱼活动，因此只会施放钓鱼。",
     ["Equip Fishing Pole"] = "装备鱼竿",
     ["When casting Fishing from Fitter's macro or key binding, equip the best fishing pole in your bags. Your weapons are put back 10 seconds after you stop fishing."] = "通过 Fitter 的宏或按键绑定施放钓鱼时，装备背包中最好的鱼竿。停止钓鱼 10 秒后会重新装备你的武器。",
+
+    -- 坐下（Fitter 2.13.0 新增）
+    ["Sit"] = "坐下",
+    ["Switches to your Sit outfit before sitting:"] = "坐下前切换到坐下套装：",
+    ["No outfit has the Sit activity, so this only sits."] = "没有套装配置坐下活动，因此只会坐下。",
+    ["Replace the standard Outfit Mount macro on druid characters that changes into Cat Form indoors, Aquatic Form while swimming or Travel Form outdoors, or summons a mount while not moving."] = "替换德鲁伊角色的标准套装坐骑宏——室内变猎豹形态、游泳时变水栖形态、户外变旅行形态，站定时则召唤坐骑。",
 
     -- 节日
     ["Lunar Festival"] = "新年节",

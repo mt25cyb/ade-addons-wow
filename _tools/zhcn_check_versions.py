@@ -27,12 +27,15 @@ BASELINE_OVERRIDE = {
 
 # 插件名 -> 项目侧代表文件（用于读首行版本头）
 HEADER_FILES = {
+    "Prat-3.0": "Prat-3.0_zhCN.lua",
+    "MapPinEnhanced": "MapPinEnhanced_zhCN.lua",
     "QuestPrism": "QuestPrism_zhCN.lua",
     "ReputationGuide": "ReputationGuide_zhCN.lua",
     "Krowi_AchievementFilter_Khamuls_ExpMetaAchievementFilter":
         "Krowi_AchievementFilter_Khamuls_ExpMetaAchievementFilter_zhCN.lua",
     "MinimalArchaeology": "MinimalArchaeology_zhCN.lua",
     "MouseoverActionSettings": "MouseoverActionSettings_zhCN.lua",
+    "CooldownManagerCentered": "CooldownManagerCentered_zhCN.lua",
     "TLDRMissions": "TLDRMissions_zhCN.lua",
     "VanasKoS": "VanasKoS/VanasKoS_Locale.lua",
     "Fitter": "Fitter_zhCN.lua",

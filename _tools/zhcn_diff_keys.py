@@ -49,6 +49,11 @@ ADDONS = {
         "enus": "MouseoverActionSettings/Locales/enUS.lua",
         "zhcn": "MouseoverActionSettings_zhCN.lua",
     },
+    # AceLocale：enUS isDefault=true，zhCN 覆盖层；译文底子来自社区汉化（5.12.1）
+    "CooldownManagerCentered": {
+        "enus": "CooldownManagerCentered/locales/enUS.lua",
+        "zhcn": "CooldownManagerCentered_zhCN.lua",
+    },
     "TLDRMissions": {
         "enus": "TLDRMissions/Locales/enus.lua",
         "zhcn": "TLDRMissions_zhCN.lua",
@@ -60,12 +65,23 @@ ADDONS = {
         "zhcn": "Fitter_zhCN.lua",
         "enus_mode": "list",
     },
+    # PRAT_L 全局共享表（enUS 建 local L={}; PRAT_L=L，各语言 GetLocale 守卫 + 同表覆盖）。
+    "Prat-3.0": {
+        "enus": "Prat-3.0/locales/enUS.lua",
+        "zhcn": "Prat-3.0_zhCN.lua",
+    },
     # QuestPrism_L 全局共享表 + 点号赋值（L.KEY = "value"）；BINDING_* 为 _G 全局。
     # L.HELP_LINES 表值非字符串，extract 的值过滤会跳过，两侧一致不影响齐平。
     "QuestPrism": {
         "enus": "QuestPrism/Locales/enUS.lua",
         "zhcn": "QuestPrism_zhCN.lua",
         "dotted": r"L\.\w+|BINDING_\w+",
+    },
+    # Phanx 方法：enUS 全量默认 + [TextLocale] 覆盖层（zhCN.lua 有 GetLocale 守卫），
+    # enUS 有跨行赋值（extract 预处理已支持）。
+    "MapPinEnhanced": {
+        "enus": "MapPinEnhanced/locales/enUS.lua",
+        "zhcn": "MapPinEnhanced_zhCN.lua",
     },
 }
 
