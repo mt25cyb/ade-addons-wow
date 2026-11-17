@@ -1,0 +1,27 @@
+## Interface: 120105
+## Title: Compass - TrackerExt
+## Title-zhCN: Compass - 追踪扩展
+## Notes: Companion addon for Compass (Boussole) that adds CompassHUD-style supertracking to its compass: tracked-target icons & distance, edge pointers, scale ticks and emphasis.
+## Notes-zhCN: Compass（Boussole）的扩展子插件，为其罗盘补齐 CompassHUD 式超追踪能力：追踪目标图标与距离、贴边指针、刻度数字与强调。
+## Author: ADE 阿德
+## Version: 1.2.0
+## IconTexture: interface/icons/spell_azerite_essence09
+## Category: Map
+## Dependencies: Boussole
+## OptionalDeps: ade_AddonFramework
+## SavedVariables: BoussoleTrackerExtDB
+
+Locales\Init.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Locales\Load.lua
+InitDB.lua
+Core.lua
+Sources.lua
+Pins.lua
+Emphasis.lua
+NativeInfo.lua
+Scale.lua
+Overlay.lua
+Options.lua
