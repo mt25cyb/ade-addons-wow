@@ -1,0 +1,11 @@
+## Interface: 120105
+## Title: adeBlizzDemo
+## Notes: ade_BlizzOptionsFrame 全控件演示
+## Author: ADE 阿德
+## Version: v6.5-r001-b014
+## Dependencies: ade_BlizzOptionsFrame
+## IconTexture: Interface\AddOns\adeBlizzDemo\assets\ade_128
+## X-License: MIT
+
+InitDB.lua
+Demo.lua
