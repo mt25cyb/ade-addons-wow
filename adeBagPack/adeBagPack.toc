@@ -1,0 +1,33 @@
+## Interface: 120105
+## Title: BagPack
+## Title-zhCN: |cff00AAFF[ADE]|r 背包整理
+## Title-zhTW: |cff00AAFF[ADE]|r 背包整理
+## Notes: 背包/银行（含战团银行）整理与分类排序（旧 adeBackpack 移植，v6.5 体系）
+## Author: Martin Good (mt25cyb)
+## Category: -|cff00D9FF ade |r-
+## Version: v6.5-r001-a15
+## X-License: MIT
+## IconAtlas: bag-main
+## Dependencies: ade_UIKit
+## SavedVariables: ADEDB_BACKPACK
+
+# 首行不得为注释（12.0.7 已知 Bug）；P4 收尾（README/打包校验）
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+Core.lua
+InitDB.lua
+Modules/Config.lua
+Modules/Rule.lua
+Modules/Slot.lua
+Modules/Item.lua
+Modules/Bag.lua
+Modules/Group.lua
+Modules/Pack.lua
+Minimap.lua
+Extra/Blizzard.lua
+Extra/Baganator.lua
+External.lua
+UI/RuleDialog.lua
+Options.lua
+Debug.lua
