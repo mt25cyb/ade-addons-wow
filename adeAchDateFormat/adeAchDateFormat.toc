@@ -1,0 +1,25 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r AchDateFormat
+## Title-zhCN: |cff00AAFF[ADE]|r 成就日期格式化
+## Title-zhTW: |cff00AAFF[ADE]|r 成就日期格式化
+## Notes: 成就完成日期格式化（暴雪原生成就 UI + Krowi_AchievementFilter）
+## Author: ADE 阿德
+## Version: v6.5-r007
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## IconAtlas: StoryHeader-CheevoIcon
+## Dependencies: ade_UIKit
+## SavedVariables: adeAchDateFormatDB
+## X-Localizations: enUS, zhCN, zhTW
+## X-License: MIT
+
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+Core.lua
+InitDB.lua
+Format.lua
+NativeHooks.lua
+Ext_Krowi_AF.lua
+Ext_Prat.lua
+Options.lua
