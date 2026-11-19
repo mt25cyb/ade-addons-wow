@@ -17,7 +17,7 @@ lib.Geometry = {
     NavEnd = 199, PageLeftPad = 16, ControlColumn = 330, NameRight = 342,
     GridLeft = 200, GridColumn = 72, GridColumns = 5,
     RowHeight = 30, RowGap = 2,
-    SearchWidth = 350,
+    SearchWidth = 175,
 }
 
 local configFields = {

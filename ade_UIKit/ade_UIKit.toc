@@ -2,7 +2,7 @@
 ## Title: |cff00AAFF[ADE]|r UIKit
 ## Notes: ADE 系列插件共享控件库 + 样式库 + 公共函数库（原生选项窗口 / 两栏布局 / 多插件 Tab / 原生控件优先）
 ## Author: ADE 阿德
-## Version: v6.5-r001-b014
+## Version: v6.5-r001-b050
 ## Category: -|cff00D9FF ade |r-
 ## Globe-Main: ADE
 ## IconTexture: Interface\AddOns\ade_UIKit\assets\ade_128
@@ -10,17 +10,36 @@
 ## X-License: MIT
 
 Core/Namespace.lua
-Core/Callbacks.lua
+Function/Callbacks.lua
 Locales/enUS.lua
 Locales/zhCN.lua
 Locales/zhTW.lua
 Core/Config.lua
-Core/API.lua
+Function/API.lua
+Function/Util.lua
+Function/Format.lua
+Function/Icon.lua
+Function/Meta.lua
+Function/ShareString.lua
+Function/OptionsStub.lua
 Widget/Kinds.lua
-Widget/RowFrames.lua
-Widget/RowMixins.lua
+Widget/Parts.lua
+Widget/KeyButton.lua
+Widget/StaticText.lua
+Widget/OptionRow.lua
+Widget/CheckGrid.lua
+Widget/TabOrder.lua
+Widget/Links.lua
+Widget/Cards.lua
+Widget/ListRow.lua
 Widget/WindowFrame.lua
 Widget/WindowLayout.lua
 Widget/WindowMixin.lua
+Widget/WindowTabs.lua
+Widget/WindowPage.lua
+Widget/WindowFooter.lua
+Widget/WindowSearch.lua
+Widget/ScrollTabs.lua
 Widget/Search.lua
 Widget/Tooltip.lua
+Widget/MinimapButton.lua

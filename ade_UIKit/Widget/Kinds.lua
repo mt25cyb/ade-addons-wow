@@ -18,7 +18,7 @@ local geometry = {
     GridLeft = 200, GridColumn = 72, GridColumns = 5,
     SliderWidth = 250, WithSliderWidth = 214,
     CardPictureHeight = 86, CardBorderColor = { 1, 1, 1, 0.12 }, TabCheckX = 34,
-    RowHeight = 30, RowGap = 2, SearchWidth = 350,
+    RowHeight = 30, RowGap = 2, SearchWidth = 160,
 }
 lib.Geometry = geometry
 Internal.Geometry = geometry
@@ -32,11 +32,19 @@ kinds.SubHeading = { Build = "SubHeadingRow", Height = 26, Search = { Heading = 
 kinds.Note = {
     Build = "NoteRow",
     Height = function(window, element)
-        return window:MeasureText(element.Text, "GameFontDisable", window:PageWidth() - 32) + 8
+        local text = element.Text
+        if type(text) == "function" then text = text() end
+        local indent = element.indent or 0
+        return window:MeasureText(text or "", "GameFontDisable", window:PageWidth() - 32 - indent * 20) + 8
     end,
 }
 kinds.Option = {
-    Build = "OptionRow", Height = 30,
+    Build = "OptionRow",
+    -- b018：multiline 行独占下半部分，高度按 Type 区分；其余行沿用 30。
+    Height = function(_, element)
+        if element.Option and element.Option.Type == "multiline" then return 118 end
+        return 30
+    end,
     Hidden = function(element) return element.Option:IsHidden() end,
     Names = function(element)
         local with = element.With
@@ -88,6 +96,20 @@ kinds.TabRow = {
     Options = function(element) return element.Item and element.Item.Show end,
 }
 kinds.Link = { Build = "LinkRow", Height = 26 }
+-- b038：列表行（kind="list"，Widget/ListRow.lua）——拖动排序/拖入物品/组合条目/斑马纹。
+kinds.List = {
+    Build = "ListRow",
+    Height = function(_, element)
+        local spec = element.Option and element.Option.Spec or {}
+        -- 标题行 26 + Inset 上下内衬 24 + visibleRows × 条目高
+        return 50 + (spec.visibleRows or 8) * (spec.rowHeight or 26)
+    end,
+    Hidden = function(element) return element.Option:IsHidden() end,
+    Names = function(element) return element.Option:GetLabel() end,
+    Options = function(element) return element.Option end,
+    Descriptions = function(element) return element.Option.GetDescription and element.Option:GetDescription() end,
+    Search = { Indented = true },
+}
 kinds.Cards = {
     Expand = function(element, list)
         local cards, columns = element.Cards, Internal.CardColumns or 3
@@ -114,7 +136,9 @@ kinds.SearchHeading = { Build = "SearchHeadingRow", Height = 45 }
 local kindMap = {
     header = "Header", subheading = "SubHeading", sub = "Sub", note = "Note",
     option = "Option", toggle = "Option", range = "Option", select = "Option",
-    input = "Option", execute = "Option", key = "Option",
+    input = "Option", execute = "Option", key = "Option", multiline = "Option",
+    color = "Option", -- b034 起新增的颜色选择器控件（漏登记时 fallback 出未知 Kind，整行被丢弃）
+    list = "List",    -- b038 列表行（Widget/ListRow.lua）
     grid = "Grid", link = "Link", tablist = "TabList", card = "Cards", cards = "Cards",
 }
 
@@ -133,6 +157,9 @@ local function Normalize(element)
         if copy.Option.Type == "toggle" and element.with then
             copy.With = Internal.MakeOption(element.with)
         end
+    elseif copy.Kind == "List" and not copy.Option and Internal.MakeOption then
+        -- b038：列表行同样走 MakeOption 适配（label/indent/Spec 契约与 Option 一致）
+        copy.Option = Internal.MakeOption(copy)
     elseif copy.Kind == "Sub" then
         copy.Members = element.members or element.Members
     end
