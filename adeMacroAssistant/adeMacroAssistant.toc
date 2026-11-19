@@ -1,0 +1,28 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MacroAssistant
+## Title-zhCN: |cff00AAFF[ADE]|r 宏助手
+## Title-zhTW: |cff00AAFF[ADE]|r 巨集助手
+## Author: ADE 阿德
+## Version: v6.5-r003
+## Notes: Auto-creates class macros (cleanse, interrupt, combat res, etc.) and resizes the macro UI (ADE v6.5).
+## Notes-zhCN: 按职业自动生成净化/打断/战复等宏，并调整宏界面尺寸（ADE v6.5）。
+## Notes-zhTW: 自動依職業產生淨化/打斷/戰復等巨集，並調整巨集介面尺寸（ADE v6.5）。
+## IconAtlas: plunderstorm-landingpagebutton-up
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## License: MIT
+## Dependencies: ade_UIKit
+## SavedVariables: ADEMA_DB
+## X-Localizations: enUS, zhCN, zhTW
+# 加载顺序：Locales → InitDB（默认真源）→ 业务模块 → Core（装配/调度）→ Settings/Options（UIKit 设置页）
+Locales/enUS.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+InitDB.lua
+Modules/AutoMacroData.lua
+Modules/MacroUIResize.lua
+Modules/AutoMacro.lua
+Modules/MacroSearch.lua
+Core.lua
+Settings.lua
+Options.lua
