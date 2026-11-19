@@ -1,0 +1,40 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MapTab - Delve
+## Title-zhCN: |cff00AAFF[ADE]|r 地图标签页 - 地下堡
+## Title-zhTW: |cff00AAFF[ADE]|r 地圖標籤頁 - 地下堡
+## Author: Martin Good (mt25cyb)
+## Version: v6.5-r002
+## Notes: World map delve tab with summary stats, filters, search, warband roster and waypoints.
+## Notes-zhCN: 世界地图地下堡标签页：综合统计、过滤、搜索、战团统计与路点。
+## Notes-zhTW: 世界地圖地下堡標籤頁：綜合統計、過濾、搜尋、戰團統計與路點。
+## IconAtlas: delves-bountiful
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## X-License: MIT
+## Dependencies: ade_UIKit, adeMapTab
+## SavedVariables: ADEDB_MAP_TAB_DELVE
+# 加载顺序：Bootstrap → Locales → InitDB → Database → Data → Services → UI → Core（见 README.md）
+# v6.5：无独立设置页（UI\Settings.lua 已删除，设置只留世界地图 Tab 内齿轮页）
+Core\Bootstrap.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+InitDB.lua
+Core\Database.lua
+Data\DelveZones.lua
+Data\DelveData.lua
+Data\StatsData.lua
+Data\Professions.lua
+Data\AbundanceData.lua
+Data\RitualData.lua
+Services\Professions.lua
+Services\DelveScanner.lua
+Services\Stats.lua
+Services\Roster.lua
+Services\Catalog.lua
+UI\DelveEntry.lua
+UI\StatsPanel.lua
+UI\RosterWindow.lua
+UI\SettingsPanel.lua
+UI\WorldMapPanel.lua
+UI\MinimapIcon.lua
+Core.lua
