@@ -6,6 +6,8 @@
 AdeBlizzDemoDefaults = {
     enable = true, scale = 1, mode = "A", note = "", key = "",
     alphaEnabled = true, alpha = 0.8, autoClean = false, dual = { "", "" }, subToggle = false, secondToggle = false,
+    barTex = [[Interface\TargetingFrame\UI-StatusBar]], demoFont = [[Fonts\FRIZQT__.TTF]], swatch = "ff17C864",
+    demoList = { 6948, 3371, 6265 }, demoExt = false,
     view = { [1] = true, [2] = false, [3] = true, [4] = false, [5] = false, [6] = false },
     reload = false,
     tabs = {

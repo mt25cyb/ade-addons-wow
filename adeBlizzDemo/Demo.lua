@@ -1,11 +1,16 @@
 -- ade_UIKit 全控件画廊：/bofdemo
--- 库解析延迟到命令执行时：避免插件加载顺序导致顶层 return 后连斜杠命令都没注册。
+local addonName = ...
+
 local function GetOF()
     local lib = GetBlizzOptionsFrame and GetBlizzOptionsFrame("ade_UIKit", true)
     if lib then return lib end
     -- 库入口函数若因加载顺序尚未就绪，仍可从自带注册表取同一张表。
     return BOF_LIBS and BOF_LIBS["ade_UIKit"]
 end
+
+-- 名称/版本统一经 UIKit GetAddonMeta 取 TOC 元数据（用户 2026-11-18）。
+local addonMeta = GetOF().GetAddonMeta(addonName)
+local TITLE, VERSION = addonMeta.title, addonMeta.version
 
 local function Print(text)
     if DEFAULT_CHAT_FRAME then DEFAULT_CHAT_FRAME:AddMessage("|cFFEEE4AE[bofdemo]|r " .. tostring(text)) end
@@ -68,6 +73,27 @@ local basic = {
     { kind = "select", key = "mode", label = "模式", desc = "下拉菜单（select）",
         items = { { text = "模式 A", value = "A" }, { text = "模式 B", value = "B" } },
         default = "A", get = function() return DB.mode end, set = function(v) DB.mode = v end },
+    { kind = "color", key = "swatch", label = "颜色选择器", desc = "色块显示当前颜色，点击弹出官方颜色选择器（color）",
+        default = "ff17C864",
+        get = function() return DB.swatch end, set = function(hex) DB.swatch = hex end },
+    { kind = "select", key = "barTex", label = "材质预览下拉", desc = "菜单项铺满材质、选中区显示当前材质（DBM 同款效果）",
+        items = {
+            { text = "目标框体", value = [[Interface\TargetingFrame\UI-StatusBar]], texture = [[Interface\TargetingFrame\UI-StatusBar]] },
+            { text = "技能条", value = [[Interface\PaperDollInfoFrame\UI-Character-Skills-Bar]], texture = [[Interface\PaperDollInfoFrame\UI-Character-Skills-Bar]] },
+            { text = "团队血条", value = [[Interface\RaidFrame\Raid-Bar-Hp-Fill]], texture = [[Interface\RaidFrame\Raid-Bar-Hp-Fill]] },
+            { text = "聊天背景", value = [[Interface\ChatFrame\ChatFrameBackground]], texture = [[Interface\ChatFrame\ChatFrameBackground]] },
+        },
+        default = [[Interface\TargetingFrame\UI-StatusBar]],
+        get = function() return DB.barTex end, set = function(v) DB.barTex = v end },
+    { kind = "select", key = "demoFont", label = "字体预览下拉", desc = "菜单项文字直接用该字体渲染（DBM 同款效果）",
+        items = {
+            { text = "Friz Quadrata", value = [[Fonts\FRIZQT__.TTF]], font = [[Fonts\FRIZQT__.TTF]], fontsize = 14 },
+            { text = "Arial Narrow", value = [[Fonts\ARIALN.TTF]], font = [[Fonts\ARIALN.TTF]], fontsize = 14 },
+            { text = "Morpheus", value = [[Fonts\MORPHEUS.ttf]], font = [[Fonts\MORPHEUS.ttf]], fontsize = 14 },
+            { text = "Skurri", value = [[Fonts\SKURRI.TTF]], font = [[Fonts\SKURRI.TTF]], fontsize = 14 },
+        },
+        default = [[Fonts\FRIZQT__.TTF]],
+        get = function() return DB.demoFont end, set = function(v) DB.demoFont = v end },
     { kind = "key", key = "key", label = "按键（真实绑定）", desc = "绑定到游戏按键系统（聊天框可验证触发）",
         default = "", get = function() return GetBound(1) end, set = function(v) SetBound(1, v) end },
     { kind = "execute", key = "click", label = "执行按钮", text = "执行", desc = "点击立即执行（execute）",
@@ -162,6 +188,32 @@ local gallery = {
     { kind = "link", label = "打开事件矩阵", detail = "点击跳转",
         onClick = function() if tab then tab:Open("events") end end },
     { kind = "note", text = "SearchHeading（搜索结果分区标题）由顶部搜索自动生成，输入关键字即可看到。" },
+    { kind = "subheading", text = "列表行（ListRow，b038）" },
+    { kind = "list", key = "demoList", label = "物品清单", desc = "拖动排序；从背包拖入物品；▲▼ 移动、✕ 删除；左键点击触发绑定",
+        getItems = function() return DB.demoList end,
+        display = function(value)
+            local ok, name = pcall(C_Item.GetItemNameByID, value)
+            return (ok and name) or ("物品 " .. tostring(value))
+        end,
+        accept = { item = true }, unique = true,
+        showDelete = true, showMove = true, visibleRows = 5,
+        bindings = { LeftButton = function(value) Print("左键点击条目：" .. tostring(value)) end,
+            ["LeftButton+shift"] = function(_, idx) Print("Shift+左键（索引 " .. idx .. "）") end },
+        bindingsTooltip = "左键 = 演示；Shift+左键 = 演示变体" },
+    -- b039：外部联动选项统一口径演示——未加载即禁用 + desc 动态说明
+    { kind = "toggle", key = "demoExt", label = "外部联动演示（DBM）",
+        desc = function()
+            local uikit = _G.ResolveBOFNamespace and _G.ResolveBOFNamespace("ade_UIKit")
+            if uikit and uikit.IsAddOnLoaded("DBM-Core") then
+                return "已检测到 DBM-Core，此开关正常工作（口径演示）。"
+            end
+            return "未检测到 DBM-Core，此选项已禁用——外部联动选项统一口径：目标插件未加载即禁用并提示。"
+        end,
+        disabled = function()
+            local uikit = _G.ResolveBOFNamespace and _G.ResolveBOFNamespace("ade_UIKit")
+            return not (uikit and uikit.IsAddOnLoaded("DBM-Core"))
+        end,
+        default = false, get = function() return DB.demoExt end, set = function(v) DB.demoExt = v end },
 }
 
 local sections = { basic = basic, events = events, gallery = gallery }
@@ -196,9 +248,9 @@ local second = {
 -- 「恢复默认」（footer 按钮）由库委托给宿主的 resetSection(id)：不实现就只是重载一遍、什么都不重置。
 -- 各分区对应的存档键（with 子选项 alpha 同属 basic）。
 local sectionKeys = {
-    basic = { "enable", "scale", "mode", "note", "key", "subToggle", "alphaEnabled", "alpha", "autoClean", "dual", "reload" },
+    basic = { "enable", "scale", "mode", "swatch", "barTex", "demoFont", "note", "key", "subToggle", "alphaEnabled", "alpha", "autoClean", "dual", "reload" },
     events = { "view" },
-    gallery = { "tabs" },
+    gallery = { "tabs", "demoList", "demoExt" },
     second = { "secondToggle" },
 }
 local function SameTable(a, b)
@@ -242,7 +294,7 @@ local function Build()
     local lib = GetOF()
     if not lib then return nil end
     tab = lib.RegisterTab({
-        name = "Blizz Demo",
+        name = TITLE,
         saved = DB,
         groups = { { name = "演示", sections = { "basic", "events" } },
             { name = "其它", sections = { "gallery" } } }, -- 两个分组：实测第二组头前的间隔条
@@ -254,7 +306,7 @@ local function Build()
         onCreated = function() end,
     })
     tab2 = lib.RegisterTab({
-        name = "Demo 2",
+        name = TITLE .. " 2",
         saved = DB,
         groups = { { name = "多页", sections = { "second" } } },
         sectionName = function() return "多页测试" end,
@@ -263,6 +315,9 @@ local function Build()
         resetSection = ResetSection,
         onCreated = function() end,
     })
+    if lib.RegisterOptionsStub then
+        lib.RegisterOptionsStub({ title = TITLE, version = VERSION, tab = tab })
+    end
     return tab
 end
 
@@ -282,4 +337,10 @@ end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function() Build() end)
+-- 登录期注册设置页与原生「打开选项」stub（KAF Stub 同款时点）；
+-- ade_UIKit 为 ## Dependencies 硬依赖，Build 失败直接 error 暴露，不静默放弃。
+frame:SetScript("OnEvent", function()
+    if not Build() then
+        error("adeBlizzDemo: 登录期注册设置页失败（ade_UIKit RegisterTab 不可用）")
+    end
+end)

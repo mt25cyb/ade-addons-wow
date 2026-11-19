@@ -2,7 +2,7 @@
 ## Title: |cff00AAFF[ADE]|r BlizzDemo
 ## Notes: ade_UIKit 全控件演示
 ## Author: ADE 阿德
-## Version: v6.5-r001-b014
+## Version: v6.5-r001-b019
 ## Dependencies: ade_UIKit
 ## IconTexture: Interface\AddOns\adeBlizzDemo\assets\ade_128
 ## Category: -|cff00D9FF ade |r-

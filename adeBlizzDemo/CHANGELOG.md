@@ -1,3 +1,23 @@
+## v6.5-r001-b019 - 2026-11-18
+
+**外部联动口径演示项 demoExt（DBM）：未加载即禁用 + desc 动态说明——演示 ade_UIKit b039 的 `IsAddOnLoaded` API 与函数式 desc；Gallery 页与 sectionKeys 同步。**
+
+## v6.5-r001-b018 - 2026-11-18
+
+**接入 UIKit b038 列表行演示（kind="list" 物品清单：拖动排序/拖入物品/showDelete/showMove/bindings），defaults.demoList + sectionKeys。**
+
+## v6.5-r001-b017 - 2026-11-18
+
+**名称/版本统一改走 UIKit `GetAddonMeta`（b024）。**
+
+## v6.5-r001-b016 - 2026-11-18
+
+**stub 页补版本号；名称/版本统一经 `C_AddOns.GetAddOnMetadata` 取 TOC 元数据（tab 名/stub 标题）；登录期 Build 失败由静默放弃改为 error 暴露。**
+
+## v6.5-r001-b015 - 2026-11-17
+
+**在原生「设置 > 插件」注册「打开选项」入口页（ade_UIKit b023 `RegisterOptionsStub`）。**
+
 ## v6.5-r001-b014 - 2026-11-17
 
 **移除临时调用栈诊断埋点；绑定 table 报错由库侧 Slots 方法签名修复（Demo 无需改动）**
