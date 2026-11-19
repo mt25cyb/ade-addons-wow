@@ -1,0 +1,28 @@
+MIT License
+
+Copyright (c) 2026 ADE
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-- 第三方素材许可（仅 Media/ 下两款进度条材质）
+--   Noodle_StatBars / atrocity.tga、border-midnight-12px.tga：随原插件分发，按其原许可使用；
+--   仅作为内置进度条样式素材复制，未修改文件内容。
+--   StatMarks 款使用暴雪系统贴图路径（Interface\RaidFrame\Raid-Bar-Hp-Fill 等），不复制文件。
+-- 第三方库许可（由基座 ade_BaseFramework 统一内嵌，本插件不 vendor 任何库）：
+--   LibStub / CallbackHandler-1.0：Public Domain；LibSharedMedia-3.0：LGPL 2.1。

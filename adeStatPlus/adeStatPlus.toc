@@ -1,0 +1,29 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r StatPlus
+## Title-zhCN: |cff00AAFF[ADE]|r 属性面板
+## Title-zhTW: |cff00AAFF[ADE]|r 屬性面板
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## Notes: 属性信息面板（ADE v6.5 原生重写）
+## Author: ade
+## Version: v6.5-r007
+## IconAtlas: plunderstorm-nameplates-icon-3
+## Dependencies: ade_UIKit
+## SavedVariables: ADEDB_ADESTATPLUS
+
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+InitDB.lua
+Data\StatDefs.lua
+Modules\SourceRegistry.lua
+Extend\Ext_GearInsight.lua
+Extend\Ext_ClassCodex.lua
+Modules\Media.lua
+Modules\Collector.lua
+Modules\Bars.lua
+Modules\Panel.lua
+Modules\CharPanel.lua
+Modules\SortWindow.lua
+Options.lua
+Core.lua
