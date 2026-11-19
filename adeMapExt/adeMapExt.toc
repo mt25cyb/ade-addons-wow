@@ -1,0 +1,21 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MapExtended
+## Title-zhCN: |cff00AAFF[ADE]|r 地图扩展
+## Title-zhTW: |cff00AAFF[ADE]|r 地圖擴展
+## Notes: Map enhancement host - geo monitor panel & world map info panel
+## Notes-zhCN: 地图增强宿主插件——地理监视面板与世界地图信息面板
+## Notes-zhTW: 地圖增強宿主插件——地理監視面板與世界地圖資訊面板
+## Author: ADE 阿德
+## Version: v6.5-r002
+## IconAtlas: perks-maintenance
+## Dependencies: ade_UIKit
+## SavedVariables: adeMapExtDB
+
+Core.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+InitDB.lua
+Panel.lua
+Options.lua
+Slash.lua
