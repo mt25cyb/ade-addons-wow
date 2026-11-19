@@ -50,7 +50,14 @@
 | [`adeChatBar`](adeChatBar/README.md) | `v6.5-r001` | 聊天频道快捷条（原 `adeChatMod` 去掉频道名缩写）；设置界面基于 `ade_UIKit` v6.5 |
 | [`ade_FontPack`](ade_FontPack/README.md) | `v6-r001-b001` | 共享字体库（LibSharedMedia-3.0，自有精选 + mMT/Blizzlike/ToriWhite/Visitor/Mono/ElvUI 六方来源；自带 LSM，独立运行） |
 | [`ade_MediaPack`](ade_MediaPack/README.md) | `v6-r001-b001` | 共享材质库（状态条/边框/背景/音效 + BigWigs/DBM 计时条皮肤；自带 LSM，独立运行） |
-| [`ade_UIKit`](ade_UIKit/README.md) | `v6.5-r001-b014` | ADE 系列共享控件库 + 样式库 + 公共函数库（当前实现：从 KAF `Krowi_Options` 2.0 复刻的原生选项窗口，两栏 / 多插件 Tab / 原生控件 / 双层行池 / KAF 特色标记），零第三方与零 AF 依赖；唯一开发计划见 [`ade_UIKit-dev-plan.md`](_docs/plans/ade_UIKit-dev-plan.md) |
+| [`adeAchDateFormat`](adeAchDateFormat/README.md) | `v6.5-r001` | 成就完成日期格式化（暴雪原生 UI + Krowi 成就行），基于 `ade_UIKit` 公共 FormatDate API；计划见 [`adeAchDateFormat-dev-plan.md`](_docs/plans/adeAchDateFormat-dev-plan.md) |
+| [`adeMacroAssistant`](adeMacroAssistant/README.md) | `v6.5-r001` | 按职业自动生成宏 + 宏界面尺寸调整（ADE v5 原生重写，UIKit 设置页） |
+| [`adeStatPlus`](adeStatPlus/README.md) | `v6.5-r001`（第一批） | 属性信息面板（ADE v5 原生重写第一批：数据/采集 + 极简面板 + 设置页 + 自绘小地图；去 LSM） |
+| [`adeStatPlus`](adeStatPlus/README.md) | `v6.5-r001`（第一批） | 属性信息面板（ADE v5 原生重写第一批：数据/采集 + 极简面板 + 设置页 + 自绘小地图；去 LSM） |
+| [`adeMapTab_Delve`](adeMapTab_Delve/README.md) | `v6.5-r001` | 世界地图地下堡标签页（战团统计/过滤/搜索/路点；设置在世界地图 Tab 内） |
+| [`adeMapTab_Portal`](adeMapTab_Portal/README.md) | `v6.5-r001` | 世界地图传送标签页（搜索/收藏/最近/随机炉石；设置在世界地图 Tab 内） |
+| [`adeMapTab`](adeMapTab/README.md) | `v6.5-r001` | 世界地图标签页公共函数库（基于 `LibWorldMapTabs`，承接 Delve / Portal 子插件）；零强依赖，图标走 `ade_UIKit` 软依赖 |
+| [`ade_UIKit`](ade_UIKit/README.md) | `v6.5-r001-b023` | ADE 系列共享控件库 + 样式库 + 公共函数库（从 KAF `Krowi_Options` 2.0 复刻的原生选项窗口 + 公共 FormatDate/Util API），零第三方与零 AF 依赖；唯一开发计划见 [`ade_UIKit-dev-plan.md`](_docs/plans/ade_UIKit-dev-plan.md) |
 | [`adeBlizzDemo`](adeBlizzDemo/README.md) | `v6.5-r001-b014` | `ade_UIKit` 控件画廊与功能自测（`/bofdemo`），双 Tab、双分组、真实键位绑定 |
 
 > v6 线的 `ade_AddonFramework`、`ade_Demo`、未完成开发的 `adeTooltip`，以及改造前的 `adeChatMod` 已移入 `_backup/`（2026-11-17），工作区不再保留原目录。
