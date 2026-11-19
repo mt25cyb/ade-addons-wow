@@ -30,7 +30,7 @@ local GetPetInfoByItemID = C_PetJournal and C_PetJournal.GetPetInfoByItemID
 
 -- 文案表骨架：Locales/enUS.lua 填充英文默认值，zhCN / zhTW 按 GetLocale() 覆盖
 -- 子表先建空表，确保 locale 文件未加载时各模块取到的引用不为 nil
-ns.L = { Sections = {}, Tooltips = {}, Panel = {}, MountInfo = {} }
+ns.L = { Sections = {}, Tooltips = {}, MountInfo = {} }
 
 
 ----------------------------------------------------------------------------

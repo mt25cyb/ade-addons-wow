@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------
 -- idTipExt 存档默认值（唯一权威源）
 -- 每一项行末注释注明它对应设置页的哪个选项；非选项的内部字段单独标注。
--- 运行时缓存（gwPosX / gwPosY / gwLastPhaseID / gwLastPhaseSource）不入表，按需写入存档。
+-- v1.4.0：地理监视面板与世界地图信息面板拆出为独立插件 adeMapExt（gw* 键随之迁出）。
 ----------------------------------------------------------------------------
 
 local addonName = ...
@@ -15,7 +15,7 @@ ns.DB_DEFAULTS = {
 	blankLineBeforeFirst = true,       -- 首行信息前加一空行做分隔（提示框中本插件的第一行）
 	prefixClassColorEnabled = true,    -- 前缀按职业着色（启用时「前缀颜色」禁用）
 	prefixColor = "ff17C864",        -- 前缀颜色（按职业着色启用时禁用）
-	version = 4,                       -- 内部字段：存档版本（非选项）
+	version = 5,                       -- 内部字段：存档版本（非选项）
 
 	-- 物品装备
 	itemEnabled = true,                -- 物品ID
@@ -62,30 +62,6 @@ ns.DB_DEFAULTS = {
 	vignetteEnabled = true,            -- 小插曲ID
 	factionEnabled = true,             -- 声望ID
 	cooldownEnabled = false,           -- 冷却ID
-
-	-- 地理监视面板（GeoWatcher.lua，按设置页控件顺序）
-	gwShowPhase = true,                -- 显示位面ID
-	gwUseHexadecimal = false,          -- 位面ID使用十六进制显示
-	gwShowMap = true,                  -- 显示地图ID
-	gwShowWorldMap = true,             -- 显示世界地图ID
-	gwShowInstance = true,             -- 显示副本ID
-	gwShowZone = true,                 -- 显示区域ID
-	gwShowPanel = true,                -- 显示地理监视面板
-	gwWorldMapPanel = true,            -- 在世界地图显示（独立地图信息面板，不受上面总开关影响）
-	gwWorldMapPosition = "bottom",     -- 地图信息面板位置：top 顶部 / bottom 底部
-	gwIsLocked = false,                -- 锁定面板位置
-	gwAutoHideInCombat = true,         -- 战斗中自动隐藏
-	gwShowTooltip = true,              -- 悬停面板时显示详细信息
-	gwGrowDirection = "up",            -- 生长方向：向下生长 down / 向上生长 up
-	gwMapNameMode = "inline",          -- 地图名称：不显示 none / 同行显示 inline / 单独一行 separate
-	gwPanelWidth = 240,                -- 面板宽度（默认按 8 个中文字符估算，可调）
-	gwUpdateInterval = 0.5,            -- 更新间隔
-	gwFontSize = 14,                   -- 字体大小
-	gwAlpha = 1.0,                     -- 面板透明度
-	gwBgColor = "ff000000",          -- 背景颜色（hex 的 alpha 位忽略，透明度由 gwBgAlpha 控制）
-	gwBgAlpha = 0.4,                   -- 背景透明度（原生色板不支持 alpha，见 Options.lua）
-	gwBorderColor = "ff666666",      -- 边框颜色（hex 的 alpha 位忽略，透明度由 gwBorderAlpha 控制）
-	gwBorderAlpha = 0.2,               -- 边框透明度
 }
 
 -- 存档初始化：旧存档迁移 + 已存在值校验 + 缺失键按 DB_DEFAULTS 补齐（幂等，ADDON_LOADED 每次都跑）
@@ -104,23 +80,11 @@ function ns.ensureDB()
 		end
 		DB.compact = nil
 	end
-	DB.pwWindowStyle = nil -- v1.1.1 起窗口风格固定扁平
-	-- v1.2.0 起 pwPosX/pwPosY 由「面板中心偏移」改为「生长方向对应的固定角偏移」，旧值失效
-	if isOldDB and DB.version < 2 then
-		DB.pwPosX = nil
-		DB.pwPosY = nil
-	end
-	-- v1.3.0：原「打开世界地图时锚定到世界地图」改为独立的「在世界地图显示」信息面板
-	if DB.pwAnchorToWorldMap ~= nil then
-		DB.pwWorldMapPanel = DB.pwAnchorToWorldMap
-		DB.pwAnchorToWorldMap = nil
-	end
-	-- v1.3.0：面板存档键 pw* 统一改名 gw*
-	if isOldDB and DB.version < 4 then
+	-- v1.4.0：地理监视面板与世界地图信息面板拆出为 adeMapExt（其首启会从旧档一次性
+	-- 迁移 pw*/gw* 键）；本插件不再读写这些键，旧档残留在此一次性清理
+	if isOldDB and DB.version < 5 then
 		for key in pairs(DB) do
-			if string.sub(key, 1, 2) == "pw" then
-				local gwKey = "gw" .. string.sub(key, 3)
-				DB[gwKey] = DB[key]
+			if string.sub(key, 1, 2) == "pw" or string.sub(key, 1, 2) == "gw" then
 				DB[key] = nil
 			end
 		end
@@ -133,18 +97,6 @@ function ns.ensureDB()
 	end
 	if DB.enabled ~= nil and type(DB.enabled) ~= "boolean" then DB.enabled = DEFAULTS.enabled end
 	if DB.prefixColor ~= nil and type(DB.prefixColor) ~= "string" then DB.prefixColor = DEFAULTS.prefixColor end
-	if DB.gwWorldMapPosition ~= nil
-		and DB.gwWorldMapPosition ~= "top" and DB.gwWorldMapPosition ~= "bottom" then
-		DB.gwWorldMapPosition = DEFAULTS.gwWorldMapPosition
-	end
-	if DB.gwMapNameMode ~= nil
-		and DB.gwMapNameMode ~= "none" and DB.gwMapNameMode ~= "inline" and DB.gwMapNameMode ~= "separate" then
-		DB.gwMapNameMode = DEFAULTS.gwMapNameMode
-	end
-	if DB.gwGrowDirection ~= nil
-		and DB.gwGrowDirection ~= "up" and DB.gwGrowDirection ~= "down" then
-		DB.gwGrowDirection = DEFAULTS.gwGrowDirection
-	end
 
 	-- 最后补齐所有缺失键：全新存档的每个默认值都从这里来
 	for key, value in pairs(DEFAULTS) do

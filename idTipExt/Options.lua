@@ -32,23 +32,12 @@ local function dependOn(child, parent, key)
 	child:SetParentInitializer(parent, function() return ns.db()[key] end)
 end
 
--- 滑条数值格式
-local function numberFormatter(fmt)
-	return function(value) return string.format(fmt, value) end
-end
-
 local function registerCheckbox(category, key, label, tooltip)
 	return Settings.CreateCheckbox(category, registerSetting(category, key, "boolean", label), tooltip)
 end
 
-local function registerSlider(category, key, label, minValue, maxValue, step, formatter)
-	local options = Settings.CreateSliderOptions(minValue, maxValue, step)
-	-- 原生样式：滑条右侧显示当前值
-	options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
-		formatter or numberFormatter("%.1f"))
-	return Settings.CreateSlider(category, registerSetting(category, key, "number", label), options)
-end
-
+-- v1.4.0 裁剪说明：slider 仅旧面板分组使用已删（含其 numberFormatter）；dropdown（style）
+-- 与 swatch（prefixColor）为 tooltip 主功能基础选项所用，保留
 local function optionsContainer(items)
 	return function()
 		local container = Settings.CreateControlTextContainer()
@@ -57,36 +46,21 @@ local function optionsContainer(items)
 	end
 end
 
+-- v1.4.0 裁剪说明：slider 仅旧面板分组使用已删；dropdown（style）与 swatch（prefixColor）
+-- 为 tooltip 主功能基础选项所用，保留
 local function registerDropdown(category, key, label, items, tooltip)
 	return Settings.CreateDropdown(category, registerSetting(category, key, "string", label),
 		optionsContainer(items), tooltip)
 end
 
+-- 原生色板：string 类型、8 位 hex（AARRGGBB）
 local function registerSwatch(category, key, label, tooltip)
-	-- 原生色板：string 类型、8 位 hex（AARRGGBB）
 	return Settings.CreateColorSwatch(category, registerSetting(category, key, "string", label), tooltip)
 end
 
--- 面板/风格设置变更后即时刷新（GeoWatcher.lua 提供 ns.OnPanelSettingChanged）
-local function watchRefresh(key)
-	Settings.SetOnValueChangedCallback(varKey(key), function()
-		ns.OnPanelSettingChanged(key)
-	end)
-end
-
--- 显示风格变化时面板行也要重算（GeoWatcher 的默认分支会 updateAll）
-local refreshKeys = {
-	"style", "prefixColor", "prefixClassColorEnabled",
-	"gwShowPanel", "gwWorldMapPanel", "gwWorldMapPosition", "gwIsLocked", "gwAutoHideInCombat",
-	"gwUseHexadecimal", "gwShowTooltip", "gwGrowDirection", "gwPanelWidth",
-	"gwMapNameMode", "gwShowPhase", "gwShowMap", "gwShowWorldMap",
-	"gwShowInstance", "gwShowZone", "gwUpdateInterval", "gwFontSize",
-	"gwAlpha", "gwBgColor", "gwBorderColor", "gwBgAlpha", "gwBorderAlpha",
-}
-
 local function registerOptions()
 	local category, layout = Settings.RegisterVerticalLayoutCategory(addonName)
-	local L, P, M = ns.L, ns.L.Panel, ns.L.MountInfo
+	local L, M = ns.L, ns.L.MountInfo
 
 	local function addHeader(sectionKey)
 		if layout and CreateSettingsListSectionHeaderInitializer then
@@ -141,51 +115,6 @@ local function registerOptions()
 		end
 	end
 
-	-- 地理监视面板分组
-	addHeader("Panel")
-	-- 每类信息单独开关
-	registerCheckbox(category, "gwShowPhase", L.ShowPhaseID)
-	registerCheckbox(category, "gwUseHexadecimal", P.Hexadecimal)
-	registerCheckbox(category, "gwShowMap", L.ShowMapID)
-	registerCheckbox(category, "gwShowWorldMap", L.ShowWorldMapID)
-	registerCheckbox(category, "gwShowInstance", L.ShowInstanceID)
-	registerCheckbox(category, "gwShowZone", L.ShowZoneID)
-
-	registerCheckbox(category, "gwShowPanel", P.ShowPanel)
-	-- 独立地图信息面板：不受上面「显示位面监视面板」影响
-	local worldMapPanel = registerCheckbox(category, "gwWorldMapPanel", P.WorldMapPanel)
-	local worldMapPosition = registerDropdown(category, "gwWorldMapPosition", P.WorldMapPosition, {
-		{ "top", P.WorldMapTop }, { "bottom", P.WorldMapBottom },
-	})
-	dependOn(worldMapPosition, worldMapPanel, "gwWorldMapPanel")
-	registerCheckbox(category, "gwIsLocked", P.Lock)
-	registerCheckbox(category, "gwAutoHideInCombat", P.AutoHide)
-	registerCheckbox(category, "gwShowTooltip", P.DetailedTooltip)
-	registerDropdown(category, "gwGrowDirection", L.GrowDirection, {
-		{ "down", L.GrowDown }, { "up", L.GrowUp },
-	})
-	registerDropdown(category, "gwMapNameMode", L.MapNameMode, {
-		{ "none", L.MapNameNone }, { "inline", L.MapNameInline }, { "separate", L.MapNameSeparate },
-	})
-
-	-- 宽度默认按 8 个中文字符估算，可在设置里调整
-	registerSlider(category, "gwPanelWidth", L.PanelWidth, 160, 420, 10,
-		numberFormatter("%d"))
-	registerSlider(category, "gwUpdateInterval", P.UpdateInterval, 0.1, 2.0, 0.1,
-		numberFormatter("%.1f"))
-	registerSlider(category, "gwFontSize", P.FontSize, 10, 32, 1,
-		numberFormatter("%d"))
-	registerSlider(category, "gwAlpha", P.Alpha, 0.1, 1.0, 0.05,
-		numberFormatter("%.2f"))
-	registerSwatch(category, "gwBgColor", P.BackgroundColor)
-	-- 原生色板不支持 alpha（SetupColorPickerAndShow 无 hasOpacity，回写强制 ff），
-	-- 透明度用独立滑条，hex 的 alpha 位忽略
-	registerSlider(category, "gwBgAlpha", P.BgAlpha, 0, 1.0, 0.05,
-		numberFormatter("%.2f"))
-	registerSwatch(category, "gwBorderColor", P.BorderColor)
-	registerSlider(category, "gwBorderAlpha", P.BorderAlpha, 0, 1.0, 0.05,
-		numberFormatter("%.2f"))
-
 	Settings.RegisterAddOnCategory(category)
 	return category
 end
@@ -199,9 +128,6 @@ ns.RegisterOnAddonLoaded(function(addon)
 		and Settings.CreateCheckbox and Settings.RegisterAddOnCategory then
 		local category = registerOptions()
 		ns.settingsCategoryID = category.ID
-		for _, key in ipairs(refreshKeys) do
-			watchRefresh(key)
-		end
 	end
 end)
 
