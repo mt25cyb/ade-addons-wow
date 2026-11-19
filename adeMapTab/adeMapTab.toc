@@ -1,0 +1,18 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MapTab
+## Title-zhCN: |cff00AAFF[ADE]|r 地图标签页基座
+## Title-zhTW: |cff00AAFF[ADE]|r 地圖標籤頁基座
+## Author: ADE 阿德
+## Version: v6.5-r001
+## Notes: Shared world-map tab scaffolding built on LibWorldMapTabs (ADE v6.5 / UIKit ecosystem; no standalone features).
+## Notes-zhCN: 基于 LibWorldMapTabs 的世界地图标签页公共函数库（ADE v6.5），本身不提供落地功能。
+## Notes-zhTW: 基於 LibWorldMapTabs 的世界地圖標籤頁公共函式庫（ADE v6.5），本身不提供落地功能。
+## IconAtlas: unitframeicon-chromietime
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## License: MIT
+# 加载顺序：LibStub → LibWorldMapTabs → 公共函数库 → Core（见 README.md）
+Libs\LibStub\LibStub.lua
+Libs\LibWorldMapTabs\LibWorldMapTabs.lua
+Public\MapTab.lua
+Core.lua
