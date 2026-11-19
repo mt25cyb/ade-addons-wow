@@ -133,7 +133,7 @@ local function Build()
     local lib = GetOF()
     if not lib then return nil end
     tab = lib.RegisterTab({
-        name = L.ADDON_TITLE or "adeChatBar",
+        name = ACB.title,
         saved = ACB.db or {},
         groups = {
             { name = L.GROUP_UI or "UI", sections = { "appearance", "channels" } },
@@ -146,7 +146,23 @@ local function Build()
         resetSection = ResetSection,
         onCreated = function() end,
     })
+    -- 原生「设置 > 插件」里注册「打开选项」入口页（KAF Stub 同款）
+    if lib.RegisterOptionsStub then
+        lib.RegisterOptionsStub({
+            title = ACB.title,
+            version = ACB.version,
+            tab = tab,
+        })
+    end
     return tab
+end
+
+--- 加载期注册 tab 与 stub 页（Core ADDON_LOADED 调用；KAF Stub 同款时点）。
+--- ade_UIKit 为 ## Dependencies 硬依赖，失败直接 error 暴露，不做静默降级。
+function ACB:InitOptionsStub()
+    if not Build() then
+        error("adeChatBar: 加载期注册设置页失败（ade_UIKit RegisterTab 不可用）")
+    end
 end
 
 function ACB:RefreshOptions()

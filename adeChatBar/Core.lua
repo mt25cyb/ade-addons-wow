@@ -5,7 +5,13 @@ local addonName = ...
 local ACB = _G.adeChatBar or {}
 _G.adeChatBar = ACB
 ACB.name = addonName or "adeChatBar"
-ACB.version = "v6.5-r001"
+-- 名称/版本/图标统一经 UIKit GetAddonMeta 取 TOC 元数据（用户 2026-11-18；
+-- 图标 IconTexture 优先于 IconAtlas，spec 供自绘小地图按钮消费）。
+local OF = GetBlizzOptionsFrame("ade_UIKit", true)
+local addonMeta = OF.GetAddonMeta(addonName)
+ACB.title = addonMeta.title
+ACB.version = addonMeta.version
+ACB.iconSpec = addonMeta.icon
 ACB.ACCENT = "|cFFEEE4AE"
 
 local L = ACB.L or {}
@@ -157,7 +163,7 @@ end
 
 function ACB:Print(msg)
     if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(self.ACCENT .. "adeChatBar|r: " .. tostring(msg))
+        DEFAULT_CHAT_FRAME:AddMessage(self.title .. ": " .. tostring(msg))
     end
 end
 
@@ -167,6 +173,9 @@ events:RegisterEvent("PLAYER_LOGIN")
 events:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ACB.name then
         ACB:InitDB()
+        -- 原生「设置 > 插件」的「打开选项」入口页在加载期注册（KAF Stub 同款时点）；
+        -- ade_UIKit 为硬依赖，失败直接 error 暴露，不做静默降级。
+        if ACB.InitOptionsStub then ACB:InitOptionsStub() end
         events:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" then
         if not ACB.db then ACB:InitDB() end

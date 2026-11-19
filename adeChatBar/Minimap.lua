@@ -9,7 +9,6 @@ local atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
 local DEFAULT_ANGLE = ACB.DEFAULTS.state.minimapAngle
 local ACCENT = { 238 / 255, 228 / 255, 174 / 255 }
 
-local ICON_FALLBACK = "Interface\\ChatFrame\\UI-ChatIcon-ArmoryChat"
 local BG = "Interface\\Minimap\\UI-Minimap-Background"
 local HIGHLIGHT = "Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
 local BORDER = "Interface\\Minimap\\MiniMap-TrackingBorder"
@@ -88,7 +87,7 @@ function ACB:CreateMinimapButton()
         if not GameTooltip then return end
         GameTooltip:SetOwner(selfButton, "ANCHOR_LEFT")
         GameTooltip:ClearLines()
-        GameTooltip:AddLine(L.ADDON_TITLE or "adeChatBar", ACCENT[1], ACCENT[2], ACCENT[3])
+        GameTooltip:AddLine(ACB.title, ACCENT[1], ACCENT[2], ACCENT[3])
         GameTooltip:AddLine(L.TT_LEFT or "Left-click: show/hide the channel bar", 1, 1, 1)
         GameTooltip:AddLine(L.TT_RIGHT or "Right-click: open settings", 1, 1, 1)
         GameTooltip:AddLine(L.TT_DRAG or "Drag to reposition", 0.75, 0.75, 0.75)
@@ -100,16 +99,15 @@ function ACB:CreateMinimapButton()
     b.background:SetTexture(BG)
     b.background:SetSize(24, 24)
     b.background:SetPoint("CENTER")
-    local iconAtlas = C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(ACB.name, "IconAtlas")
-    local iconTexture = C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(ACB.name, "IconTexture")
+    -- 图标两态统一走 UIKit ApplyIcon（spec 取自 GetAddonMeta，IconTexture 优先于
+    -- IconAtlas；TOC 元数据缺失即按钮无图标，暴露问题便于排查）。
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetSize(20, 20)
     b.icon:SetPoint("CENTER")
     b.icon:SetTexCoord(0, 1, 0, 1)
-    if iconAtlas then
-        b.icon:SetAtlas(iconAtlas)
-    else
-        b.icon:SetTexture(iconTexture or ICON_FALLBACK)
+    local of = GetBlizzOptionsFrame("ade_UIKit", true)
+    if ACB.iconSpec and of and of.ApplyIcon then
+        of.ApplyIcon(b.icon, ACB.iconSpec)
     end
     b:SetHighlightTexture(HIGHLIGHT)
     b.border = b:CreateTexture(nil, "OVERLAY")
