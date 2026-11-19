@@ -1,0 +1,8 @@
+<Bindings>
+    <Binding name="ADEPORTALTAB_TOGGLE_PANEL" category="adeMapTab_Portal">
+        ADEMAPTAB_PORTAL_TOGGLE()
+    </Binding>
+
+    <Binding name="CLICK ADEPortalTabRandomHearthstoneButton:LeftButton" category="adeMapTab_Portal">
+    </Binding>
+</Bindings>
