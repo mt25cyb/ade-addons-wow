@@ -1,5 +1,17 @@
 # adeBagPack CHANGELOG
 
+## v6.5-r001-a18 - 2026-11-19（Baganator 银行/战团银行标题栏整理按钮）
+
+**按用户要求把标题栏 sort 左侧的 atlas 整理按钮（a17 形态）扩展到 Baganator 银行/战团银行视图：`Extra/Baganator.lua` 扫描前缀扩为 Backpack+Bank 共 4 条（银行帧名实证 Baganator Initialize.lua:224-228）；银行是单帧双 tab（BankView.lua:40/:75-80 currentTab 切换 Character/Warband），不照抄旧版「两按钮按 tab 显隐重挂」而是沿用 a17 单按钮注入，OnClick/tooltip 按 `GetActiveBankTab(view)`（`view.Warband and view.currentTab == view.Warband`）动态生成——角色 tab：左键整理银行、Shift+左键 bank2bag；战团 tab：左键整理战团银行、Shift+左键 abank2bag、Shift+右键 abank2bank（三个转移 def 现版均可用，Pack.lua:93-102）；tooltip OnEnter 实时读 tab，切换后自动正确。增注 `BankViewChanged` 回调重排银行视图（BankView.lua:71 广播）；「未找到视图」提示改走三语 `BAGANATOR_NOT_FOUND`。三语新增 7 键，`DESC_BAGANATOR_BUTTON` 更新为背包/银行（含战团银行）。TOC bump v6.5-r001-a18。**
+
+## v6.5-r001-a17 - 2026-11-19（Baganator 按钮改标题栏 sort 左侧材质图标）
+
+**按用户要求把 Baganator 整理按钮从「界面下方文本按钮」（`RegisterRegion bottom_left`）改为「标题栏原排序按钮左侧的材质图标按钮」：`bags-button-autosort-up/down`（暴雪原生 BagItemAutoSortButton 同款 atlas，ContainerFrame.xml:312-315）。因 Baganator 官方 API 仅支持 bottom_left/top_left 区域注入、无标题栏按钮扩展点，改走视图帧内部路径——扫描 `Baganator_SingleView/CategoryViewBackpackViewFrame*`（Initialize.lua:150-151），取 `view.ButtonsManager`（视图帧子帧，Utilities.lua:9-13），hook `Arrange`（Buttons.lua:61-145 每次重排 topRight 锚点）在 sort 按钮左侧插入本按钮并把原左邻改锚到本按钮左侧，避免遮挡；开关关闭时直接 return 不触碰原生按钮链。图标按钮 28×26、Normal/Pushed 双 atlas + HIGHLIGHT，parent=视图帧随其显隐，保留左键整理/Shift+左键 bag2bank 转移与 tooltip；`RegisterContainerSort` 排序注册不变。TOC bump v6.5-r001-a17。**
+
+## v6.5-r001-a16 - 2026-11-19（原生背包外挂自建整理按钮）
+
+**按用户要求引入「外挂方式在背包界面加整理按钮」：源插件 adeBackpack 两份副本实测只有「接管原生 BagItemAutoSortButton」（形态 B），无自建按钮；用户确认按描述新建。a16 在 `Extra/Blizzard.lua` 新增形态 A——`AdeBagPackNativeSortButton`（UIPanelButtonTemplate，parent=UIParent 避免污染容器帧 secure 环境），锚在原生整理按钮左侧（原生锚 TOPRIGHT -9,-34，ContainerFrame.lua:978），HookScript(OnShow/OnHide) 跟随 ContainerFrameCombinedBags / ContainerFrame1 显隐，BAG_OPEN/CLOSED + C_Timer.After(0) 重锚（reanchorPending 防递归）对齐原生按钮 SetParent 切换；点击走 DoSort('bag') = Pack:Start。新开关 `nativeSortButton`（默认 true）独立于 `overrideNativeSort`；修复原 Init「hooked 成功即 return」导致自建按钮不初始化的坑。三语 LABEL/DESC_NATIVE_BUTTON + 按钮/提示文案，设置页 pack 分组即时生效、恢复默认纳入。Baganator 按钮沿用现有 RegisterRegion（官方 API 仅支持 backpack 视图，已核 Main.lua:321/338）。TOC bump v6.5-r001-a16。**
+
 ## v6.5-r001-a15 - 2026-11-19（逐项核对 119 件物品 + 诊断 stub 装备部位/tie-break 修复）
 
 **应用户要求按最新存档与日志逐项核对全部 119 件物品：分类 idx 与物理槽位全部对应正确（逆序 desc=true 下 idx 1→100000 沿槽序单调不减），`286563` 落到末尾 idx=27、垃圾沉底 idx=100000、模拟整理「待搬移=0 全部已归位」——整理引擎本身无隐藏错位。核对中发现诊断假象：4 件 armor 的 `boundFirst` 在日志里看似交错，实为 `Debug.lua:MakeStub` 缺 `GetItemEquipLoc`（invSlot 恒 99，抹平装备部位维度）与 `GetGUID=nil`（丢 tie-break），使逐槽 SORTKEY 无法据以核对部位排序；a15 补齐第 9 列 equipLoc 与真实 GUID（按 GUID 缓存不与真实整理互污）。另记录待用户定夺的口径差异（未改行为）：`junkSource=builtin` 下 Poor 品质即垃圾，日志中 2 件任务类物品（278279/278397）被判 junk 沉底，而 Baganator 以 `not hasNoValue` 豁免无价值任务物品（OrderBags.lua:260-261）。TOC bump v6.5-r001-a15。**

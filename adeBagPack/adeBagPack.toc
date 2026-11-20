@@ -5,7 +5,7 @@
 ## Notes: 背包/银行（含战团银行）整理与分类排序（旧 adeBackpack 移植，v6.5 体系）
 ## Author: Martin Good (mt25cyb)
 ## Category: -|cff00D9FF ade |r-
-## Version: v6.5-r001-a15
+## Version: v6.5-r001-a18
 ## X-License: MIT
 ## IconAtlas: bag-main
 ## Dependencies: ade_UIKit

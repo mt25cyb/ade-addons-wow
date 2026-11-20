@@ -15,6 +15,7 @@ ns.defaults = {
         messageframe = 2,                 -- 1=聊天框 2=UIErrors
         useBlizzardSort = false,          -- 启用暴雪原生整理（右键菜单/兜底）
         overrideNativeSort = true,        -- 接管原生背包整理按钮（false=保留原生按钮行为）
+        nativeSortButton = true,          -- a16：在原生背包界面外挂一个自建整理按钮（独立于原生接管）
         desc = true,                      -- 默认逆序整理
         symmetricJunk = true,             -- a11：垃圾对称整理（替代 junkZone 垃圾钉放区）
         orders = { CustomOrder = {}, EquipLocOrder = {} },

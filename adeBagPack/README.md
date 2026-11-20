@@ -9,8 +9,8 @@ v6.5 体系独立插件（旧 adeBackpack 移植重构）：背包 / 银行（�
 - **逆序整理 / 垃圾对称整理**：支持从末槽反向填充；可选 Baganator 同款对称整理——非垃圾从首格正向排、垃圾从末格逆向排、**两段之间留空**（如 100 格时非垃圾占格 1 起、垃圾占格 100 起，中间空），开启逆序时整体镜像（替代旧「垃圾钉放区」）。旧档 `junkZone` 升级时自动迁移为新开关。
 
 > 说明：a11 的对称整理只反排物品列表、未改槽位分配，物理上无法留空；a12 改为显式「物品→目标槽」双端游标映射（对齐 Baganator `OrderBags.lua`），对称整理才真正生效。
-- **原生整合**：接管暴雪原生背包整理按钮（`Extra/Blizzard.lua`，可开关）。
-- **Baganator 集成**：注册为 Baganator 官方容器排序 + 背包视图注入整理按钮（`Extra/Baganator.lua`，官方 API `RegisterContainerSort` / `RegisterRegion`）。
+- **原生整合**（`Extra/Blizzard.lua`，两项独立开关）：① 背包内显示自建整理按钮（外挂到原生背包右上角、原生整理按钮左侧）；② 接管暴雪原生整理按钮（点击原生按钮时触发本插件排序）。
+- **Baganator 集成**：注册为 Baganator 官方容器排序 + 背包/银行（含战团银行）视图标题栏「排序」按钮左侧的材质整理按钮（`Extra/Baganator.lua`，`RegisterContainerSort` 官方 API；按钮走视图帧 `ButtonsManager` 的 `Arrange` hook，使用暴雪原生 `bags-button-autosort-up/down` atlas；银行视图单按钮随激活 tab 动态——角色银行：左键整理、Shift+左键取回背包；战团银行：左键整理、Shift+左键取回背包、Shift+右键存入银行）。
 - **外部插件支持**（`External.lua`，选项随目标插件加载状态禁用/启用）：
   - Dejunk —— 垃圾判定来源接管（仅排序侧判定，不出售）；
   - ItemEra —— 资料片 / 专业文本显示（仅显示，排序键不变）。

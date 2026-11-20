@@ -81,6 +81,10 @@ local function AfterSet(key)
             and ABP.Blizzard and ABP.Blizzard.ApplyOverride then
         ABP.Blizzard:ApplyOverride()
     end
+    -- a16：自建按钮开关即时显隐
+    if key == "nativeSortButton" and ABP.Blizzard and ABP.Blizzard.ApplyNativeButton then
+        ABP.Blizzard:ApplyNativeButton()
+    end
     if key:find("^external%.") and ABP.External and ABP.External.Apply then
         ABP.External:Apply()
     end
@@ -102,6 +106,7 @@ local sections = {}
 
 sections.pack = {
     { kind = "note", text = L["NOTE_USAGE"] },
+    KeySpec({ kind = "toggle", label = L["LABEL_NATIVE_BUTTON"], desc = L["DESC_NATIVE_BUTTON"] }, "nativeSortButton"),
     KeySpec({ kind = "toggle", label = L["LABEL_OVERRIDE_NATIVE"], desc = L["DESC_OVERRIDE_NATIVE"] }, "overrideNativeSort"),
     KeySpec({ kind = "toggle", label = L["LABEL_USE_BLIZZARD"], desc = L["DESC_USE_BLIZZARD"] }, "useBlizzardSort"),
 }
@@ -237,7 +242,7 @@ local sectionNames = {
 }
 
 local sectionKeys = {
-    pack = { "useBlizzardSort", "overrideNativeSort" },
+    pack = { "nativeSortButton", "useBlizzardSort", "overrideNativeSort" },
     sort = { "desc", "symmetricJunk" },
     categories = { "orders.CustomOrder", "orders.EquipLocOrder" },
     interface = { "showmessage", "messageframe", "minimap.hide", "minimap.minimapPos" },
