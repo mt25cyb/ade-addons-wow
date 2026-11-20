@@ -1,0 +1,19 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r PerfGuard
+## Title-zhCN: |cff00AAFF[ADE]|r 性能护栏
+## Title-zhTW: |cff00AAFF[ADE]|r 效能護欄
+## Author: Martin Good (mt25cyb)
+## Version: v6.5-r001
+## Notes: One-shot reminder when debug CVars (taintLog/scriptProfile) are left on. /adeperf on|off
+## Notes-zhCN: 调试 CVar（taintLog/scriptProfile）未关时进副本一次性提醒。/adeperf on|off
+## Notes-zhTW: 偵錯 CVar（taintLog/scriptProfile）未關時進副本一次性提醒。/adeperf on|off
+## IconAtlas: lemixArtifact-node-FX
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## X-License: MIT
+## SavedVariables: ADEDB_PERF_GUARD
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+InitDB.lua
+Core.lua
