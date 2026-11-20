@@ -601,7 +601,10 @@ local optionTypes = {
 }
 
 local function WithControl(row)
-    return row.With and row.With.Type == "range" and row.Range or row.Execute
+    if not row.With then return row.Execute end
+    if row.With.Type == "range" then return row.Range end
+    if row.With.Type == "color" then return row.Color end
+    return row.Execute
 end
 
 function OptionRowMixin:OnLoad()
@@ -630,7 +633,9 @@ function OptionRowMixin:OnLoad()
         -- b034：色块点击 → 官方 ColorPickerFrame。swatchFunc 实时回写 hex 并刷新色块；
         -- cancelFunc 还原打开时的存档值（closure 捕获 startHex，比 prev 参数更直接）。
         self.Color:SetScript("OnClick", function()
-            local option = self.Option
+            -- 色块可能是 toggle 的 with 副控件（如「使用职业色」+自定义色），
+            -- 此时要操作 with 的颜色值而非宿主 toggle。
+            local option = self.With and self.With.Type == "color" and self.With or self.Option
             if not option or option.Type ~= "color" then return end
             if not ColorPickerFrame or not ColorPickerFrame.SetupColorPickerAndShow then return end
             local startHex = tostring(option:Get() or "")
@@ -741,6 +746,9 @@ function OptionRowMixin:Init(element, window)
         if with.Type == "range" then
             self.Range:SetWidth(geometry.WithSliderWidth)
             InitRange(self, with)
+        elseif with.Type == "color" then
+            RefreshSwatch(self, with)
+            self.Color:Show()
         else
             self.Execute:SetText(with:GetButtonText())
             self.Execute:Show()
@@ -774,6 +782,9 @@ function OptionRowMixin:Refresh()
         local withDisabled = disabled or with:IsDisabled()
         if with.Type == "range" then
             RefreshRange(self, with, withDisabled)
+        elseif with.Type == "color" then
+            RefreshSwatch(self, with)       -- 职业色开关切换时色块随之更新
+            self.Color:SetEnabled(not withDisabled)
         else
             self.Execute:SetEnabled(not withDisabled)
         end

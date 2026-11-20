@@ -2,7 +2,7 @@
 ## Title: |cff00AAFF[ADE]|r UIKit
 ## Notes: ADE 系列插件共享控件库 + 样式库 + 公共函数库（原生选项窗口 / 两栏布局 / 多插件 Tab / 原生控件优先）
 ## Author: ADE 阿德
-## Version: v6.5-r001-b050
+## Version: v6.5-r001-b051
 ## Category: -|cff00D9FF ade |r-
 ## Globe-Main: ADE
 ## IconTexture: Interface\AddOns\ade_UIKit\assets\ade_128

@@ -153,7 +153,8 @@ local function Normalize(element)
     if copy.Detail == nil then copy.Detail = element.detail end
     if copy.Kind == "Option" and not copy.Option and Internal.MakeOption then
         copy.Option = Internal.MakeOption(copy)
-        -- KAF RowMixins.lua:28-33：toggle 可跟一个 range 或 execute 作为 With 组合控件。
+        -- KAF RowMixins.lua:28-33：toggle 可跟一个 range / execute / color 作为 With 组合控件
+        -- （b051 起支持 color：勾选框右侧色块，如「使用职业色」+自定义色）。
         if copy.Option.Type == "toggle" and element.with then
             copy.With = Internal.MakeOption(element.with)
         end

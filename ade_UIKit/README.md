@@ -39,6 +39,7 @@ tab:Open("general")
 - 图标（b017）：`OF.ResolveIcon(icon)` / `OF.ApplyIcon(texture, icon, opts)` / `OF.IconEscape(icon, size)` / `OF.SetButtonIcon(button, icon, opts)`，支持 FilePath / FileID / Atlas 三态。
 - 小地图（b017）：`OF.CreateMinimapButton(opts)` / `OF.ApplyMinimapPosition(btn, angle, radius)` / `OF.SetMinimapButtonShown(btn, shown)` / `OF.AngleFromCursor(frame)`；零依赖自绘，显隐由宿主的 `getShown/setShown` 委托。
 - 行类型（b018/b019）：在 `RegisterTab` 的 `elements` 中使用 `{ kind = "multiline", label, get, set, default, disabled }`，就地渲染**可滚动**多行 EditBox（label 贴顶且与 NameLeft 同缩进、Enter 换行、失焦提交、`disabled` 只读，行高 118），适合宏体 / 导入导出等长文本。b019 增加 `onTextChanged(edit, userChanged)` 与 `onEditBox(edit)` 回调（后者把实际 EditBox 交给宿主），`disabled` 支持函数形式。
+- 颜色选项 spec（b051）：`lib.ColorOption(spec)` 建单纯颜色行；`lib.ToggleColorOption(toggleSpec, colorSpec)` 建「开关 + 同行色块」行（截图「显示职业颜色」结构），勾选时色块自动禁用，取消勾选走自定义色，宿主自有的 `disabled` 与勾选禁用取「或」。底层 `OptionRow` 的 `with.Type=="color"` 全链路已支持；`RegisterTab` 的 `elements` 中 `with` 仅在主 option 为 toggle 时构造。
 - 配置分享字符串（b019）：`lib.ShareString.Encode(prefix, payload)` / `Decode(text, prefix, validate)` / `Sanitize(profile, defaults, nestedKey)`；`C_EncodingUtil` CBOR→压缩→Base64，前缀识别来源，每步 pcall，错误返回本地化 key。宿主自行构造 payload（`{schemaVersion, profile}`）与校验回调，本 API 不碰存档、不 ReloadUI。
 
 ## 能力（均源自 KAF 蓝本）

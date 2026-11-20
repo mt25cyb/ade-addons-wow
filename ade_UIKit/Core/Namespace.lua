@@ -4,7 +4,7 @@
 -- 因此函数名带 BOF 前缀，避免两个库同时加载时互相改写全局入口。
 ------------------------------------------------------------
 local MAJOR = "ade_UIKit"
-local MINOR = 13 -- v6.5 从 KAF 复刻重写；b015 Util/Format，b017 Icon/MinimapButton，b018 multiline，b019 可滚动多行/ShareString，b020 payload 泛化/边框，b021 缩进对齐，b022 TextRow 就地 Refresh，b023 Function 目录 + OptionsStub，b024 GetAddonMeta，b025 select 函数式 items，b026 select 下拉滚动；同步内置形态时递增本值
+local MINOR = 14 -- v6.5 从 KAF 复刻重写；b015 Util/Format，b017 Icon/MinimapButton，b018 multiline，b019 可滚动多行/ShareString，b020 payload 泛化/边框，b021 缩进对齐，b022 TextRow 就地 Refresh，b023 Function 目录 + OptionsStub，b024 GetAddonMeta，b025 select 函数式 items，b026 select 下拉滚动，b051 OptionRow 色块可作 toggle 的 with 副控件 + ColorOption/ToggleColorOption 两种 spec 工厂；同步内置形态时递增本值
 
 _G.BOF_LIBS = _G.BOF_LIBS or {}
 _G.BOF_LIB_MINORS = _G.BOF_LIB_MINORS or {}

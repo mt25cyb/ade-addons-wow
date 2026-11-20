@@ -1,5 +1,9 @@
 # ade_UIKit CHANGELOG
 
+## b051 - 2026-11-20（OptionRow：色块可作 toggle 的 with 副控件 + 两种颜色 spec 工厂）
+
+**OptionRow 的 `WithControl`/Color OnClick/Init/Refresh 全链路支持 `with.Type=="color"`：勾选框右侧直接显示色块（暴雪「显示职业颜色」同款结构），点击走官方 ColorPickerFrame、写回 with 的颜色值。新增导出 `lib.ColorOption(spec)`（单纯颜色行）与 `lib.ToggleColorOption(toggleSpec, colorSpec)`（开关+同行色块，勾选时色块自动禁用、与宿主自有 disabled 取「或」）。`RegisterTab` elements 的 `with` 仅在主 option 为 toggle 时构造（Kinds.Normalize）。MINOR 13→14、TOC bump b051。**
+
 ## b050 - 2026-11-19（ListRow：排序按钮扩为四项 + CovenantSanctum 材质三态）
 
 **按用户要求：预置 showMove 按钮由「上移/下移」两项扩为「移到最上 / 上移 / 下移 / 移到最下」四项——视觉从左到右（删除仍最右）；自右向左构建次序 = delete/moveToBottom/moveDown/moveUp/moveToTop，自定义 entryButtons 仍追加最左。材质按用户指定：单箭头（移一层）= `CovenantSanctum-Renown-Arrow` / `-Hover` / `-Disabled`；双箭头（移到顶/底）= `CovenantSanctum-Renown-DoubleArrow` / `-Hover` / `-Disabled`，均向左箭头：rotation −90° = 向上、+90° = 向下（b041 旋转实证）；hoverAtlas 走 EntryButton 既有 OnEnter/OnLeave 三态切换。新增 `ListRowMixin:MoveTo(idx, target)`（remove+insert 保序搬运）；首项禁用「移到最上/上移」、末项禁用「下移/移到最下」。三语补 `BOF_LIST_MOVE_TOP` / `BOF_LIST_MOVE_BOTTOM`。旧 backarrow/forwardarrow 组仍供 TabRow 使用。TOC bump v6.5-r001-b050。**
