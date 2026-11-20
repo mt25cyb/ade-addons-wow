@@ -1,0 +1,22 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r TimerHUD
+## Title-zhCN: |cff00AAFF[ADE]|r 计时面板
+## Title-zhTW: |cff00AAFF[ADE]|r 計時面板
+## Category: -|cff00D9FF ade |r-
+## Notes: Single-panel clock HUD with native Time Manager alarm.
+## Author: ADE 阿德
+## Version: v6.5-r032
+## IconAtlas: islands-queue-prop-compass
+## Dependencies: ade_UIKit
+## SavedVariables: ADEDB_TIMERHUD
+
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+InitDB.lua
+Modules\Media.lua
+Modules\TimeFormat.lua
+Modules\AlarmClock.lua
+Modules\Clock.lua
+Options.lua
+Core.lua
