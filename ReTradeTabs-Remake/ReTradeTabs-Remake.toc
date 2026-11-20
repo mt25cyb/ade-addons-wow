@@ -1,0 +1,12 @@
+## Interface: 120105, 16001
+## Title: ReTradeTabs-Remake
+## Notes: Adds spellbook-style tabs to the ProfessionsFrame for easy swapping between production skills. |n|n|cff33ff99/rtt|r refresh
+## Author: tardmrr, Shadowhand (original), 12.x remake
+## Version: 12.1.5-1.1.0
+## IconTexture: Interface\Icons\Trade_Smithing
+## Category: Tradeskill
+## OptionalDeps: AllTheThings
+## SavedVariables: RTTAnchorPoint
+
+ReTradeTabs.lua
+RTT_ATT_Ext.lua
