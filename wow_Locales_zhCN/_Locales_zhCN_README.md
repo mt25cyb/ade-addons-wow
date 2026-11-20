@@ -17,6 +17,7 @@
 | **A · 每语言独立文件** | 每种语言一个文件（如 `Locales/xxXX.lua`），由 `.toc` 或 `locale.xml` 显式加载 | ① 完全没有 `zhCN.lua`；② 已有 `zhCN.lua` 但部分 key 缺失 / 大量 value 仍为英文 | ① 新建并登记清单；② 对照英文基准补全并覆盖原文件 |
 | **B · 单文件集中多语言** | 所有语言写在**同一个文件**里（含 AceLocale 同文件多语种分段），zhCN 往往靠回退显示英文 | zhCN 表 / zhCN 段不存在或严重残缺 | 在该文件内补全 zhCN 表 / zhCN 段，整体覆盖同步该文件 |
 | **D · 外挂劫持补丁** | 插件硬编码英文、无任何多语言机制，且不愿改源文件 | 全部英文 | 做独立外挂插件运行时劫持 `SetText` 整串替换，见 [`_Locales_zhCN_External-Locale-Patch-Handbook.md`](_Locales_zhCN_External-Locale-Patch-Handbook.md)；已落地实例：`Patches/Retrace_LocalesPatch/` |
+| **E · 源码级自建多语言改造** | 插件硬编码英文，且外挂补丁覆盖不全（如 AceGUI 组件内文本），改走源码：硬编码包 `L["<英文原文>"]` + 全局语言表缺键回退 | 全部英文 | 按插件改造文档在**源码内**包裹文本并新建语言文件；产物含源码改动，**不适用 zhcn_sync 同步流程**，插件重装后须按文档重新应用。已落地实例：`CompassHUD`（文档在子项目根，成果目录 `CompassHUD/`，脚本在 `_tools`，见下文条目） |
 | *（预留）C · 框架式 locale* | 使用 Ace3 / LibStub / 注册式 locale 表等 | 取决于具体框架 | 按框架约定写入对应 locale 表，必要时注册 |
 
 > 判断属于哪类，只需看插件目录：有 `Locales/` 且里面是 `enUS.lua`/`deDE.lua`… 的多半是 A 类；
@@ -119,6 +120,23 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   更常用「图钉」）。
 - 尺寸档：Tiny → `特小号`（对齐既有 Small=小号 / Default=默认 / Large=大号）。
 - 已完成文件：`MapPinEnhanced_zhCN.lua`（同步至镜像 `locales/zhCN.lua`）。
+
+### EmberLedger（A-① 变体：自建框架 localeOverrides 插表，2026-11-19）
+
+- 机制：**自建本地化框架**（非 AceLocale）——`Localization.lua` 内嵌 `local enUS = {...}`
+  基线表（**英文串即 key**，141 条）→ 装入 `EL.L` → `localeOverrides` 表按
+  `EL.locale` 合并（上游已有 `["ruRU"]` 社区全译）。TOC 第三位加载。
+- 落地（**B 类整文件模式**，同 VanasKoS）：主档 `EmberLedger/Localization.lua` 为镜像
+  完整副本 + 版本头，在 `localeOverrides` 的 ruRU 表后平级插入 `["zhCN"]` 全译 141 条；
+  sync 整文件覆盖镜像。**diff_keys 不登记**（enUS/zhCN 同文件且结构与 SEGMENT 模式不同，
+  齐平用一次性脚本比对 enUS 141 / zhCN 141，缺失 0）。
+- 专名查证：`Concentration` → `专注`（10.2 现役官方资源名）；`Artisan Moxie`、
+  `Imbued Mulch`/`Mulch` 为 12.0「至暗之夜」新系统，Wowhead CN 被地域封锁、社区无权威
+  官方译名 → **保留英文**（不臆造，待用户给出口径或官方译名后更新）。
+- 译法：`Conc 1/2` → `专注 1/2`、`charges` → `次数`、`Realm` → `服务器`、
+  `/el` 命令字面量保留英文、`P1/P2` 保留；Welcome 长文本保留 `\n\n` 结构全译。
+- 工具登记：sync / check_versions（版本头规范格式——⚠ 首行括号内不得加后缀，
+  HEADER_RE 要求 `（基准 enUS <版本>）` 严格收尾）；版本基线 2.3.5 MATCH。
 
 ### Prat-3.0（A-②：PRAT_L 全局共享表补齐，2026-11-17）
 
@@ -298,6 +316,37 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 已知局限（手册 §11 口径）：事件叙述/日期/距离统计等运行时格式化串、地图事件气泡内容、
   `Atlas.lua` 内置的经典副本与首领英文名（数据类，未译）、聊天命令输出（走 `print`）保留英文。
 
+### CompassHUD（E 类：源码级自建多语言改造，2026-11-19）
+
+- 判定：全部界面文案硬编码英文、无任何多语言机制。曾按 D 类做过外挂劫持补丁，
+  **实测只命中小地图图标 tooltip**，设置界面等 AceGUI-3.0 组件内文本无法劫持——
+  外挂方案整体废弃删除，改走 **E 类源码改造**（本子项目首例；见踩坑记录 #17）。
+- **独立子项目（文件位于 `wow_Locales_zhCN/` 根 + 成果目录 + `_tools` 脚本）**：
+  - [`_Locales_CompassHUD_zhCN_Development-Process.md`](_Locales_CompassHUD_zhCN_Development-Process.md)：
+    完整开发流程（路线变更、机制设计、加载时序、开发实录、校验、快速应用、实机验证清单）；
+  - [`_Locales_CompassHUD_zhCN_Modification-Locations.md`](_Locales_CompassHUD_zhCN_Modification-Locations.md)：
+    修改位置明细（20 个文件逐个表格，含锚点行号与不译位置核对清单）；
+  - [`_Locales_CompassHUD_zhCN.lua`](_Locales_CompassHUD_zhCN.lua)：
+    中英对照词条主档（**520 条**，507 静态 + 13 条 `%s` 模板；key=英文原文逐字对齐；唯一权威）；
+  - `CompassHUD/`：**项目成果 = 插件目录镜像**（20 个文件），可整目录直接覆盖游戏插件安装目录；
+  - `_tools/CompassHUD_zhCN_Locations-apply.ps1`：一键应用脚本。
+- 机制：全局表 `CompassHUDLocale`（`__index` 缺键回退返回 key 即英文原文，英文零维护）；
+  源码硬编码全部包 `L["<英文原文>"]`；`Init.lua` 经 `Addon.env.L` 注入共享环境
+  （⚠ 仅对执行了 `setfenv(1, Addon.env)` 的文件生效，`databroker.lua` 等主块文件须
+  自行 `local L = CompassHUDLocale`，见踩坑 #18）；
+  Profiles 页由 `Libs\AceDBOptions-3.0` **自带 zhCN 语言块**自译——第三方库保持原样不改；
+  TOC 中 Locales 两文件位于 `Libs\libs.xml` 之前（全局表与回退说明同在 enUS.lua 头部，
+  不再单独加载 Localization.lua）。
+- 规模：Options.lua 478 + Looks.lua 70 + 其余 59 ≈ **607 处 L[ 引用**，对应主档 520 条。
+- **快速应用**（插件重装同版本后一条命令）：
+  `powershell -ExecutionPolicy Bypass -File _tools\CompassHUD_zhCN_Locations-apply.ps1`
+  （版本基线核对 → 主档刷新成果目录 → 成果整体覆盖 → 哨兵行核验；版本不符时拒绝执行需 `-Force`）。
+- **上游更新流程**：先 `git diff --no-index` 对比成果目录与新版 → 按修改位置文档逐文件
+  复核 → 更新主档/成果/版本基线 → 脚本加 `-Force` 重跑。
+- 改造后完整插件备份：`_temp\CompassHUD_zhCN\`（2.1.1 多语言版；Libs 与原版一致）。
+- 不译清单：内部存档键、poiTypeEnum / Enum 值、纹理查找键、LSM 媒体名、方向字母、
+  AddToBlizOptions 路径键（详见修改位置文档）。
+
 ## 踩坑记录
 
 开发过程中实际踩到的坑，按机制归类沉淀于此；新增条目须写清「现象 → 原因 → 对策」。
@@ -358,6 +407,18 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
     「跨行拆开的半截串」）。对策：改为全文抓引号字面量 + 去注释行（不依赖行结构，同行多串
     天然免疫）；**不要重排镜像里的原版 enUS 来"修复"**（镜像只读）。Fitter 2.12.2 升级时由
     此补回 95 条、删 7 条半截串。
+17. **D 类外挂补丁对 AceGUI/框架内文本覆盖不全时，果断升级为 E 类源码改造**（CompassHUD）。
+    实测：劫持 `SetText` 只命中小地图图标 tooltip，AceConfig 设置面板（AceGUI-3.0 组件树、
+    动态构建的 label/checkbox 文本）大量文本无法静态枚举劫持。凡设置界面基于 AceConfig
+    / AceGUI 或类似运行时构建框架的硬编码插件，直接走源码包裹 `L["<原文>"]` +
+    全局语言表缺键回退，不做外挂补丁（避免双重维护与半覆盖状态）。
+18. **包裹全局语言表引用前，先确认目标文件是否进入共享环境**（CompassHUD 实机报错）。
+    CompassHUD 靠各文件头部 `setfenv(1, Addon.env)` 共享顶层名，`Init.lua` 注入
+    `Addon.env.L` 只对已 setfenv 的文件可见；`databroker.lua` 无 setfenv（主块跑在
+    全局环境），顶层包裹 `L[...]` 直接报 `attempt to index global 'L' (a nil value)`，
+    且主块中断导致后续文件引用其函数连锁报错。对策：包裹前 grep 目标文件的 setfenv
+    情况；不进环境的文件先 `local L = CompassHUDLocale`（语言表本身是真全局，
+    由 TOC 中更早加载的 enUS 文件建立）。
 
 ## 工作流程小结
 
