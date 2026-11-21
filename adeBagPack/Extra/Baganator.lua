@@ -28,6 +28,10 @@
 --    设计上不照抄旧版「bank 视图挂两按钮按 tab 显隐重挂」（切换跳动），沿用 a17 单按钮注入，
 --    OnClick / tooltip 按 GetActiveBankTab(view) 动态生成（tooltip OnEnter 实时读 tab）。
 -- junk 回调剔除（决策 7：判定不接管 Baganator）。
+-- ④ a19：修复本按钮随 Baganator sort 按钮显隐的问题——Baganator 设置可单独设每个按钮
+--    show/hide/alt（Buttons.lua:72-110 读 BUTTONS 配置），原 ReflowButtons 把 sortBtn:IsShown()
+--    当隐藏条件，sort 设为 hide 时本按钮一并消失；改为只由本插件开关决定显隐，sort 隐藏时
+--    锚点回退到可见按钮链首（active.topRight[1]），照 Extra/Blizzard.lua:103-132 的解耦模式。
 -- 开关 external.baganatorSort / baganatorButton 消费（注册时读档，P3.5 External.lua 提供即时挂/卸）。
 local ABP = _G.adeBagPack
 if not ABP then return end
@@ -149,7 +153,13 @@ local function CreatePackButton(view, viewType)
 end
 
 -- Arrange() 每次都会重设 topRight 全部锚点 → 在此之后重新插入本按钮。
--- 关闭开关时直接 return，保持 Baganator 原按钮链不变（避免静默留下空位）。
+-- a19：显隐只由本插件开关决定，**不再跟随 Baganator sort 按钮显隐**
+-- （用户 2026-11-21：Baganator 可单独设置每个按钮 show/hide/alt，把 sort 设为 hide 后
+-- 本按钮曾一并消失）。照 Extra/Blizzard.lua:103-132 的解耦模式：sort 隐藏只回退锚点，
+-- 不隐藏本按钮。Baganator 侧回退锚 = mgr.active.topRight[1]（当前可见链最右按钮，
+-- 通常 customise，即 sort 原位置）；无可见按钮时照 Buttons.lua:125-128 锚 CloseButton。
+-- Baganator 设置变更 → SettingChanged("buttons.*") → Arrange（Buttons.lua:157-161）
+-- → 本 hook 重排，锚点自动适配。
 local function ReflowButtons(view)
     local state = injected[view]
     if not state then return end
@@ -158,22 +168,31 @@ local function ReflowButtons(view)
 
     local p = ABP:GetProfile()
     local enabled = p and p.external and p.external.baganatorButton
-    local sortBtn = mgr:GetButton("sort")  -- 懒创建，parent = view（Buttons.lua:55）
-    if not enabled or not sortBtn or not sortBtn:IsShown() then
+    if not enabled then
         state.btn:Hide()
         return
     end
 
-    state.btn:SetFrameLevel(sortBtn:GetFrameLevel())
+    -- 显式设 700，与 Baganator Arrange() 给可见按钮的 FrameLevel 一致（Buttons.lua:82/113），
+    -- 不再从可能隐藏的 sortBtn 取值。
+    state.btn:SetFrameLevel(700)
+    local active = mgr.active and mgr.active.topRight
+    local sortBtn = mgr:GetButton("sort")  -- 懒创建，parent = view（Buttons.lua:55）
+    local anchor = (sortBtn and sortBtn:IsShown() and sortBtn) or (active and active[1])
     state.btn:ClearAllPoints()
-    state.btn:SetPoint("RIGHT", sortBtn, "LEFT", 0, 0)
+    if anchor then
+        state.btn:SetPoint("RIGHT", anchor, "LEFT", 0, 0)
+    elseif view.CloseButton then
+        state.btn:SetPoint("RIGHT", view.CloseButton, "LEFT", 0, 0)
+    else
+        state.btn:SetPoint("TOPRIGHT", view, "TOPRIGHT", -5, 0)
+    end
 
     -- 原左邻（transfer/swap/…）改锚到本按钮左侧：按钮链从「…→左邻→sort→customise」
-    -- 变为「…→左邻→[ADE]→sort→customise」，不遮挡原生按钮。
-    local active = mgr.active and mgr.active.topRight
+    -- 变为「…→左邻→[ADE]→sort→customise」，不遮挡原生按钮；sort 隐藏时按实际 anchor 插入。
     if active then
         for i, b in ipairs(active) do
-            if b == sortBtn then
+            if b == anchor then
                 local left = active[i + 1]
                 if left then
                     left:ClearAllPoints()
@@ -232,7 +251,7 @@ local function RegisterAll()
 
     -- 视图帧在皮肤切换 / FrameGroup 切换时才创建，回调到达后延迟重扫（幂等）；
     -- BankViewChanged = 银行 tab 切换（BankView.lua:71 SetTab 后广播）→ 重排银行视图按钮
-    -- （tab 切换后 sort 显隐可能变化，防 Arrange 未触发的边缘情况）
+    -- （tab 切换可能改变可见按钮链，防 Arrange 未触发的边缘情况）
     local reg = _G.Baganator and _G.Baganator.CallbackRegistry
     if reg and reg.RegisterCallback and not callbacksRegistered then
         reg:RegisterCallback("BackpackFrameChanged", function() C_Timer.After(0, InjectAll) end)

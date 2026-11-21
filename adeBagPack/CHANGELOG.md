@@ -1,5 +1,9 @@
 # adeBagPack CHANGELOG
 
+## v6.5-r001-a19 - 2026-11-21（修复：adeBP 整理按钮跟随 Baganator 排序按钮显隐）
+
+**修复用户实测问题：Baganator 设置可单独指定每个按钮 show/hide/alt（镜像 `Baganator/ItemViewCommon/Buttons.lua:72-110` 读 `BUTTONS` 配置），把 sort 设为 hide 后 adeBP 标题栏整理按钮也一起消失。根因：`Extra/Baganator.lua` 的 `ReflowButtons()` 把 `sortBtn:IsShown()` 当作 adeBP 按钮的隐藏条件。按 `Extra/Blizzard.lua:103-132` 的解耦模式改造：① 显隐只由本插件开关 `external.baganatorButton` 决定，sort 隐藏不再隐藏本按钮；② 锚点分两路——sort 可见照旧锚其左侧，sort 隐藏时回退到 `mgr.active.topRight[1]`（当前可见链最右按钮，通常 customise，即 sort 原位置），无可见按钮时照 `Buttons.lua:125-128` 锚 `view.CloseButton`；左邻重锚逻辑改用实际 anchor 查找；③ FrameLevel 显式设 700（与 Baganator `Arrange()` 一致），不再取可能隐藏的 sortBtn。Baganator 设置变更触发 `SettingChanged("buttons.*")` → `Arrange()` → hook 自动重排，无需新增事件。TOC bump v6.5-r001-a19。**
+
 ## v6.5-r001-a18 - 2026-11-19（Baganator 银行/战团银行标题栏整理按钮）
 
 **按用户要求把标题栏 sort 左侧的 atlas 整理按钮（a17 形态）扩展到 Baganator 银行/战团银行视图：`Extra/Baganator.lua` 扫描前缀扩为 Backpack+Bank 共 4 条（银行帧名实证 Baganator Initialize.lua:224-228）；银行是单帧双 tab（BankView.lua:40/:75-80 currentTab 切换 Character/Warband），不照抄旧版「两按钮按 tab 显隐重挂」而是沿用 a17 单按钮注入，OnClick/tooltip 按 `GetActiveBankTab(view)`（`view.Warband and view.currentTab == view.Warband`）动态生成——角色 tab：左键整理银行、Shift+左键 bank2bag；战团 tab：左键整理战团银行、Shift+左键 abank2bag、Shift+右键 abank2bank（三个转移 def 现版均可用，Pack.lua:93-102）；tooltip OnEnter 实时读 tab，切换后自动正确。增注 `BankViewChanged` 回调重排银行视图（BankView.lua:71 广播）；「未找到视图」提示改走三语 `BAGANATOR_NOT_FOUND`。三语新增 7 键，`DESC_BAGANATOR_BUTTON` 更新为背包/银行（含战团银行）。TOC bump v6.5-r001-a18。**
