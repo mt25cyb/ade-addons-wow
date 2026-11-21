@@ -12,7 +12,7 @@ local f = CreateFrame("Frame")
 local ICON_DELVE = "Interface\\icons\\ui_delves" -- 聊天行内图标用（|T 只认贴图路径，DFCN_DelveHelper.lua:4221 实证）
 local TAB_ICON_ATLAS = "delves-bountiful" -- Tab 图集（用户指定：丰饶地下堡） 备用 majorfactions_icons_delve512
 
-local panel, tabButton, topBar, statsPanel, scrollBox, scrollBar, view, searchBar
+local panel, tabButton, topBar, scrollBox, scrollBar, view, searchBar
 
 local settingsFrame, emptyText
 local searchText = ""
@@ -45,7 +45,7 @@ local function IsPanelVisible()
 end
 
 -------------------------------------------------------------------------------
--- 交互：左键切图，右键原生路点，Shift+右键 TomTom
+-- 交互：左键切图；右键设置路点（r003 重设计：统一委托 /way 命令的当前占用者）
 -------------------------------------------------------------------------------
 
 local function GetWaypointTarget(entry)
@@ -76,44 +76,23 @@ function addon.MapPanel:ShowOnMap(entry)
     end
 end
 
---- 暴雪原生路点：EverythingDelves Core/Utils.lua:67-71。
-function addon.MapPanel:SetBlizzardWaypoint(entry)
+--- 右键设置路点（r003 重设计）：不再硬编码「右键=原生 / Shift+右键=TomTom」，
+--- 统一委托 /way 命令的当前占用者（Core.lua PLAYER_LOGIN 时确定 addon.MapPanel.WayRunner）：
+--- MPE/TomTom 等占用 → 调对方 handler，等价执行 `/way #<mapID> x y <名称>`（支持名称）；
+--- 未被占用 → 本插件实现（原生路点 + TomTom 同步 + 聊天反馈）。
+--- 坐标折成百分数字符串与 HandleWayCommand 解析口径一致（>1 自动 /100）。
+function addon.MapPanel:SetWaypointAt(entry)
     local mapID, x, y = GetWaypointTarget(entry)
-    if not mapID or not x or not y then
+    if not (mapID and x and y) or not addon.MapPanel.WayRunner then
         print("|T" .. ICON_DELVE .. ":14:14|t " .. (L["WAYPOINT_UNAVAILABLE"] or ""))
         return
     end
-    if C_Map.CanSetUserWaypointOnMap and not C_Map.CanSetUserWaypointOnMap(mapID) then
-        print("|T" .. ICON_DELVE .. ":14:14|t " .. (L["WAYPOINT_UNAVAILABLE"] or ""))
-        return
-    end
-    if not (UiMapPoint and UiMapPoint.CreateFromCoordinates and C_Map.SetUserWaypoint) then return end
-    local point = UiMapPoint.CreateFromCoordinates(mapID, x, y)
-    if point then
-        C_Map.SetUserWaypoint(point)
-        if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
-            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-        end
-    end
-end
-
---- TomTom 路点：EverythingDelves Core/Utils.lua:54-63、DelveCompanion WaypointTracker.lua:72-75。
-function addon.MapPanel:SetTomTomWaypoint(entry)
-    local mapID, x, y = GetWaypointTarget(entry)
-    if not mapID or not x or not y then
-        print("|T" .. ICON_DELVE .. ":14:14|t " .. (L["WAYPOINT_UNAVAILABLE"] or ""))
-        return
-    end
-    local tomtom = _G.TomTom
-    if not (tomtom and tomtom.AddWaypoint) then
-        print("|T" .. ICON_DELVE .. ":14:14|t " .. (L["TOMTOM_MISSING"] or ""))
-        return
-    end
-    tomtom:AddWaypoint(mapID, x, y, { title = entry.name or "" })
+    local name = (entry.name or ""):gsub("[%c|]", "")  -- 名称进聊天/对方插件，去掉控制符与管道符防注入
+    addon.MapPanel.WayRunner(string.format("#%d %.2f %.2f %s", mapID, x * 100, y * 100, name))
 end
 
 -------------------------------------------------------------------------------
--- TopBar：角色统计按钮 / 过滤器 / 搜索框 / 搜索开关
+-- TopBar：机器人按钮 / 战团按钮 / 过滤器 / 搜索框 / 搜索开关
 -------------------------------------------------------------------------------
 
 local function BuildFilterMenu(_, root)
@@ -155,10 +134,89 @@ local function EnsureTopBar(host)
     -- 顶栏是面板内顶部 0~26 那一行，不是 Mapster 标题栏行，也不是内容区第一行。
     local bar = MapTab.CreateTopBar(host, { levelOffset = 3 })
 
-    -- 原 WorldQuestTab 的 SortDropdown（全局名 FML）位置改为「角色统计」。
+    -- r003：机器人按钮（地下堡机器人 7001 型）从统计面板迁到顶栏最左（原战团按钮位置），
+    -- 战团按钮及后续控件整体右移。外观走暴雪原生 UIPanelIconDropdownButtonTemplate
+    -- （底板 + Icon parentKey + HIGHLIGHT 悬停，与右侧 roster 同款），
+    -- SecureActionButton 走宏使用玩具（原 StatsPanel.lua:167-215 的实现精简迁移）。
+    -- 模板顺序照 LibActionButton-1.0 的 "ActionButtonTemplate, SecureActionButtonTemplate"
+    -- （z-ref_retail_Interface_AddOns/CooldownManagerCentered/libs/.../LibActionButton-1.0.lua:240）
+    -- ：外观在前、Secure 在后，Secure 的宏 OnClick 最后 apply 必胜（同时覆盖 IconDropdown
+    -- 模板可能自带的下拉 OnClick）；Background/Icon/HIGHLIGHT 纹理层保留。
+    local toy = CreateFrame("Button", nil, bar, "UIPanelIconDropdownButtonTemplate, SecureActionButtonTemplate")
+    toy:SetSize(22, 22)
+    toy:SetPoint("LEFT", bar, "LEFT", 0, 0)
+    toy:SetAttribute("type1", "macro")
+    toy:SetAttribute("macrotext1", "/use item:" .. tostring(addon.Data.TOY.itemID))
+    -- 12.x 实证（SecureTemplates.xml:4-10）：模板不自带 RegisterForClicks，必须显式注册。
+    toy:RegisterForClicks("AnyDown", "AnyUp")
+    local toyIcon = toy.Icon or toy:CreateTexture(nil, "ARTWORK")
+    toyIcon:SetSize(18, 18)
+    toyIcon:ClearAllPoints()
+    toyIcon:SetPoint("CENTER", 0, 0)
+    toyIcon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    toyIcon:SetTexture((C_Spell and C_Spell.GetSpellTexture and C_Spell.GetSpellTexture(addon.Data.TOY.spellID))
+        or (C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(addon.Data.TOY.itemID))
+        or "Interface\\Icons\\INV_Misc_QuestionMark")
+    toy.Icon = toyIcon
+    local toyMask = toy:CreateMaskTexture(nil, "ARTWORK")
+    toyMask:SetTexture("Interface\\Common\\common-iconmask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    toyMask:SetAllPoints(toyIcon)
+    toyIcon:AddMaskTexture(toyMask)
+    -- HIGHLIGHT：模板自带 questlog-icon-setting（齿轮）悬停图集（SharedUIPanelTemplates.xml:2241-2247），
+    -- 照 roster（本文件 roster 段同逻辑）：遍历 regions 找到无 parentKey 的 HIGHLIGHT 层，
+    -- 换成玩具图标纹理（同 TexCoord 裁边）、ADD 混合 + 0.4 透明度。
+    for _, region in ipairs({ toy:GetRegions() }) do
+        if region.GetDrawLayer and region:GetDrawLayer() == "HIGHLIGHT" and region ~= toyIcon then
+            region:SetTexture(toyIcon:GetTexture())
+            region:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+            region:SetAllPoints(toyIcon)
+            region:SetBlendMode("ADD")
+            region:SetAlpha(0.4)
+        end
+    end
+    local toyCooldown = CreateFrame("Cooldown", nil, toy, "CooldownFrameTemplate")
+    toyCooldown:SetAllPoints(toyIcon)
+    toy.Cooldown = toyCooldown
+    toy:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        -- SetItemByID 自带玩具名；信息未缓存时退到 API 名称（原 StatsPanel.lua:197-213 逻辑）。
+        if not GameTooltip:SetItemByID(addon.Data.TOY.itemID) then
+            local toyName
+            if C_ToyBox and C_ToyBox.GetToyInfo then
+                _, toyName = C_ToyBox.GetToyInfo(addon.Data.TOY.itemID)
+            end
+            if not toyName and C_Item and C_Item.GetItemNameByID then
+                toyName = C_Item.GetItemNameByID(addon.Data.TOY.itemID)
+            end
+            if toyName then GameTooltip:SetText(toyName, 1, 0.82, 0) end
+        end
+        GameTooltip:Show()
+    end)
+    toy:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    bar.ToyButton = toy
+
+    --- 冷却与持有态刷新（SPELL_UPDATE_COOLDOWN / NEW_TOY_ADDED 事件与按钮创建时调用）。
+    function addon.MapPanel.UpdateToyButton()
+        if not bar.ToyButton then return end
+        local start, duration = addon.Stats:GetToyCooldown()
+        if start and duration and duration > 0 then
+            bar.ToyButton.Cooldown:SetCooldown(start, duration)
+        else
+            bar.ToyButton.Cooldown:Clear()
+        end
+        if addon.Stats:HasToy() then
+            bar.ToyButton.Icon:SetVertexColor(1, 1, 1)
+        else
+            bar.ToyButton.Icon:SetVertexColor(0.4, 0.4, 0.4)
+        end
+    end
+    addon.MapPanel.UpdateToyButton()
+
+    -- 原 WorldQuestTab 的 SortDropdown（全局名 FML）位置改为「角色统计」；
+    -- r003 起让出最左位，锚到机器人按钮右侧。
     local roster = CreateFrame("Button", nil, bar, "UIPanelIconDropdownButtonTemplate")
     roster:SetSize(22, 22)
-    roster:SetPoint("LEFT", bar, "LEFT", 0, 0)
+    roster:SetPoint("LEFT", toy, "RIGHT", 6, 0)
     if roster.Icon then
         roster.Icon:SetAtlas("warbands-icon", true) -- WorldQuestTab.xml:294 实证
         roster.Icon:SetSize(18, 18)
@@ -357,13 +415,10 @@ local function EnsurePanel()
 
     EnsureTopBar(panel)
 
-    statsPanel = addon.StatsPanel:Create(panel)
-
     -- 现代 ScrollBox 列表与 MinimalScrollBar 的创建 / 初始化统一走主插件公共函数
     -- （WQT WorldQuestTab.lua:1470-1482 同款），范围由 ScrollUtil 自动维护。
+    -- r003：统计面板已删除，列表直接从面板顶部起（topFrame 缺省 = panel TOPLEFT 0,-4）。
     scrollBox, scrollBar, view = MapTab.CreateScrollBox(panel, {
-        topFrame = statsPanel,
-        topY = -2,
         rightX = -12,
         extent = 38,
         initializer = function(button, elementData)
@@ -449,29 +504,8 @@ function addon.MapPanel.Refresh()
 
     ApplySettingsMode(currentMode == "settings")
 
-    -- 纵向堆叠：统计面板 → 列表。搜索条已纳入 TopBar（bar）内，不再参与内容区堆叠。
-    local showStats = (addon.db and addon.db.showStats ~= false) and currentMode == "list"
-    if statsPanel then
-        statsPanel:SetShown(showStats)
-        scrollBox:ClearAllPoints()
-        if showStats then
-            addon.StatsPanel:Update(statsPanel)
-            -- 第二阶段 9.9：恢复高度（隐藏态可能改过 0），引用 StatsPanel.lua:25 PANEL_HEIGHT=64。
-            statsPanel:SetHeight(64)
-            -- 内容区从统计面板底部（-94）开始（用户 2026-10-28）。
-            scrollBox:SetPoint("TOPLEFT", statsPanel, "BOTTOMLEFT", 0, -2)
-        else
-            -- 第二阶段 9.9：隐藏时彻底释放高度，避免内容区上方留大空白（统计面板空白 BUG）。
-            statsPanel:SetHeight(0)
-            -- ⚠ panel 本身已锚 ContentsAnchor 顶 -29（本文件 EnsurePanel anchorPanel），
-            -- 顶栏那条 0~29 已由面板偏移让出，这里不能再按「panel 顶 -30」二次下移——
-            -- 否则列表顶部比顶栏底部多空出约 30px（用户 2026-10-30 截图：取消统计面板后首行空白）。
-            -- 与 adePortalTab 无统计面板时的锚法一致（adePortalTab/UI/WorldMapPanel.lua:561：
-            -- scrollBox 锚 panel TOPLEFT 0,-4），列表顶紧贴面板顶、留 4px 缝。
-            scrollBox:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -4)
-        end
-        scrollBox:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -12, 0)
-    end
+    -- r003：统计面板已删除，列表固定从面板顶部起（CreateScrollBox 缺省锚 panel TOPLEFT 0,-4，
+    -- 与 adePortalTab 无统计面板时的锚法一致），无需每次刷新重锚。
 
     if currentMode ~= "list" then
         scrollBox:Hide()
@@ -537,9 +571,6 @@ end
 
 local WATCHED_EVENTS = {
     "AREA_POIS_UPDATED",
-    "CURRENCY_DISPLAY_UPDATE",
-    "BAG_UPDATE_DELAYED",
-    "UPDATE_UI_WIDGET",
     "CRITERIA_UPDATE",
     "ACHIEVEMENT_EARNED",
     "QUEST_LOG_UPDATE",
@@ -562,7 +593,7 @@ end
 f:SetScript("OnEvent", function(_, event)
     if not IsPanelVisible() then return end
     if event == "SPELL_UPDATE_COOLDOWN" or event == "NEW_TOY_ADDED" then
-        if statsPanel then addon.StatsPanel:Update(statsPanel) end
+        addon.MapPanel.UpdateToyButton()
         return
     end
     if event == "AREA_POIS_UPDATED" then

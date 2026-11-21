@@ -545,26 +545,12 @@ function Entry:Update(button, entry)
     end
 end
 
---- TomTom 是否真的加载了。未加载时整条 Shift+右键都不该存在：
--- 既不设路点，也不在 tooltip 里提（用户 2026-10-28）。
--- C_AddOns.IsAddOnLoaded 的写法照原生 AddonList.lua。
-local function IsTomTomLoaded()
-    if not (C_AddOns and C_AddOns.IsAddOnLoaded) then return false end
-    return C_AddOns.IsAddOnLoaded("TomTom") == true
-end
-
 function Entry:OnClick(mouseButton)
     local entry = self.entry
     if not entry then return end
     if mouseButton == "RightButton" then
-        if IsShiftKeyDown() then
-            -- 没装 TomTom 就当这个操作不存在，别去碰暴雪路点。
-            if IsTomTomLoaded() then
-                addon.MapPanel:SetTomTomWaypoint(entry)
-            end
-            return
-        end
-        addon.MapPanel:SetBlizzardWaypoint(entry)
+        -- r003 重设计：右键统一委托 /way 占用者（原生/TomTom 修饰键区分已删）。
+        addon.MapPanel:SetWaypointAt(entry)
         return
     end
     addon.MapPanel:ShowOnMap(entry)
@@ -659,10 +645,6 @@ function Entry:OnEnter()
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine(L["HINT_LEFT_CLICK"], 0.7, 0.7, 0.7)
     GameTooltip:AddLine(L["HINT_RIGHT_CLICK"], 0.7, 0.7, 0.7)
-    -- TomTom 没加载就不提这一行：此时 Shift+右键是没反应的（用户 2026-10-28）。
-    if IsTomTomLoaded() then
-        GameTooltip:AddLine(L["HINT_SHIFT_RIGHT_CLICK"], 0.7, 0.7, 0.7)
-    end
     GameTooltip:Show()
 end
 

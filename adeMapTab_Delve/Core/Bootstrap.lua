@@ -9,7 +9,6 @@ addon.Stats = {}
 addon.Roster = {}
 addon.MapPanel = {}
 addon.MinimapIcon = {}
-addon.StatsPanel = {}
 addon.RosterWindow = {}
 addon.State = {} -- 本次登录的临时状态，不写入 SavedVariables。
 addon.Player = {

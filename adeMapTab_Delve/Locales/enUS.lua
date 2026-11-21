@@ -39,11 +39,6 @@ L["FILTER_DROPDOWN_DELVE"] = "Delves"
 L["FILTER_DROPDOWN_RITUAL"] = "Ritual Sites"
 L["FILTER_DROPDOWN_ABUNDANCE"] = "Abundance"
 
--- 鎏金藏匿物：名称与描述都走 API（spellID → C_Spell.GetSpellName、spellInfo.tooltip），
--- 这里只留游戏给不出来的两句说明，照 DelveCompanion LockitMain.lua:65-66。
-L["GILDED_CRESTS_NOTE"] = "Each stash contains %d |cnIQ4:Myth Crests|r (|cnNORMAL_FONT_COLOR:%d per week|r in total)."
-L["GILDED_BOUNTIFUL_NOTE"] = "Appears only in |cnNORMAL_FONT_COLOR:Tier 11|r Bountiful Delves|A:delves-bountiful:16:16|a."
-
 -- 进度状态
 L["PROGRESS_ACHIEVEMENT"] = "Achievement"
 L["PROGRESS_QUEST"] = "Quest"
@@ -59,10 +54,9 @@ L["PROGRESS_DONE"] = "Completed"
 L["PROGRESS_PENDING"] = "Not completed"
 L["PROGRESS_TURN_IN"] = "Ready to turn in"
 
--- 条目提示（照 Entry.OnClick 的实际行为：左键在地图显示、右键设路径点、Shift+右键走 TomTom）
+-- 条目提示（照 Entry.OnClick 的实际行为：左键在地图显示；右键设路点，行为随 /way 占用者而定）
 L["HINT_LEFT_CLICK"] = "Left-click: show on map"
-L["HINT_RIGHT_CLICK"] = "Right-click: set a Blizzard waypoint"
-L["HINT_SHIFT_RIGHT_CLICK"] = "Shift+Right-click: set a TomTom waypoint"
+L["HINT_RIGHT_CLICK"] = "Right-click: set a waypoint"
 
 -- 时间
 L["TIME_SECONDS"] = "%ds"
@@ -106,8 +100,10 @@ L["MINIMAP_TIP_RIGHT"] = "Right-click"
 L["MINIMAP_TIP_RIGHT_ACTION"] = "Open the world map Delve tab"
 
 -- 路径点
-L["TOMTOM_MISSING"] = "TomTom is not installed, cannot set a waypoint."
 L["WAYPOINT_UNAVAILABLE"] = "Waypoints are not supported on this map."
+-- r003：/way 命令
+L["WAY_USAGE"] = "Usage: /way #<mapID> x y <name>  (mapID and name optional; coordinates are percentages)"
+L["WAY_SET_CONFIRM"] = "Waypoint set: #%d %.1f, %.1f %s"
 
 -- 设置面板
 L["SETTINGS_TITLE"] = "Config Management"
@@ -120,7 +116,6 @@ L["SETTINGS_CATEGORY_ABUNDANCE"] = "Abundance List"
 L["SETTING_DEFAULT_TAB"] = "Default tab"
 L["SETTING_DEFAULT_TAB_DESC"] = "Open the Delve tab by default when the world map is opened."
 L["SETTING_DEFAULT_TAB_CONFLICT"] = "WorldQuestTab also enabled its default tab, so this setting has no effect."
-L["SETTING_SHOW_STATS"] = "Show stats panel"
 L["SETTINGS_CATEGORY_ROSTER"] = "Warband Panel"
 L["SETTING_ROSTER_SHOW_LAST_LOGIN"] = "Show last login time"
 L["SETTING_ROSTER_SHOW_LAST_LOGIN_DESC"] = "Add an extra column showing when each character was last seen."
@@ -142,7 +137,6 @@ L["SETTING_ROSTER_GROUPING_DESC"] = "Group the character list by realm, by facti
 L["SETTING_ROSTER_GROUPING_NONE"] = "No grouping"
 L["SETTING_ROSTER_GROUPING_REALM"] = "By realm"
 L["SETTING_ROSTER_GROUPING_FACTION"] = "By faction"
-L["SETTING_SHOW_STATS_DESC"] = "Show currencies, items, Gilded Stash and the Delve-O-Bot button above the delve list."
 L["SETTING_SHOW_MINIMAP_ICON"] = "Show minimap icon"
 L["SETTING_SHOW_MINIMAP_ICON_DESC"] = "Show an icon on the minimap: left-click opens the character stats window, right-click opens the world map Delve tab."
 

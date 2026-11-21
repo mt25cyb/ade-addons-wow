@@ -60,7 +60,6 @@ local LAYOUT = {
         category = "SETTINGS_CATEGORY_GENERAL",
         items = {
             "defaultTab", "showMinimapIcon",
-            "showStats",
             "showAbundance",
             "showRitual",
             { kind = "dropdown", key = "entrySortMode", options = ENTRY_SORT_OPTIONS },
@@ -83,7 +82,7 @@ local LAYOUT = {
         },
     },
     {
-        -- ⑤ 战团面板：分组与上次登录时间（showStats 已移至信息列表）。
+        -- ⑤ 战团面板：分组与上次登录时间。
         category = "SETTINGS_CATEGORY_ROSTER",
         items = {
             { kind = "dropdown", key = "rosterGrouping", options = ROSTER_GROUPING_OPTIONS },

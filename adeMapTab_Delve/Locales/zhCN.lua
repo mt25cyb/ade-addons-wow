@@ -40,12 +40,6 @@ L["FILTER_DROPDOWN_DELVE"] = "地下堡"
 L["FILTER_DROPDOWN_RITUAL"] = "仪式场地"
 L["FILTER_DROPDOWN_ABUNDANCE"] = "丰饶区域"
 
--- 鎏金藏匿物：名称与描述都走 API，这里只留游戏给不出来的两句说明。
--- BOUNTIFUL_NOTE 照 DelveCompanion 的 zhCN（zhCN.lua:40）；
--- CRESTS_NOTE 它的 zhCN 也留着英文 Myth Crests，这里照样保留原词，等确认国服译名再换。
-L["GILDED_CRESTS_NOTE"] = "每个藏匿物含 %d 个 |cnIQ4:神话纹章|r（|cnNORMAL_FONT_COLOR:每周共 %d 个|r）。"
-L["GILDED_BOUNTIFUL_NOTE"] = "仅出现在 |cnNORMAL_FONT_COLOR:难度 11|r 丰裕地下堡|A:delves-bountiful:16:16|a。"
-
 -- 进度状态
 L["PROGRESS_ACHIEVEMENT"] = "成就"
 L["PROGRESS_QUEST"] = "任务"
@@ -61,10 +55,9 @@ L["PROGRESS_DONE"] = "已完成"
 L["PROGRESS_PENDING"] = "未完成"
 L["PROGRESS_TURN_IN"] = "待交还"
 
--- 条目提示（照 Entry.OnClick 的实际行为：左键在地图显示、右键设路径点、Shift+右键走 TomTom）
+-- 条目提示（照 Entry.OnClick 的实际行为：左键在地图显示；右键设路点，行为随 /way 占用者而定）
 L["HINT_LEFT_CLICK"] = "左键：在地图上显示"
-L["HINT_RIGHT_CLICK"] = "右键：设置暴雪路点"
-L["HINT_SHIFT_RIGHT_CLICK"] = "Shift+右键：设置 TomTom 路点"
+L["HINT_RIGHT_CLICK"] = "右键：设置路点"
 
 -- 时间
 L["TIME_SECONDS"] = "%d 秒"
@@ -108,8 +101,10 @@ L["MINIMAP_TIP_RIGHT"] = "右键"
 L["MINIMAP_TIP_RIGHT_ACTION"] = "打开世界地图标签页"
 
 -- 路径点
-L["TOMTOM_MISSING"] = "未安装 TomTom，无法设置路点。"
 L["WAYPOINT_UNAVAILABLE"] = "该地图不支持路点。"
+-- r003：/way 命令
+L["WAY_USAGE"] = "用法：/way #<地图ID> x y <名称>（地图ID 与名称可省略，坐标为百分数）"
+L["WAY_SET_CONFIRM"] = "路点已设置：#%d %.1f, %.1f %s"
 
 -- 设置面板
 L["SETTINGS_TITLE"] = "配置管理"
@@ -122,7 +117,6 @@ L["SETTINGS_CATEGORY_ABUNDANCE"] = "丰饶列表"
 L["SETTING_DEFAULT_TAB"] = "默认标签页"
 L["SETTING_DEFAULT_TAB_DESC"] = "打开世界地图时默认停在地下堡标签页。"
 L["SETTING_DEFAULT_TAB_CONFLICT"] = "WorldQuestTab 也启用了默认标签页，本项不会生效。"
-L["SETTING_SHOW_STATS"] = "显示统计面板"
 L["SETTINGS_CATEGORY_ROSTER"] = "战团面板"
 L["SETTING_ROSTER_SHOW_LAST_LOGIN"] = "显示角色上次登录时间"
 L["SETTING_ROSTER_SHOW_LAST_LOGIN_DESC"] = "在名单里额外增加一列，显示每个角色最后一次上线的时间。"
@@ -144,7 +138,6 @@ L["SETTING_ROSTER_GROUPING_DESC"] = "名单按服务器分组、按阵营分组�
 L["SETTING_ROSTER_GROUPING_NONE"] = "不分组"
 L["SETTING_ROSTER_GROUPING_REALM"] = "按服务器分组"
 L["SETTING_ROSTER_GROUPING_FACTION"] = "按阵营分组"
-L["SETTING_SHOW_STATS_DESC"] = "在地下堡列表上方显示货币、道具、鎏金藏匿物与地下堡机器人按钮。"
 L["SETTING_SHOW_MINIMAP_ICON"] = "显示小地图图标"
 L["SETTING_SHOW_MINIMAP_ICON_DESC"] = "在小地图显示图标：左键打开角色统计窗口，右键打开世界地图标签页。"
 

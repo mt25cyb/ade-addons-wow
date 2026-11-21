@@ -40,7 +40,6 @@ addon.defaults = {
         showAbundance = true,           -- 显示丰饶区域
         showTimeLeft = true,            -- 丰饶条目下显示剩余时间
         entrySortMode = "default",      -- 条目排序：default / map
-        showStats = true,               -- 列表上方显示综合统计面板
         rosterShowLastLogin = false,    -- 战团名单显示上次登录时间
         rosterTimeFormat = "ymd",      -- 上次登录时间格式
         rosterTime24 = true,            -- 24 小时制（false 为 12 小时制带 AM/PM）
