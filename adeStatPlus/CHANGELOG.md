@@ -1,5 +1,10 @@
 # adeStatPlus — CHANGELOG
 
+## v6.5-r008 - 2026-11-21（修复：角色面板进度条启用后装备变动导致原生内容消失）
+
+**修复用户实测：启用角色面板进度条（`charPanel.bars.enabled`）后，装备变动使属性数值变化时，原生角色属性面板（CharacterStatsPane）原有内容消失。`Modules/CharPanel.lua` 三处叠加竞态修复：① `RestoreFontString` 原守卫要求当前锚点精确匹配我们写入的偏移才还原；装备变动时暴雪重锚池化行，守卫失效 → 上一轮 +delta 位移残留 → 下一轮以残留位置为基线再上移 → 文字逐次上飘离开可视区；改为无条件还原到记录的原始锚点（暴雪对同一行锚点稳定，写回 base 不破坏其布局）。② `UpdateScrollRange` 测量失败（行池重建中 `GetTop/GetBottom` 无效）时原逻辑把 pane 高度压到 viewHeight，超出视口内容被 ScrollFrame 裁掉；改为直接 return、保留原生尺寸等下一帧补测。③ `PaperDollFrame_UpdateStats` hook 原只测一次；`Relayout()` 返回 false（行未就绪）时改为 0.05s 后补测一次（OnShow 的 ticker 不覆盖装备变动路径）。TOC bump v6.5-r008。**
+
+
 ## v6.5-r007 - 2026-11-18
 
 **① 背景颜色行错用 execute 按钮改为 UIKit b034 的 kind="color" 色块控件（存档 {r,g,b} 表 ↔ hex 适配，default 取 ns.defaults）；其余 execute（排序窗口切换等）为真执行按钮保留。② 下拉乱序修复（用户实测材质/字体下拉乱序，DBM 无此问题）：Media.FontItems/TextureItems 由哈希表改返回有序数组（内置项/「游戏默认」置顶、其余按显示名排序），SourceItems「无来源」置顶+排序——旧实现 pairs 展开 map 顺序不可预期。注：材质菜单项文字被材质盖住属 UIKit b035 已修（fontString 提 OVERLAY 层 + 加深阴影），本插件升级 UIKit 即生效。**

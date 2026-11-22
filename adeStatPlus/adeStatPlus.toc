@@ -6,7 +6,7 @@
 ## Globe-Main: ADE
 ## Notes: 属性信息面板（ADE v6.5 原生重写）
 ## Author: ade
-## Version: v6.5-r007
+## Version: v6.5-r008
 ## IconAtlas: plunderstorm-nameplates-icon-3
 ## Dependencies: ade_UIKit
 ## SavedVariables: ADEDB_ADESTATPLUS

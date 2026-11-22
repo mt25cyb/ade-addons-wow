@@ -206,9 +206,12 @@ UpdateScrollRange = function()
             end
         end
     end
-    local contentHeight
-    if top and lowest then contentHeight = (top - lowest) + SCROLL_BOTTOM_PAD end
-    if not contentHeight or contentHeight < viewHeight then contentHeight = viewHeight end
+    -- r008：测量失败（装备变动时行池正在重建，子帧尚未布局 → top/lowest 无效）时
+    -- 不再写尺寸——原逻辑会把 pane 高度强行压到 viewHeight，超出视口的内容被
+    -- ScrollFrame 裁掉，表现为「角色面板原有内容消失」。保留原生尺寸，等下一轮补测。
+    if not top or not lowest then return end
+    local contentHeight = (top - lowest) + SCROLL_BOTTOM_PAD
+    if contentHeight < viewHeight then contentHeight = viewHeight end
     scrollChild:SetHeight(contentHeight)
     pane:SetHeight(contentHeight)
 end
@@ -237,16 +240,14 @@ local function ShiftFontString(fs, delta)
     return { base = a, written = written }
 end
 
---- 仅当 FontString 仍停在我们写入的偏移上时还原（池化行可能已被 Blizzard 重锚）。
+--- r008：无条件还原 FontString 到我们记录的原始锚点。
+--- 原守卫要求当前锚点精确匹配我们写入的偏移才还原；装备变动时暴雪会重锚池化行，
+--- 守卫一旦失效，上一轮的 +delta 位移就残留下来，下一轮 Relayout 又以残留位置为基线
+--- 再上移 delta —— 文字逐次上飘，几次换装后全部离开可视区（用户实测面板变空）。
+--- 暴雪对同一行的锚点定义是稳定的，写回 base 只会回到原生位置，不会破坏其新布局。
 local function RestoreFontString(fs, rec)
     if not rec or not fs then return end
-    local cur = FirstAnchor(fs)
-    if cur and rec.written[1] == cur[1] and rec.written[2] == cur[2]
-        and rec.written[3] == cur[3]
-        and math.abs((rec.written[4] or 0) - (cur[4] or 0)) < 0.01
-        and math.abs((rec.written[5] or 0) - (cur[5] or 0)) < 0.01 then
-        ApplyAnchor(fs, rec.base)
-    end
+    ApplyAnchor(fs, rec.base)
 end
 
 --- 恢复上一轮对原生行的高度与 FontString 锚点（每轮重排前调用，防累积）。
@@ -399,7 +400,14 @@ local function OnEvent(self, event, name)
         mounted = true
         if not hooked and type(PaperDollFrame_UpdateStats) == "function" then
             hooksecurefunc("PaperDollFrame_UpdateStats", function()
-                CharPanel.Relayout()
+                -- r008：同帧重建竞态——Relayout 返回 false 表示原生行还没就绪
+                -- （IsPaneReady 找不到强化组首行）。原逻辑只测一次就压了 pane 尺寸，
+                -- 内容被裁；改为下一帧补测一次（OnShow 的 ticker 不覆盖装备变动路径）。
+                if not CharPanel.Relayout() and pane and pane:IsShown() then
+                    C_Timer.After(0.05, function()
+                        if pane and pane:IsShown() then CharPanel.Relayout() end
+                    end)
+                end
             end)
             hooked = true
         end
