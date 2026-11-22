@@ -70,6 +70,11 @@ ADDONS = {
         "enus": "Prat-3.0/locales/enUS.lua",
         "zhcn": "Prat-3.0_zhCN.lua",
     },
+    # AceLocale：Locale/enUS.lua 注册 RdysCrateTracker，其他语言 NewLocale 覆盖。
+    "RCT": {
+        "enus": "RCT/Locale/enUS.lua",
+        "zhcn": "RCT_zhCN.lua",
+    },
     # QuestPrism_L 全局共享表 + 点号赋值（L.KEY = "value"）；BINDING_* 为 _G 全局。
     # L.HELP_LINES 表值非字符串，extract 的值过滤会跳过，两侧一致不影响齐平。
     "QuestPrism": {

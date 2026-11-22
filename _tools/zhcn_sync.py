@@ -24,6 +24,9 @@ MIRROR_DIR = TOOLS_DIR.parent / "z-ref_retail_Interface_AddOns"
 # A 类通常为「项目文件 -> 插件内 zhCN 槽位」；B 类为「项目文件 -> 整体覆盖的插件原文件」。
 # 套件子目录（如 VanasKoS）的镜像侧结构必须与项目侧逐文件对应。
 ADDONS = {
+    "RCT": [
+        ("RCT_zhCN.lua", "RCT/Locale/zhCN.lua"),
+    ],
     "EmberLedger": [
         ("EmberLedger/Localization.lua", "EmberLedger/Localization.lua"),
     ],
