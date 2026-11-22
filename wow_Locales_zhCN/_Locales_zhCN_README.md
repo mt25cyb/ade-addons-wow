@@ -121,6 +121,25 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 尺寸档：Tiny → `特小号`（对齐既有 Small=小号 / Default=默认 / Large=大号）。
 - 已完成文件：`MapPinEnhanced_zhCN.lua`（同步至镜像 `locales/zhCN.lua`）。
 
+### RCT（A-①：AceLocale 新建 zhCN.lua，2026-11-21）
+
+- 机制：标准 **AceLocale-3.0**——注册名 `RdysCrateTracker`，`Locale/enUS.lua` 为默认表
+  （`NewLocale(..., "enUS", true)`），其余语言 `NewLocale` 覆盖，`Locale/locale.lua` 用
+  `GetLocale(..., true)` 取表挂 `_G.RCT_LOCALE`。TOC 中 `Locale/` 段在所有主文件之前加载。
+- 落地：主档 `RCT_zhCN.lua`（版本头 14.5.5）全译 **438 条**（含 3 条跨行/单引号长文本：
+  `ADDON_ADVERTISEMENT`、`VERSION_UPDATE_MESSAGE`、`WAR_CRATE_GUIDELINES`），
+  TOC 在 `Locale/ruRU.lua` 后、`Locale/locale.lua` 前登记 `Locale/zhCN.lua`。
+- 现 **enUS 453 / zhCN 453，缺失 0 / 多余 0**。刻意保留 15 条：插件名 4
+  （`ADDON_NAME/TITLE/SHORT_NAME/TRACKER_TITLE`）、按钮字面量 `X`/`Opt`、Discord URL、
+  格式串 `WINDOW_LABEL`/`WINDOW_TIMER`/`%dh %dm`、字体表 5 条（字体路径+字体名）。
+- 官方地名（wow_dict confirmed）：多恩岛 / 喧鸣深窟 / 陨圣峪 / 艾基-卡赫特 / 海妖岛 / 安德麦。
+  `DF`/`DRGF`/`DragonFlight` 三种缩写同指**巨龙时代**，已统一；`Shard`→位面、
+  `War Supply Crate`→战争补给箱、`Raid Warning`→团队警告、`War Mode`→战争模式。
+- 长 HOWTO 指南共 10 章全译（起始/计时器/位面/掉落/组队/日志/争夺/节奏/停靠/区域/队长/须知），
+  保留 `/rct` 命令字面量与 `%s`/`%d` 占位符。
+- 工具登记：diff_keys / sync / check_versions，落点 `RCT/Locale/zhCN.lua`（sync 首次
+  `SYNC->MISSING` 即创建，复跑 `EQUAL`）；版本 14.5.5 MATCH。
+
 ### EmberLedger（A-① 变体：自建框架 localeOverrides 插表，2026-11-19）
 
 - 机制：**自建本地化框架**（非 AceLocale）——`Localization.lua` 内嵌 `local enUS = {...}`
