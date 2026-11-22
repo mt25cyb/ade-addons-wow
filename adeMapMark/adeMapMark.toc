@@ -1,0 +1,37 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MapMark
+## Title-zhCN: |cff00AAFF[ADE]|r 地图标记
+## Title-zhTW: |cff00AAFF[ADE]|r 地圖標記
+## Notes: Map markers with external coordinate data providers. Create icons/text, navigate, import/export.
+## Notes-zhCN: 地图标记与外挂坐标数据包。支持图标/文字、导航、导入导出。
+## Notes-zhTW: 地圖標記與外掛座標數據包。支援圖標/文字、導航、導入導出。
+## Author: ADE 阿德
+## Version: v6.5-r021
+## IconAtlas: poi-hub
+## IconTexture: Interface\AddOns\adeMapMark\assets\ade_128
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## X-Localizations: enUS, zhCN, zhTW
+## X-License: MIT
+## SavedVariables: adeMapMarkDB
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\HereBeDragons\HereBeDragons-2.0.lua
+Libs\HereBeDragons\HereBeDragons-Pins-2.0.lua
+Libs\HereBeDragons\HereBeDragons-Migrate.lua
+Libs\LibWorldMapTabs\LibWorldMapTabs-1.6.lua
+
+adeMapMark.xml
+Core.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Provider.lua
+WorldMapPin.lua
+Icons.lua
+Panel.lua
+Settings.xml
+Settings.lua
+MinimapPin.lua
+Commands.lua

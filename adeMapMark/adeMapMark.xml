@@ -1,0 +1,5 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Frame name="adeMapMarkWorldMapPinTemplate" hidden="true" enableMouse="true" mixin="adeMapMarkWorldMapPinMixin" virtual="true">
+        <Size x="30" y="30"/>
+    </Frame>
+</Ui>

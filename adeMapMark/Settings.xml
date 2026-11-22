@@ -1,0 +1,292 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <!-- 设置面板行模板：对齐 WorldQuestTab Settings.xml 的控件样式；行为由 Settings.lua 的 mixin 挂载 -->
+
+    <!-- 一级分组：对齐 WQT_SettingCategoryTemplate（Options_ListExpand 横条 + 居中文字） -->
+    <Button name="adeMapMarkSettingCategoryTemplate" virtual="true">
+        <Size y="34"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="BGLeft" atlas="Options_ListExpand_Left" useAtlasSize="true">
+                    <Anchors><Anchor point="LEFT" x="10"/></Anchors>
+                </Texture>
+                <Texture parentKey="BGRight" atlas="Options_ListExpand_Right" useAtlasSize="true">
+                    <Anchors><Anchor point="RIGHT" x="-10"/></Anchors>
+                </Texture>
+                <Texture parentKey="BGMiddle" atlas="_Options_ListExpand_Middle" horizTile="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.BGLeft" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BGRight" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontHighlightMedium" maxLines="1" justifyH="CENTER" justifyV="MIDDLE">
+                    <Size y="24"/>
+                    <Anchors><Anchor point="LEFT" x="30" y="-1"/><Anchor point="RIGHT" x="-30" y="-1"/></Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="HighlightLeft" atlas="Section_Expand_glowing_Left" useAtlasSize="true" alpha="0.7">
+                    <Anchors><Anchor point="TOPLEFT" relativeKey="$parent.BGLeft" y="-1"/></Anchors>
+                </Texture>
+                <Texture parentKey="HighlightRight" atlas="Section_Expand_glowing_right" useAtlasSize="true" alpha="0.7">
+                    <Anchors><Anchor point="TOPRIGHT" relativeKey="$parent.BGRight" y="-1"/></Anchors>
+                </Texture>
+                <Texture parentKey="HighlightMiddle" atlas="Section_Expand_glowing_middle" horizTile="true" alpha="0.7">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.HighlightLeft" relativePoint="TOPRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.HighlightRight" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <!-- 二级分组：逐项对齐 WQT_SettingSubCategoryTemplate（Settings.xml:71-126） -->
+    <Button name="adeMapMarkSettingSubCategoryTemplate" virtual="true">
+        <Size y="36"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" atlas="_Options_ListExpand_Middle" alpha="0.8">
+                    <Anchors><Anchor point="TOPLEFT" x="30" y="-5"/><Anchor point="BOTTOMRIGHT" x="-45" y="5"/></Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontHighlight" maxLines="1" justifyH="CENTER" justifyV="MIDDLE">
+                    <Size y="24"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Background" relativePoint="LEFT" x="15"/>
+                        <Anchor point="RIGHT" relativeKey="$parent.Background" relativePoint="RIGHT" x="-15"/>
+                    </Anchors>
+                </FontString>
+                <Texture parentKey="ExpandIcon" atlas="friendslist-categorybutton-arrow-right" useAtlasSize="true" desaturated="true">
+                    <Anchors><Anchor point="CENTER" relativeKey="$parent.Background" relativePoint="RIGHT" x="-44"/></Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="Highlight" atlas="Soulbinds_Collection_Entry_Selected" alphaMode="ADD" alpha="0.4">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Background" x="20" y="-1"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Background" x="-20" y="1"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <!-- 基础行（WQT_SettingsBaseTemplate 等价）：行悬停高亮 -->
+    <Frame name="adeMapMarkSettingRowBase" virtual="true">
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="BgHighlight" atlas="socialqueuing-row-select" alphaMode="ADD" alpha="0.1" hidden="true" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- 复选框：WQT_SettingCheckboxTemplate（左侧 minimal 方框 + 右侧文字） -->
+    <Button name="adeMapMarkSettingCheckboxTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="32"/>
+        <Frames>
+            <CheckButton parentKey="CheckBox" enableMouse="false">
+                <Size x="25" y="25"/>
+                <Anchors><Anchor point="LEFT" x="40"/></Anchors>
+                <NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+                <DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
+            </CheckButton>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.CheckBox" relativePoint="RIGHT" x="5"/>
+                        <Anchor point="RIGHT" x="-15"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <!-- 滑动条：WQT_SettingSliderTemplate（顶部文字 + MinimalSliderWithSteppers + 数值框） -->
+    <Frame name="adeMapMarkSettingSliderTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="49"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors><Anchor point="TOPLEFT" x="42" y="-7"/><Anchor point="RIGHT" x="-15"/></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="SliderWithSteppers" inherits="MinimalSliderWithSteppersTemplate">
+                <Size y="20"/>
+                <Anchors><Anchor point="BOTTOMLEFT" x="40" y="4"/><Anchor point="RIGHT" x="-80"/></Anchors>
+            </Frame>
+            <EditBox parentKey="TextBox" inherits="InputBoxTemplate" autoFocus="false">
+                <Size x="30" y="20"/>
+                <Anchors><Anchor point="LEFT" relativeKey="$parent.SliderWithSteppers" relativePoint="RIGHT" x="10" y="1"/><Anchor point="RIGHT" x="-40" y="1"/></Anchors>
+                <FontString inherits="NumberFont_Shadow_Small"/>
+            </EditBox>
+        </Frames>
+    </Frame>
+
+    <!-- 下拉框：WQT_SettingDropDownTemplate -->
+    <Frame name="adeMapMarkSettingDropdownTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="55"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors><Anchor point="TOPLEFT" x="42" y="-5"/><Anchor point="RIGHT" x="-15"/></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <DropdownButton parentKey="Dropdown" inherits="WowStyle1DropdownTemplate">
+                <Anchors><Anchor point="BOTTOMLEFT" x="42" y="7"/><Anchor point="RIGHT" x="-42" y="0"/></Anchors>
+            </DropdownButton>
+        </Frames>
+    </Frame>
+
+    <!-- 颜色：WQT_SettingColorTemplate（UIMenuButtonStretch + LootBanner-IconGlow） -->
+    <Button name="adeMapMarkSettingColorTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="32"/>
+        <Frames>
+            <Button parentKey="Picker" inherits="UIMenuButtonStretchTemplate">
+                <Size x="26" y="26"/>
+                <Anchors><Anchor point="RIGHT" x="-42"/></Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Color" atlas="LootBanner-IconGlow">
+                            <Size x="14" y="14"/>
+                            <Anchors><Anchor point="CENTER"/></Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors><Anchor point="LEFT" x="42"/><Anchor point="RIGHT" relativeKey="$parent.Picker" relativePoint="LEFT" x="-5"/></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <!-- 外挂标记行：左勾选框+标题，右颜色控件+收藏星（对齐主面板收藏星素材） -->
+    <Button name="adeMapMarkSettingExternalMarkTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="32"/>
+        <Frames>
+            <CheckButton parentKey="CheckBox" enableMouse="false">
+                <Size x="25" y="25"/>
+                <Anchors><Anchor point="LEFT" x="40"/></Anchors>
+                <NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+                <DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
+            </CheckButton>
+            <Button parentKey="Favorite">
+                <Size x="20" y="20"/>
+                <Anchors><Anchor point="RIGHT" x="-45"/></Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Star" file="Interface\Common\ReputationStar" setAllPoints="true"/>
+                    </Layer>
+                </Layers>
+            </Button>
+            <Button parentKey="Picker" inherits="UIMenuButtonStretchTemplate">
+                <Size x="26" y="26"/>
+                <Anchors><Anchor point="RIGHT" relativeKey="$parent.Favorite" relativePoint="LEFT" x="-6"/></Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Color" atlas="LootBanner-IconGlow">
+                            <Size x="14" y="14"/>
+                            <Anchors><Anchor point="CENTER"/></Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Button>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.CheckBox" relativePoint="RIGHT" x="5"/>
+                        <Anchor point="RIGHT" relativeKey="$parent.Picker" relativePoint="LEFT" x="-5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <!-- 按钮：WQT_SettingFunctionButtonTemplate（UIMenuButtonStretch） -->
+    <Frame name="adeMapMarkSettingButtonTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="32"/>
+        <Frames>
+            <Button parentKey="Button" inherits="UIMenuButtonStretchTemplate">
+                <Size x="120" y="26"/>
+                <Anchors><Anchor point="RIGHT" x="-42"/></Anchors>
+            </Button>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors><Anchor point="LEFT" x="42"/><Anchor point="RIGHT" relativeKey="$parent.Button" relativePoint="LEFT" x="-5"/></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- 分隔线：WQT_SettingSeparatorTemplate（ChallengeMode-ThinDivider） -->
+    <Frame name="adeMapMarkSettingSeparatorTemplate" inherits="adeMapMarkSettingRowBase" virtual="true">
+        <Size y="16"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="GameFontNormal" maxLines="1" justifyH="LEFT">
+                    <Anchors><Anchor point="LEFT" x="42"/><Anchor point="RIGHT" x="-14"/></Anchors>
+                </FontString>
+                <Texture parentKey="Divider" atlas="ChallengeMode-ThinDivider">
+                    <Size y="2"/>
+                    <Anchors><Anchor point="LEFT" x="20" y="-6"/><Anchor point="RIGHT" x="-14" y="-6"/></Anchors>
+                    <Color r="0.6" g="0.5" b="0.5"/>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- 设置面板模板：纯结构；panelID / 脚本 / mixin 由 Settings.lua 设置 -->
+    <Frame name="adeMapMarkSettingsPanelTemplate" hidden="true" setAllPoints="true" virtual="true">
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" atlas="QuestLog-main-background" setAllPoints="true"/>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="TitleText" inherits="Game15Font_Shadow" wordwrap="false">
+                    <Anchors><Anchor point="BOTTOM" relativeKey="$parent.Border" relativePoint="TOP" x="-1" y="10"/></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="Border" inherits="QuestLogBorderFrameTemplate"/>
+            <!-- 设置面板关闭按钮：对齐 WQT_PanelCloseButtonTemplate（边框外右上、common-search-clearbutton） -->
+            <Button parentKey="CloseButton">
+                <Size x="15" y="15"/>
+                <Anchors><Anchor point="TOPRIGHT" x="19" y="25"/></Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="texture" atlas="common-search-clearbutton" alpha="0.5" setAllPoints="true"/>
+                    </Layer>
+                </Layers>
+            </Button>
+            <Frame parentKey="ScrollBox" inherits="WowScrollBoxList" setAllPoints="true"/>
+            <!-- 滚动条锚点对齐 WQT Settings.xml:774-779 -->
+            <EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="8" y="2"/>
+                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="8" y="-4"/>
+                </Anchors>
+            </EventFrame>
+        </Frames>
+    </Frame>
+</Ui>
