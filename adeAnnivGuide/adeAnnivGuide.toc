@@ -1,0 +1,25 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r AnnivGuide
+## Title-zhCN: |cff00AAFF[ADE]|r 艾泽拉斯之秘攻略
+## Title-zhTW: |cff00AAFF[ADE]|r 艾澤拉斯之祕攻略
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## Notes: 20 周年艾泽拉斯之秘解密任务图文攻略（游戏内阅读器）
+## Notes-zhCN: 20 周年艾泽拉斯之秘解密任务图文攻略（游戏内阅读器，39 个解密任务 + 271 张截图）
+## Author: ADE 阿德
+## Version: 12.1.0-4-01.03
+## IconAtlas: adventureguide-icon-whatsnew
+## SavedVariables: ADEDB_ADEANNIVGUIDE
+## X-License: MIT
+
+Core\Namespace.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Data\GuideData.lua
+UI\Blocks.lua
+UI\ListPage.lua
+UI\ContentPage.lua
+UI\Window.lua
+Core\Minimap.lua
+Core\Main.lua
