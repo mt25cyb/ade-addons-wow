@@ -1,0 +1,34 @@
+## Interface: 120105, 120100, 120007, 110207, 50503, 40402, 38001, 30405, 20506, 16001, 11508
+## Title: HandyNotes: WorldMapButton (fork)
+## Version: v6.5-r004
+## Notes: Adds a Button to the Worldmap that can toggle HandyNotes Icons. Fork: fixed Leatrix Maps simple map frame positioning.
+## Notes-deDE: Fügt der Weltkarte einen Button hinzu, mit dem HandyNotes Icons umgeschaltet werden können
+## Notes-ruRU: Добавляет кнопку на карту мира, которая может переключать значки HandyNotes
+## Author: ADE 阿德
+## IconTexture: Interface\AddOns\HandyNotes_WorldMapButton_fork\fubaLogo
+## OptionalDeps: Ace3, Leatrix_Maps
+## RequiredDeps: HandyNotes
+
+## X-Curse-Project-ID: 298530
+## X-Wago-ID: q96dVqGO
+## X-Fork-Of: HandyNotes_WorldMapButton 20261106.02-Release by fuba (GPL-3.0, see LICENSE.txt)
+
+## X-Category: |cffff8000fuba
+## Category-enUS: |cffff8000fuba
+## Category-deDE: |cffff8000fuba
+
+#@no-lib-strip@
+# Library files
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\LibStub\LibStub.lua
+#@end-no-lib-strip@
+
+# Locale files
+Locale\enUS.lua
+Locale\deDE.lua
+Locale\ruRU.lua
+Locale\zhCN.lua
+
+# Core files
+HandyNotes_WorldMapButton_fork.lua
