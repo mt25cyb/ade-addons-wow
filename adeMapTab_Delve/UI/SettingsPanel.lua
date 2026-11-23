@@ -250,7 +250,7 @@ local function CreateDropdownRow(parent, item, ownerFrame)
     local dropdown = CreateFrame("DropdownButton", nil, row, "WowStyle1DropdownTemplate")
     dropdown:SetHeight(DROPDOWN_CONTROL_HEIGHT)
     dropdown:SetPoint("TOPLEFT", row, "TOPLEFT", 40 + indent, -28)
-    dropdown:SetPoint("TOPRIGHT", row, "TOPRIGHT", -8, -28)
+    dropdown:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(40 + indent), -28)
     row.Dropdown = dropdown
 
     local function CurrentValue()

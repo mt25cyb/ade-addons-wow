@@ -493,7 +493,18 @@ end
 -- 边框同样二选一：设置页自带 BorderFrame（WQT Settings.xml:769），两个外扩 3px 的边框叠在一起会互相啃。
 local function ApplySettingsMode(active)
     if not panel then return end
-    if topBar then topBar:SetShown(not active) end
+    -- topBar 由公共库 adeMapTab 创建，且内含 SecureActionButtonTemplate 玩具按钮
+    -- （本文件 EnsureTopBar 的 toy）。战斗中 Show/Hide 它会被保护机制拦截
+    -- （ADDON_ACTION_BLOCKED，归责 adeMapTab）。战斗中只改 alpha，与 Portal 的
+    -- SafeSetVisible 同纪律；非战斗恢复真实显隐并把 alpha 复位。
+    if topBar then
+        if InCombatLockdown and InCombatLockdown() then
+            topBar:SetAlpha(active and 0 or 1)
+        else
+            topBar:SetShown(not active)
+            topBar:SetAlpha(1)
+        end
+    end
     if panel.SettingsButton then panel.SettingsButton:SetShown(not active) end
     if panel.BorderFrame then panel.BorderFrame:SetShown(not active) end
     if settingsFrame then settingsFrame:SetShown(active) end
@@ -501,6 +512,10 @@ end
 
 function addon.MapPanel.Refresh()
     if not panel or not scrollBox then return end
+    -- 与 Portal 版 RefreshPanel 同纪律：战斗中不动任何 frame 的显隐/列表数据
+    -- （topBar 等容器含 SecureActionButton，Show/Hide 会被 ADDON_ACTION_BLOCKED 拦截）。
+    -- 战斗结束由 PLAYER_REGEN_ENABLED 补刷一次。
+    if InCombatLockdown and InCombatLockdown() then return end
 
     ApplySettingsMode(currentMode == "settings")
 
@@ -576,6 +591,7 @@ local WATCHED_EVENTS = {
     "QUEST_LOG_UPDATE",
     "SPELL_UPDATE_COOLDOWN",
     "NEW_TOY_ADDED",
+    "PLAYER_REGEN_ENABLED", -- 战斗结束补刷：Refresh 在战斗中跳过显隐/列表，这里恢复。
 }
 
 function addon.MapPanel:RegisterEvents()

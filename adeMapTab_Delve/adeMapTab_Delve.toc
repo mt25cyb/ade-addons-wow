@@ -3,7 +3,7 @@
 ## Title-zhCN: |cff00AAFF[ADE]|r 地图标签页 - 地下堡
 ## Title-zhTW: |cff00AAFF[ADE]|r 地圖標籤頁 - 地下堡
 ## Author: Martin Good (mt25cyb)
-## Version: v6.5-r003
+## Version: v6.5-r004
 ## Notes: World map delve tab with filters, search, warband roster and waypoints.
 ## Notes-zhCN: 世界地图地下堡标签页：过滤、搜索、战团统计与路点。
 ## Notes-zhTW: 世界地圖地下堡標籤頁：過濾、搜尋、戰團統計與路點。
