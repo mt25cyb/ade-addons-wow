@@ -1,4 +1,4 @@
--- MinimalArchaeology 12.1.2 · zhCN 本地化（基准 enUS 12.1.2）
+-- MinimalArchaeology 12.1.3 · zhCN 本地化（基准 enUS 12.1.3）
 -- If you would like to help with translations, please use https://curseforge.com/wow/addons/minimal-archaeology/localization
 local L = LibStub("AceLocale-3.0"):NewLocale("MinArch", "zhCN")
 if not L then return end
