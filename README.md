@@ -57,6 +57,7 @@
 | [`adeMapTab_Delve`](adeMapTab_Delve/README.md) | `v6.5-r001` | 世界地图地下堡标签页（战团统计/过滤/搜索/路点；设置在世界地图 Tab 内） |
 | [`adeMapTab_Portal`](adeMapTab_Portal/README.md) | `v6.5-r001` | 世界地图传送标签页（搜索/收藏/最近/随机炉石；设置在世界地图 Tab 内） |
 | [`adeMapTab`](adeMapTab/README.md) | `v6.5-r001` | 世界地图标签页公共函数库（基于 `LibWorldMapTabs`，承接 Delve / Portal 子插件）；零强依赖，图标走 `ade_UIKit` 软依赖 |
+| [`LibWMT_LeatrixMaps_Patch`](LibWMT_LeatrixMaps_Patch/README.md) | `v6.5-r002` | Leatrix Maps「简易地图框体」下 `LibWorldMapTabs` 系 Tab 面板偏移补丁（r002 再下沉让出顶栏；覆盖 WQT / Portal / Delve / adeMapMark），独立插件、零侵入 |
 | [`ade_UIKit`](ade_UIKit/README.md) | `v6.5-r001-b023` | ADE 系列共享控件库 + 样式库 + 公共函数库（从 KAF `Krowi_Options` 2.0 复刻的原生选项窗口 + 公共 FormatDate/Util API），零第三方与零 AF 依赖；唯一开发计划见 [`ade_UIKit-dev-plan.md`](_docs/plans/ade_UIKit-dev-plan.md) |
 | [`adeBlizzDemo`](adeBlizzDemo/README.md) | `v6.5-r001-b014` | `ade_UIKit` 控件画廊与功能自测（`/bofdemo`），双 Tab、双分组、真实键位绑定 |
 
