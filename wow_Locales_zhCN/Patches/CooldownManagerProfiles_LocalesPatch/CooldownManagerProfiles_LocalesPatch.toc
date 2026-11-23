@@ -1,0 +1,10 @@
+## Interface: 120001, 120005, 120007, 120100
+## Title: CooldownManagerProfiles |cff00ccff多语言支持|r
+## Notes: 冷却管理器配置插件的多语言支持补丁（外挂式，不修改原文件；当前含简体中文，可按语种扩展）
+## Author: 汉化
+## Version: 1.0.1
+## Dependencies: CooldownManagerProfiles
+## SavedVariables: 
+
+Lang_zhCN.lua
+LocalesPatch.lua
