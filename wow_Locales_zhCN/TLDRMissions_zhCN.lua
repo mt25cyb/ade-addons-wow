@@ -1,4 +1,4 @@
--- TLDRMissions 12.1-002 · zhCN 本地化（基准 enUS 12.1-002）
+-- TLDRMissions 12.1-003 · zhCN 本地化（基准 enUS 12.1-003）
 local addonName, addon = ...
 local L = LibStub("AceLocale-3.0"):NewLocale("TLDRMissions", "zhCN")
 if not L then return end
