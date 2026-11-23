@@ -16,7 +16,7 @@
 |------|-----------|---------------|----------|
 | **A · 每语言独立文件** | 每种语言一个文件（如 `Locales/xxXX.lua`），由 `.toc` 或 `locale.xml` 显式加载 | ① 完全没有 `zhCN.lua`；② 已有 `zhCN.lua` 但部分 key 缺失 / 大量 value 仍为英文 | ① 新建并登记清单；② 对照英文基准补全并覆盖原文件 |
 | **B · 单文件集中多语言** | 所有语言写在**同一个文件**里（含 AceLocale 同文件多语种分段），zhCN 往往靠回退显示英文 | zhCN 表 / zhCN 段不存在或严重残缺 | 在该文件内补全 zhCN 表 / zhCN 段，整体覆盖同步该文件 |
-| **D · 外挂劫持补丁** | 插件硬编码英文、无任何多语言机制，且不愿改源文件 | 全部英文 | 做独立外挂插件运行时劫持 `SetText` 整串替换，见 [`_Locales_zhCN_External-Locale-Patch-Handbook.md`](_Locales_zhCN_External-Locale-Patch-Handbook.md)；已落地实例：`Patches/Retrace_LocalesPatch/` |
+| **D · 外挂劫持补丁** | 插件硬编码英文、无任何多语言机制，且不愿改源文件 | 全部英文 | 做独立外挂插件运行时劫持 `SetText` 整串替换，见 [`_Locales_zhCN_External-Locale-Patch-Handbook.md`](_Locales_zhCN_External-Locale-Patch-Handbook.md)；已落地实例：`Patches/Retrace_LocalesPatch/`、`Patches/CooldownManagerProfiles_LocalesPatch/` |
 | **E · 源码级自建多语言改造** | 插件硬编码英文，且外挂补丁覆盖不全（如 AceGUI 组件内文本），改走源码：硬编码包 `L["<英文原文>"]` + 全局语言表缺键回退 | 全部英文 | 按插件改造文档在**源码内**包裹文本并新建语言文件；产物含源码改动，**不适用 zhcn_sync 同步流程**，插件重装后须按文档重新应用。已落地实例：`CompassHUD`（文档在子项目根，成果目录 `CompassHUD/`，脚本在 `_tools`，见下文条目） |
 | *（预留）C · 框架式 locale* | 使用 Ace3 / LibStub / 注册式 locale 表等 | 取决于具体框架 | 按框架约定写入对应 locale 表，必要时注册 |
 
@@ -121,6 +121,48 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 尺寸档：Tiny → `特小号`（对齐既有 Small=小号 / Default=默认 / Large=大号）。
 - 已完成文件：`MapPinEnhanced_zhCN.lua`（同步至镜像 `locales/zhCN.lua`）。
 
+### ParchmentReader（A-①：RegisterLocale 注册表 + 白名单/TOC 双改镜像，2026-11-23）
+
+- 机制：**自建注册表**——`Localization.lua` 定义 `ParchmentReader:RegisterLocale(locale, strings)`
+  + `supportedLocales` 白名单（不在名单回退 enUS）；`Locales/enUS.lua` 等 6 个文件调用注册，
+  **key=value 同文表**（英文串即 key，406 条）；L 表 metatable 回退。TOC 有 **5 个客户端版本**
+  （Vanilla/TBC/Mists/Camelot/正式），各含完整加载清单。
+- 落地：主档 `ParchmentReader_zhCN.lua`（`RegisterLocale("zhCN", {...})` 全译 **406 条**）
+  → 镜像 `Localization.lua` 的 `supportedLocales` 加 `zhCN = true`（否则白名单拦截回退 enUS）
+  → **5 个 TOC** 均在 `Locales\ptBR.lua` 后登记 `Locales\zhCN.lua`（直接改镜像）。
+- 现 **enUS 406 / zhCN 406，缺失 0 / 多余 0**。刻意保留 4 条：`Esc`/`Home / End`/
+  `Page Up / Page Down`（按键名）、`Parchment Reader`（插件名）。
+- 踩坑：TSV 分隔符 `|` 与颜色码 `|cFFD1AD61` 冲突——含颜色码的 9 条 key 被
+  `split("|", 1)` 截断，构建脚本改硬编码映射；另注意 `\n` 等转义序列在译文中
+  **不做二次转义**（直接作为 Lua 转义输出）。
+- 调试信息段（[Editor]/[SavedVariables] 等约 60 条）全译，占位符 `%s`/`%d`/`%.2f%%` 原样保留。
+- 工具登记：diff_keys / sync / check_versions，落点 `ParchmentReader/Locales/zhCN.lua`，
+  版本 2.7.0 MATCH。
+
+### TaxiCatalog（E 类多语言表注入：主档仅版本头 + 多语言表，2026-11-23）
+
+- 机制：**自建 `STR = { DE, EN }` 双语表内嵌在两个功能代码文件中**（STR 只是该插件为
+  多语言表起的表名，非独立语言文件）+ `GetLang()`/`EffectiveLang()` 按
+  `GetLocale()`/`DB.lang` 选择。用户指定（2026-11-23）：**不做整文件管理**——
+  上游更新/重装时只需更新多语言字段。
+- 落地（**E 类多语言表注入模式**，zhcn_sync.py 新机制 `TABLE_INJECT`，表名经
+  `head` 参数配置，机制可复用于其他「表内嵌功能代码」的插件）：
+  - 主档：`TaxiCatalog/TaxiCatalog_zhCN.lua`（含 ZH 表 8 键）与
+    `TaxiCatalog/TaxiCatalog_Ace3_zhCN.lua`（含 ZH 表 31 键 + EN/DE 表补 CHINESE 显示名），
+    各为「版本头 + 多语言表 + `--@@` 行级补丁段」，文件名带 `_zhCN` 后缀。
+  - **代码分支改动也存主档**（用户指定 2026-11-23）：GetLang/EffectiveLang/语言下拉
+    values 共 4 处补丁以 `--@@ patch/old/new/end` 注释段形式附在主档尾部（不影响 Lua
+    语法），sync 从主档解析（`_parse_patch_sections`）——主档是唯一权威，登记表不再
+    硬编码补丁。
+  - 安装 = 整块替换镜像文件中的多语言表定义（括号计数定位）+ 按 `--@@` 段重打行级补丁
+    （old/new 带真实行缩进；new 子串已存在视为已打，幂等）。
+  - 已模拟「上游重装」验证两次（登记表硬编码版与主档解析版各一次）：破坏镜像侧后
+    sync 自动 INJECT 修复完整，复跑 EQUAL，Lua OK，版本 1.3.7 MATCH。
+  - ⚠ 上游更新若改动多语言表本身（增删键）或分支代码，需人工把变化合并进主档——
+    这正是「只对此字段进行更新」的工作面。
+- 译名：飞行目标 / 仅可到达 / 收藏 / 最近目标 / 艾泽拉斯琉璃 等；字体描边选项保留
+  Outline/ThickOutline 等引擎枚举词。
+
 ### RCT（A-①：AceLocale 新建 zhCN.lua，2026-11-21）
 
 - 机制：标准 **AceLocale-3.0**——注册名 `RdysCrateTracker`，`Locale/enUS.lua` 为默认表
@@ -206,6 +248,12 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   `REP_TXT.elements.name/tip.REP_ShowDarkmoonFaireButton`），且官方 zhCN **漏建 `REP_TXT.Mob = {}` 子表声明**
   （会导致 Mob 赋值直接报错，已补）；**未翻译 value 61 处**已逐条翻译。
 - 刻意保留（5 个）：`[G]`/`[M]`/`[Q]`/`[D]`/`[I]` 方括号单字母 UI 标签（`*Short` 键），非可译词汇。
+- **2026-11-24 更新补齐（1.6.0 → 2.0.0-release）**：上游大版本新增 85 键，已全部自译补齐——
+  详细信息框设置（`settings.showStandingBar`/`showDetailStatistics`/`expandSourcesByDefault`/
+  `listFontSize`/`backgroundAlpha`/`allowDetailResize` 等约 20 条）、声望全量同步消息
+  （`factionSync*` 5 条 + `showSyncMessages*`）、未知声望来源记录（`record*`/`helprecord`）、
+  **手动录入表单全套**（`manual*` 约 45 条：类型/起止/ID/校验/保存提示）+ 联盟/部落描述长文。
+  `manualNpcID`（NPC ID）/`manualPvp`（PvP）同文保留。现已 **330 键齐平**（值相同 2 + 刻意保留 5）。
 - 结果：key 集合 enUS 245 = zhCN 245，缺失 0、多余 0、值相同 5（即上述刻意保留）。
 - 已完成文件：`ReputationGuide_zhCN.lua`（覆盖同步至镜像 `locales/zhCN.lua`）。
 
@@ -244,6 +292,7 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 机制：A 类 + AceLocale。另一 `addon/locales/DigSiteLocales/ZhCN.lua`（挖掘场地名）作者已提供且完整，**无需维护**。
 - 原有 13 处 `--[[Translation missing --]]`（值仍英文），已全部填充（化石密文提示、边框样式/颜色/粗细/
   按钮位置/现代边框自定义等）并移除缺失标记；主文件 **322 键**与 enUS 齐平、占位符一致。
+- **2026-11-24 例行更新核对**：镜像 `12.1.2 → 12.1.3`，键集合不变（322=322 缺失 0），仅版本头 bump。
 - 已完成文件：`MinimalArchaeology_zhCN.lua`（同步至镜像 `addon/locales/ZhCN.lua`）。
 
 ### MouseoverActionSettings（A-①：zhCN 是空壳，全量自译）
@@ -255,11 +304,12 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 该插件 TOC **没有 `## Version:`**，版本头按上文特殊写法登记。
 - 已完成文件：`MouseoverActionSettings_zhCN.lua`（184 键齐平，同步至镜像 `Locales/zhCN.lua`）。
 
-### TLDRMissions（已卸载，文件保留）
+### TLDRMissions（2026-11-13 卸载，2026-11-24 重装恢复维护）
 
-- 曾维护至镜像 `12.1-002`（`Locales/zhcn.lua` 全小写落点，90 键齐平）。
-- 2026-11-13 镜像更新后插件被卸载（整个目录消失），主文件 `TLDRMissions_zhCN.lua` 保留以备重装，
-  同步脚本自动报 `UNINSTALLED`。
+- 曾维护至镜像 `12.1-002`（`Locales/zhcn.lua` 全小写落点，90 键齐平）；2026-11-13 镜像更新后
+  插件被卸载（整个目录消失），主文件保留以备重装。
+- **2026-11-24 重装**：版本 `12.1-003`（分客户端 TOC 有版本号，主 TOC 仍无），90=90 缺失 0
+  （此版本仅微调，键集合不变），版本头已 bump 并恢复同步。
 
 ### Altoholic / DataStore 套件（已安装并同步，2026-11-13）
 
@@ -301,7 +351,54 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
 - 节日名取官方日历用词：新年节 / 爱就在空中 / 贵族花园节 / 儿童周 / 仲夏火焰节 / 美酒节 /
   万圣节 / 亡者节 / 朝圣者的恩赐 / 冬幕节 / 暗月马戏团 / 魔兽世界周年庆。
 
-### CooldownManagerCentered（A-②：AceLocale 覆盖层，社区汉化底子 + 5.12.2 新增，2026-11-17）
+### CooldownManagerProfiles_LocalesPatch（D 类外挂补丁：由 _temp 旧 ADE 迁移，2026-11-24）
+
+- 目标插件判定：`CooldownManagerProfiles` 2.3.1（AqueGen）**无任何本地化机制**——无
+  AceLocale/语言目录，文案硬编码在 `UI.lua`（102KB）/`Settings.lua`/`ProfileStore.lua`/
+  `Presets.lua`，控件全部为标准类型、frame 名规律清晰 → D 类外挂劫持补丁。
+  **手册原型即此补丁**（`_Locales_zhCN_External-Locale-Patch-Handbook.md` §6 示例列全）。
+- 来源与迁移：`_temp/_old_ADE/CooldownManagerProfiles_LocalesPatch/`（旧 ADE 项目成果，
+  字典 157 键基准 2.3.0）→ 按手册 Checklist 迁入
+  `Patches/CooldownManagerProfiles_LocalesPatch/`（Lang_zhCN.lua + LocalesPatch.lua + TOC）。
+- 字典核对（基准 2.3.0 → 2.3.1，157 键逐条比对）：
+  - **比对方法**：模拟 hook 去色逻辑——先把源码剥 `|cxxxxxxxx`/`|r` 再查 key（直接 raw
+    比对会因色码大量误报失效）；反向从源码抽取 `:SetText(` 字面串查字典，剔除拼接前缀
+    （尾部 `..` 续行）与 `' '`/`'v'`/`'|cFF'` 等噪音。
+  - 结论：真失效仅 2 键——`Import failed.`（2.3.1 移除，导入失败改由 `%s` 动态消息承载）、
+    Settings 长描述（改为动态拼接，hook 不可覆盖）；真缺失 2 键——`Delete Template`/
+    `Paste from Clipboard`（2.3.1 新增按钮）。字典 155 → 157。
+  - `LocalesPatch.lua` 机制锚点 2.3.1 全部有效（`CMP_` 弹窗 key 前缀、`CM Profiles\n\n`
+    POPUP_PREFIX、`CooldownManagerProfilesFrame`/`Cooldown Manager Profiles` frame 名、
+    Settings 分类名、LDB label `CM Profiles`），原样迁移。
+- TOC 按手册模板重写：`Interface: 120001, 120005, 120007, 120100`（与目标主 TOC 一致）、
+  Title「多语言支持」、`Dependencies: CooldownManagerProfiles`、Version 1.0.1。
+- 工具链：sync `PATCHES` 登记，整目录落盘镜像 AddOns 根（首次 NEW x3，复跑 EQUAL x3）；
+  D 类不参与 check_versions（同 Retrace 先例）。
+- 已知保留英文（hook 局限，手册 §11）：仅 `AddLine` 追加行（tooltip 详情行前缀与长说明）。
+- **2026-11-24 二轮补全**（版本仍 2.3.1，目标＝消灭 hook 可达范围内的残留）：
+  - **弹窗前缀双形态适配**：2.3.1 弹窗 text 前缀 `CM Profiles\n\n`（2 个长提示弹窗）与
+    `CM Profiles\n`（14 个输入类弹窗）并存，原加载器只剥双换行 → 单换行弹窗全部漏翻；
+    `LocalesPatch.lua` 改为 `POPUP_PREFIXES` 表长前缀优先、命中后拼回原前缀。
+  - **拼接常量整串作 key**：Settings 面板信息段（多行常量拼接经 `SetText` 显示）以拼接
+    结果整串作 key 补译；`None` / `Select a profile on the left` 两条「色码常量+纯常量」
+    形态同法补齐。核对脚本口径：`SetText(...)` 到平衡括号抽取、按 `..` 分段求值常量段。
+  - **修复迁移脚本插入 bug**：上轮「2.3.1 新增」4 键被误插到文件尾 `CMPLang or {...}`
+    初始化表内、随即被 `CMPLang.zhCN = L` 覆盖而从未生效；已移入 `L` 字典并恢复注册表为
+    `CMPLang = CMPLang or {}`。教训：向「`local L = {...}` 表尾追加」的脚本应定位
+    `local L` 表的闭合 `}`，而非 `rindex("}")`。
+  - 补齐后复检：弹窗 text 缺失 0、可提取常量缺失 0（字典 160 键）。**含 `%s` 的弹窗
+    消息实际可覆盖**——`dialog.text` 层整串查表（格式串作 key）命中后替换，`%s` 照常
+    format；此前「保留英文」的判断过悲观，真正不可覆盖的只有 `AddLine` 与运行时变量拼接。
+- 与另一开发者版本对比（`_temp/_old_ADE/CooldownManagerProfiles_zhCN/`，单文件
+  字典+加载器合一、128 键，2026-11-24）：仅吸收 3 处——补 `Sync from Blizz`/
+  `Load to Blizz` 2 个短形态键（2.3.1 源码中与长版 `...Blizzard` 并存）；`Create a Copy`
+  采其译法「创建副本」（语境=导入冲突弹窗，原译「复制并添加」不贴切）；清理旧 ADE
+  继承的 3 个重复键。其余独有键均为过时/失效形态：其弹窗 key 按「拆段」登记且
+  `WARNING:` key 带色码（违反去色规范），2.3.1 弹窗整串含新增第二段
+  （`Blizzard's Cooldown Manager does not support...`），整串匹配下全部失效；
+  我方字典弹窗 key 为完整整串（含第二段），无此问题。
+
+### CooldownManagerCentered（A-②：AceLocale 覆盖层，社区汉化底子 + 6.0.0 新增，2026-11-24）
 
 - 语言文件位置：`locales/zhCN.lua`（小写 `locales/`；根目录 `local.xml` 已登记，无需改动）。
 - 机制：A 类 + AceLocale（enUS `NewLocale(..., "enUS", true)` 为默认，zhCN 覆盖层缺 key 回退）。
@@ -311,7 +408,11 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   `modules/visibility.lua`，均为 `%s` 格式串，`%s` 实参为查看器名 / 高亮的暴雪设置名 / 蓝色高亮的
   `HUD_EDIT_MODE_MENU`（官译「编辑模式」），色码结构已保留），插入位置对齐 enUS 行序。
 - 刻意保留（1 条）：`Slug`（自定义字体 flag 名，各语言版本均同值）。
-- 已完成文件：`CooldownManagerCentered_zhCN.lua`（515 键齐平，同步至镜像 `locales/zhCN.lua`）。
+- **6.0.0 新增 12 条**（2026-11-24 补齐，自译）：追踪器汇总文案（`Tracked spells & items`/
+  `Assigned auras: %d`/`Buff Container %d`/`%d custom` 等计数与汇总串）+ 德鲁伊形态隐藏
+  （`Hide in Form`/`Hide out of Form`/`Hide in %s`——`%s` 为形态名，`druidForms.lua`）。
+  `Slug` 仍保留；现已 **527 键齐平**，版本头 bump 至 6.0.0。
+- 已完成文件：`CooldownManagerCentered_zhCN.lua`（同步至镜像 `locales/zhCN.lua`）。
 
 ### Questwise（已停止支持，2026-11-13）
 
@@ -334,6 +435,27 @@ AceLocale 分段套件（VanasKoS）无独立首行版本头，基线版本登�
   `Restore removed entries (N)` / `Notable loot (N)`、`recording paused` 状态段、`(blue) = within the Trail window:`
 - 已知局限（手册 §11 口径）：事件叙述/日期/距离统计等运行时格式化串、地图事件气泡内容、
   `Atlas.lua` 内置的经典副本与首领英文名（数据类，未译）、聊天命令输出（走 `print`）保留英文。
+
+### BattlePetBreedID（E 类：源码级自建多语言改造，2026-11-23）
+
+- 判定：v1.42.0 全部界面文案硬编码英文、无任何本地化机制（`X-Localizations: enUS`），
+  直接走 **E 类源码改造**（第 2 例，机制沿用 CompassHUD 先例）。
+- 机制：新文件 `BPBIDLocale.lua`（TOC 首位）挂 `internal.L`（zhCN 表 + 缺键回退元表，
+  key=英文原文逐字对齐）；各文件头部 `local L = internal.L`。该插件全部文件经
+  `local addonname, internal = ...` 共享命名空间，`internal.L` 全局可见——无踩坑 #18 的
+  setfenv 环境问题。
+- **53 条词条**：BreedTooltips.lua 品种 tooltip 22 处包裹（当前品种/已收集/可能品种/
+  基础属性/25 级属性各行的拼接短串逐个作 key）+ OptionsPanel.lua 设置面板 36 处包裹
+  （含 3 段格式说明长文与 21 个复选框）；`BattlePetBreedID.lua` 仅 Debug 串不包不译；
+  **`ERR*`/`NEW`/`???` 是逻辑返回值（依赖 `"ERR"` 前缀比较）禁止翻译**。
+- 产物（`wow_Locales_zhCN/BattlePetBreedID/`，可整目录覆盖游戏插件目录）：
+  - [`_Locales_BattlePetBreedID_zhCN.lua`](_Locales_BattlePetBreedID_zhCN.lua)：
+    中英对照词条主档（53 条，唯一权威）；
+  - [`_Locales_BattlePetBreedID_zhCN_Development-Notes.md`](_Locales_BattlePetBreedID_zhCN_Development-Notes.md)：
+    机制设计、范围决策、修改位置明细、重新应用方法、实机验证清单；
+  - `BattlePetBreedID/`：改造后完整插件目录（BPBIDLocale.lua 新增 + 2 文件包裹 + TOC 首位）；
+  - `_tools/_bpbid_build.py`（重新应用构建，逐条断言锚点命中数）+ `_bpbid_verify.py`（校验）。
+- 已应用镜像（z-ref 覆盖），5 个 Lua 语法 OK、调用点残留字面串 0。
 
 ### CompassHUD（E 类：源码级自建多语言改造，2026-11-19）
 
