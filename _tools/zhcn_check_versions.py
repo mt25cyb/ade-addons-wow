@@ -27,6 +27,8 @@ BASELINE_OVERRIDE = {
 
 # 插件名 -> 项目侧代表文件（用于读首行版本头）
 HEADER_FILES = {
+    "ParchmentReader": "ParchmentReader_zhCN.lua",
+    "TaxiCatalog": "TaxiCatalog/TaxiCatalog_zhCN.lua",
     "RCT": "RCT_zhCN.lua",
     "EmberLedger": "EmberLedger/Localization.lua",
     "Prat-3.0": "Prat-3.0_zhCN.lua",

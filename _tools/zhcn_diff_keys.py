@@ -70,6 +70,11 @@ ADDONS = {
         "enus": "Prat-3.0/locales/enUS.lua",
         "zhcn": "Prat-3.0_zhCN.lua",
     },
+    # 自建 RegisterLocale 注册表：enUS 为 key=value 同文表，zhCN 主档逐键译。
+    "ParchmentReader": {
+        "enus": "ParchmentReader/Locales/enUS.lua",
+        "zhcn": "ParchmentReader_zhCN.lua",
+    },
     # AceLocale：Locale/enUS.lua 注册 RdysCrateTracker，其他语言 NewLocale 覆盖。
     "RCT": {
         "enus": "RCT/Locale/enUS.lua",
