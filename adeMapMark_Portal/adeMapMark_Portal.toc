@@ -1,0 +1,23 @@
+## Interface: 120105
+## Title: |cff00AAFF[ADE]|r MapMark: Portal
+## Title-zhCN: |cff00AAFF[ADE]|r 地图标记：传送点
+## Title-zhTW: |cff00AAFF[ADE]|r 地圖標記：傳送點
+## Notes: Portal coordinate data pack for adeMapMark.
+## Notes-zhCN: adeMapMark 的传送点坐标数据包。
+## Author: ADE 阿德
+## Version: v6.5-r042
+## IconAtlas: poi-hub
+## IconTexture: Interface\AddOns\adeMapMark\assets\ade_128
+## Category: -|cff00D9FF ade |r-
+## Globe-Main: ADE
+## Dependencies: adeMapMark
+## SavedVariables: adeMapMark_PortalDB
+
+Core.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Data_Portal_Legion.lua
+Data_Portal_WarWithin.lua
+Data_Portal_Midnight.lua
+Dev_CoordDump.lua
