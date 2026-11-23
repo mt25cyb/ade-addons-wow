@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="PROTOFORMSYNTHESISJOURNAL_TOGGLE" header="PROTOFORMSYNTHESISJOURNAL" category="ADDONS">
+		ProtoformSynthesisJournal:Toggle()
+	</Binding>
+</Bindings>

@@ -1,0 +1,19 @@
+## Interface: 120105
+## Title: Protoform Synthesis Journal
+## Notes: View the battle pets and mounts you can make at the Protoform Synthesis forge and how many reagents are on your person, in your bank and in the warband bank
+## Version: v6-r010
+## Author: ADE 阿德
+## X-Original-Author: Gello
+## X-WoWI-ID: 26267
+## X-Wago-ID: xZKx2pNk
+## X-Curse-Project-ID: 596546
+## SavedVariables: ProtoformSynthesisJournalSettings
+## IconTexture: Interface\Icons\inv_progenitor_protoformsynthesis
+## AddonCompartmentFunc: ProtoformSynthesisJournalToggleWindow
+localization\localization.xml
+Data.lua
+Guides.lua
+AutoScrollFrame.xml
+ProtoformSynthesisJournal.xml
+UI.lua
+Alerts.lua
