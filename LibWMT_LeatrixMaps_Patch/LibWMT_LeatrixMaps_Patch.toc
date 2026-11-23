@@ -1,0 +1,12 @@
+## Interface: 120105
+## Title: LibWorldMapTabs - Leatrix Maps Patch
+## Title-zhCN: LibWorldMapTabs - Leatrix Maps 简易地图框体补丁
+## Notes: Fixes LibWorldMapTabs tab panels drifting when Leatrix Maps "Use simple map frame" is enabled.
+## Notes-zhCN: 修复 Leatrix Maps「使用简易地图框体」开启时，LibWorldMapTabs 系世界地图 Tab 面板相对原生任务日志的偏移。
+## Author: ADE 阿德
+## Version: v6.5-r002
+## Category: -|cff00D9FF ade |r-
+## OptionalDeps: Leatrix_Maps, WorldQuestTab, adeMapTab, adeMapTab_Portal, adeMapTab_Delve, adeMapMark
+## X-License: MIT
+
+LibWMT_LeatrixMaps_Patch.lua
