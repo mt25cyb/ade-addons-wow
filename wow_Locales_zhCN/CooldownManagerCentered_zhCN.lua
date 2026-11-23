@@ -1,4 +1,4 @@
--- CooldownManagerCentered 5.12.2 · zhCN 本地化（基准 enUS 5.12.2）
+-- CooldownManagerCentered 6.0.0 · zhCN 本地化（基准 enUS 6.0.0）
 -- 译文底子：社区汉化（5.12.1），新增 5 条为 5.12.2 的编辑模式锚定/可见性提示（自译）
 local L = LibStub:GetLibrary("AceLocale-3.0"):NewLocale("CooldownManagerCentered", "zhCN")
 
@@ -523,3 +523,17 @@ L["Open %s to change the Blizzard setting."] = "打开%s以修改暴雪设置."
 L["The Blizzard setting %s was changed. Save the layout in %s to keep it."] = "暴雪设置%s已修改. 请在%s中保存布局以保留更改."
 L["%s: the Blizzard setting %s is set to %s. Blizzard hides the viewer itself, so these rules cannot show it. Set it to %s?"] = "%s: 暴雪设置%s当前为%s. 暴雪隐藏了查看器本身, 这些规则无法将其显示. 要将其设为%s吗?"
 L["%s has visibility rules, but the Blizzard setting %s is set to %s, so they cannot show it. Change it in %s."] = "%s已设置可见性规则, 但暴雪设置%s当前为%s, 因此这些规则无法将其显示. 请在%s中修改."
+
+-- 6.0.0 新增：追踪器汇总与德鲁伊形态隐藏（自译）
+L["Tracked spells & items"] = "追踪的法术与物品"
+L["Tracked spells & items: %d"] = "追踪的法术与物品: %d"
+L["Number of custom trackers"] = "自定义追踪器数量"
+L["Buff assignments & custom auras"] = "Buff 分配与自定义光环"
+L["Assigned auras: %d"] = "已分配光环: %d"
+L["Buff Container %d"] = "Buff 容器 %d"
+L["%d custom"] = "%d 自定义"
+L["%d with own settings"] = "%d 项独立设置"
+L["%s layout"] = "%s 布局"
+L["Hide in Form"] = "形态中隐藏"
+L["Hide out of Form"] = "非形态时隐藏"
+L["Hide in %s"] = "在%s中隐藏"
