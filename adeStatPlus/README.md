@@ -23,6 +23,7 @@
 ## 命令
 
 - `/adsp panel` 显示/隐藏面板；`/adsp sort` 排序窗口（第二批）；`/adsp config` 打开设置
+- `/adsp charpanel` 角色面板诊断（打开角色面板后运行）：输出进度条开关、pane/scrollFrame 尺寸与可见性、锚点、滚动范围、行数，用于定位「启用进度条后内容消失」
 - `/adeSP` 直接打开设置窗口
 - 原生「设置 > 插件」里有「打开选项」入口页（UIKit b023）
 
@@ -32,7 +33,7 @@
 
 ## 第二批 UI（2026-11-17）
 
-- **CharPanel**：内嵌原生角色面板——属性行下 8px 进度条（刻度/火花）、原生 `CharacterStatsPane` 整体 reparent 到无滚动条 ScrollFrame（滚轮滚动，基座 scrollBar="none" 等价内联）。12.x 注意：角色面板代码在 `Blizzard_UIPanels_Game` 包内，`Blizzard_CharacterFrame` addon 名已不存在。
+- **CharPanel**：内嵌原生角色面板——属性行下 8px 进度条（刻度/火花）、原生 `CharacterStatsPane` 整体 reparent 到无滚动条 ScrollFrame（滚轮滚动，基座 scrollBar="none" 等价内联）。12.x 注意：角色面板代码在 `Blizzard_UIPanels_Game` 包内，`Blizzard_CharacterFrame` addon 名已不存在。r008 修复了换装时文字累积上飘与测量失败压高度；r009 补上「同帧增高行后测量读到旧布局值」的下一帧补测、ticker 连续就绪收敛与 OnShow 恢复 scrollFrame 可见性（详见 CHANGELOG）。
 - **SortWindow**：「显示/排序/颜色」侧窗（`/adsp sort` 或设置页按钮），双点锚主设置窗左外侧；锚定走 `Options.GetWindowFrame`（UIKit 共享窗惰建），滚动容器内联 `ScrollFrameTemplate + MinimalScrollBar`。
 - ~~图形内嵌（Radar/Ring）~~：已删除（实测问题较大）；旧存档 charts 键不消费。
 

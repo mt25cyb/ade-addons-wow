@@ -37,10 +37,12 @@ local SCROLL_BOTTOM_PAD = 8
 
 local pane, bars = nil, {}
 local scrollFrame, scrollChild
+local nativePaneHeight            -- r010：reparent 前 pane 的原生高度（回退测量用）
 local mounted = false
 local eventFrame
 local hooked = false
 local grownRows = {}          -- [原生行] = { height, labelShift, valueShift }
+local remeasureScheduled = false -- r009：下一帧补测去抖，避免 Relayout 密集调用堆积
 local UpdateScrollRange       -- 前向声明：EnsureScroll 的 OnSizeChanged 引用
 local PositionBarTick         -- 前向声明：EnsureBar 的 OnSizeChanged 引用
 
@@ -174,6 +176,15 @@ end
 local function AdoptPane()
     if not (pane and scrollChild) or InCombatLockdown() then return end
     if pane:GetParent() ~= scrollChild then
+        -- r010：reparent + ClearAllPoints 后 pane 失去原生双锚尺寸（高度变 0！）。
+        -- 必须在改父前记下原生高度，供屏幕坐标测量失败时回退。
+        if not nativePaneHeight then
+            local h = pane:GetHeight()
+            if type(h) == "number" and h > 0
+                and not (issecretvalue and issecretvalue(h)) then
+                nativePaneHeight = h
+            end
+        end
         pane:SetParent(scrollChild)
         pane:ClearAllPoints()
         pane:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, 0)
@@ -183,14 +194,14 @@ end
 --- 按「最底可见子帧」实测内容高度（StatMarks/Bars.lua:1366-1435 同款）。
 --- 增高行与链头偏移都已体现在子帧的 bottom 上，无需单独累加。
 UpdateScrollRange = function()
-    if not (scrollFrame and scrollChild and pane) or InCombatLockdown() then return end
+    if not (scrollFrame and scrollChild and pane) or InCombatLockdown() then return false end
     local w = scrollFrame:GetWidth()
     if w and w > 0 then
         scrollChild:SetWidth(w)
         pane:SetWidth(w)
     end
     local viewHeight = scrollFrame:GetHeight()
-    if not viewHeight or viewHeight <= 0 then return end
+    if not viewHeight or viewHeight <= 0 then return false end
 
     local top = scrollChild:GetTop()
     local lowest
@@ -206,14 +217,39 @@ UpdateScrollRange = function()
             end
         end
     end
-    -- r008：测量失败（装备变动时行池正在重建，子帧尚未布局 → top/lowest 无效）时
-    -- 不再写尺寸——原逻辑会把 pane 高度强行压到 viewHeight，超出视口的内容被
-    -- ScrollFrame 裁掉，表现为「角色面板原有内容消失」。保留原生尺寸，等下一轮补测。
-    if not top or not lowest then return end
+    local function FallbackHeight()
+        local extra = 0
+        for row in pairs(grownRows) do
+            if row:IsShown() then
+                extra = extra + BAR_TEXT_GAP + BAR_H + BAR_BOTTOM_OFFSET
+            end
+        end
+        return (nativePaneHeight or viewHeight) + extra + SCROLL_BOTTOM_PAD
+    end
+    local function WriteHeight(h)
+        if h < viewHeight then h = viewHeight end
+        scrollChild:SetHeight(h)
+        pane:SetHeight(h)
+    end
+    -- r010：屏幕坐标测量失败时（用户 /adsp charpanel 实测：pane 203x0、scrollChild
+    -- 203x1、8 行全可见但 top/lowest 无效），r008 的「直接 return 保留原生尺寸」在
+    -- reparent 后根本不成立——AdoptPane 的 ClearAllPoints 已让 pane 失去原生双锚，
+    -- 留下的就是 0 高度，全部内容被裁掉（用户截图黑屏）。回退到「reparent 前记录的
+    -- 原生高度 + 已增高行数 × 每行增高量」，保证不低于原生、不裁内容；下一帧补测
+    -- 会再尝试精确屏幕坐标测量。
+    if not top or not lowest then
+        WriteHeight(FallbackHeight())
+        return true
+    end
     local contentHeight = (top - lowest) + SCROLL_BOTTOM_PAD
-    if contentHeight < viewHeight then contentHeight = viewHeight end
-    scrollChild:SetHeight(contentHeight)
-    pane:SetHeight(contentHeight)
+    -- r011：增高行只会让内容变高，测得高度不可能小于 reparent 前的原生高度。
+    -- 用户 r010 诊断中 scroll=0/0、pane 被压到视口 360，而原生 355 + 4×13 + 8 = 415，
+    -- 说明屏幕坐标虽取到值却仍是增高前旧布局；此时改用回退值，避免底部行被裁。
+    if nativePaneHeight and nativePaneHeight > 0 and contentHeight < nativePaneHeight then
+        contentHeight = FallbackHeight()
+    end
+    WriteHeight(contentHeight)
+    return true
 end
 
 --- 读取帧的第 1 个锚点（可能多点锚，只取第 1 个用于 y 位移/还原）。
@@ -378,8 +414,18 @@ function CharPanel.Relayout()
     -- D66：滚动容器必须在布局完成后测量（增高行都已生效）
     if EnsureScroll() then
         AdoptPane()
-        UpdateScrollRange()
+        local measured = UpdateScrollRange()
         if scrollFrame then scrollFrame:Show() end
+        -- r009：同帧 SetHeight 后暴雪尚未解析布局，GetTop/GetBottom 可能仍是增高前的
+        -- 旧值 → contentHeight 偏小 → 后续行被 ScrollFrame 裁掉（面板变空）。r008 只
+        -- 挡住「测量完全失败(nil)」，这里在下一帧补测一次让高度落定；去抖避免密集 Relayout 堆积。
+        if measured and not remeasureScheduled and not InCombatLockdown() then
+            remeasureScheduled = true
+            C_Timer.After(0, function()
+                remeasureScheduled = false
+                if mounted and pane and pane:IsShown() then UpdateScrollRange() end
+            end)
+        end
     end
     return IsPaneReady()
 end
@@ -413,15 +459,19 @@ local function OnEvent(self, event, name)
         end
         if pane.HookScript then
             pane:HookScript("OnShow", function()
+                -- r009：OnHide 里会 Hide scrollFrame；这里先恢复可见性，不依赖
+                -- Relayout 的前置守卫（pane 尚未 Show 时 Relayout 会提前 return）。
+                if scrollFrame then scrollFrame:Show() end
                 CharPanel.Relayout()
                 -- D88：更稳健的重试——原生 stats 行在 OnShow 之后才重建，过早 Relayout
-                -- 会因行未就绪而留空（偶发需等数秒）。ticker 每 0.05s 重试，直到
-                -- IsPaneReady（强化组首行就绪）即停，最多 2s；首帧竞态与重开均覆盖。
-                local tries = 0
+                -- 会因行未就绪而留空（偶发需等数秒）。ticker 每 0.05s 重试；r009：
+                -- IsPaneReady 只代表「行已构建」，不代表滚动测量已落定，改为至少
+                -- 连续 4 次就绪（0.2s）再停，给下一帧补测与暴雪重锚留窗口，最多 2s。
+                local tries, ready = 0, 0
                 C_Timer.NewTicker(0.05, function(self)
                     tries = tries + 1
-                    local ok = CharPanel.Relayout()
-                    if ok or tries >= 40 or not (pane and pane:IsShown()) then self:Cancel() end
+                    if CharPanel.Relayout() then ready = ready + 1 end
+                    if ready >= 4 or tries >= 40 or not (pane and pane:IsShown()) then self:Cancel() end
                 end)
             end)
             pane:HookScript("OnHide", function()
@@ -449,4 +499,58 @@ function CharPanel.Init()
     ns.Collector.RegisterRefresh(CharPanel.Refresh)
     pane = _G.CharacterStatsPane
     OnEvent(eventFrame, "PLAYER_ENTERING_WORLD")
+end
+
+--- r009 诊断：/adsp charpanel（打开角色面板后运行），打印原生 pane 与自建滚动容器的
+--- 实际尺寸/可见性/锚点、行数与测量状态，用于定位「启用进度条后内容消失」。
+function CharPanel.Diagnose()
+    local function n(v)
+        if v == nil then return "nil" end
+        if issecretvalue and issecretvalue(v) then return "secret" end
+        if type(v) == "number" then return string.format("%.1f", v) end
+        return tostring(v)
+    end
+    local function anchorText(f)
+        if not f or not f.GetNumPoints or f:GetNumPoints() < 1 then return "无锚点" end
+        local p, rel, rp, x, y = f:GetPoint(1)
+        local relName = "nil"
+        if rel then
+            if rel == scrollChild then relName = "scrollChild"
+            elseif rel == pane then relName = "pane"
+            elseif rel.GetName then relName = rel:GetName() or "匿名帧"
+            else relName = type(rel) end
+        end
+        return tostring(p) .. "/" .. relName .. "/" .. tostring(rp)
+            .. " (" .. n(x) .. "," .. n(y) .. ")"
+    end
+    local grown = 0
+    for _ in pairs(grownRows) do grown = grown + 1 end
+    print("|cff00d9ff[adeStatPlus] 角色面板诊断|r （请先打开角色面板）")
+    print("配置: bars.enabled=" .. tostring(Cfg().bars.enabled)
+        .. " mounted=" .. tostring(mounted) .. " hooked=" .. tostring(hooked)
+        .. " ready=" .. tostring(IsPaneReady()) .. " grownRows=" .. grown
+        .. " 补测中=" .. tostring(remeasureScheduled))
+    print("pane: shown=" .. tostring(pane and pane:IsShown())
+        .. " parent=" .. (pane and pane:GetParent()
+            and (pane:GetParent() == scrollChild and "scrollChild"
+                 or (pane:GetParent():GetName() or "匿名帧")) or "nil")
+        .. " size=" .. n(pane and pane:GetWidth()) .. "x" .. n(pane and pane:GetHeight())
+        .. " anchor=" .. anchorText(pane))
+    print("scrollFrame: shown=" .. tostring(scrollFrame and scrollFrame:IsShown())
+        .. " size=" .. n(scrollFrame and scrollFrame:GetWidth()) .. "x" .. n(scrollFrame and scrollFrame:GetHeight())
+        .. " scroll=" .. n(scrollFrame and scrollFrame:GetVerticalScroll()) .. "/"
+        .. n(scrollFrame and scrollFrame:GetVerticalScrollRange()))
+    print("scrollChild: size=" .. n(scrollChild and scrollChild:GetWidth())
+        .. "x" .. n(scrollChild and scrollChild:GetHeight())
+        .. " 回退基准 nativePaneHeight=" .. n(nativePaneHeight)
+        .. " viewHeight=" .. n(scrollFrame and scrollFrame:GetHeight()))
+    local attr, enh = ResolveCategories()
+    local total, shownRows = 0, 0
+    ForEachStatRow(function(row)
+        total = total + 1
+        if row:IsShown() then shownRows = shownRows + 1 end
+    end)
+    print("categories: attr=" .. tostring(attr and attr:IsShown())
+        .. " enh=" .. tostring(enh and enh:IsShown())
+        .. " statRows=" .. total .. "/" .. shownRows .. "（总/可见）")
 end

@@ -1,5 +1,17 @@
 # adeStatPlus — CHANGELOG
 
+## v6.5-r011 - 2026-11-23（r010 已恢复显示；补下限保护，消除底部行仍被裁的隐患）
+
+**用户确认 r010 后面板已显示内容；诊断显示 `pane/scrollChild 203x360`、`scroll=0/0`、`nativePaneHeight=355`。360 正好等于视口，说明本轮走的是屏幕坐标测量路径、且测得值被压到视口高度——按 4 行各增高 13px 计算，正确内容高度应约 415px，即底部约 55px 的行仍可能被裁，只是顶部已可见。r011 加确定性下限保护：增高行只会让内容变高，测得高度不可能小于 reparent 前记录的原生高度；若 `contentHeight < nativePaneHeight`（旧布局读数），改用 r010 的回退高度（原生高度 + 可见增高行 × 13px + 8px）。回退计算提取为 FallbackHeight 局部函数供两条路径复用。TOC bump v6.5-r011。**
+
+## v6.5-r010 - 2026-11-23（确诊并修复：reparent 后 pane 高度为 0 导致角色面板全空）
+
+**用户 `/adsp charpanel` 诊断输出给出确凿证据：`pane: shown=true parent=scrollChild size=203.0x0.0`、`scrollChild: size=203.0x1.0`、`scrollFrame: 203x360 scroll=0/0`、`statRows=8/8`，即 pane 宽度已写入但高度始终为 0、scrollChild 仍是初始 1×1。根因确定：`UpdateScrollRange` 的屏幕坐标测量（`scrollChild:GetTop()` / 子帧 `GetBottom()`）在本环境持续无效，`if not top or not lowest then return false` 每次命中；r008 的「测量失败就 return、保留原生尺寸」策略对 reparent 后的 pane 根本不成立——`AdoptPane` 的 `ClearAllPoints()` 已让 pane 失去原生双锚尺寸，所谓「保留原生尺寸」实际就是 0 高度，全部内容被自建 ScrollFrame 裁掉。r010 修复：① `AdoptPane` 在 `SetParent(scrollChild)` **之前**记录 pane 原生高度 `nativePaneHeight`；② `UpdateScrollRange` 屏幕坐标失败时不再直接 return，而是回退写入「原生高度（缺失则用 viewport 高度）+ 已增高行数 × 13px(BAR_TEXT_GAP+BAR_H+BAR_BOTTOM_OFFSET) + 8px 底部留白」，保证高度不低于原生、内容不被裁，下一帧补测仍会尝试精确值；③ 诊断输出增加回退基准字段。TOC bump v6.5-r010。**
+
+## v6.5-r009 - 2026-11-23（角色面板进度条再修复：测量滞后一帧 + 过早收敛 + 诊断命令）
+
+**用户实测：r008 已失效修复仍复现「启用进度条（charPanel.bars.enabled）后角色面板内容看不见」。r008 只挡住「测量完全失败（GetTop/GetBottom 为 nil）」，未覆盖两个有据路径：① `UpdateScrollRange` 在同帧 `row:SetHeight(base+13)` 增高后立刻用 `scrollChild:GetTop()` / `child:GetBottom()` 测量，暴雪布局尚未解析，读到的是增高前旧值 → `contentHeight` 偏小 → 增高后的行被自建 ScrollFrame 裁掉，表现为空面板（r008 CHANGELOG 已自述「行池重建中 GetTop/GetBottom 无效」，但只处理 nil 未处理旧值）。② `pane:OnShow` 的 ticker 仅凭 `IsPaneReady()`（强化组首行存在）即 Cancel，不给下一帧补测留窗口。修复：`UpdateScrollRange` 返回测量成功标志；`Relayout` 在测量成功后用 `C_Timer.After(0)` 下一帧补测一次（去抖 `remeasureScheduled`，战斗中跳过）；ticker 收敛改为连续 4 次就绪；`pane:OnShow` 先显式 `scrollFrame:Show()`（OnHide 会 Hide 它，原逻辑依赖 Relayout 前置守卫，pane 未 Show 时提前 return 导致滚动容器不恢复）。新增 `/adsp charpanel` 诊断命令，输出 bars.enabled / mounted / ready / pane 与 scrollFrame 的尺寸、可见性、锚点、scroll 范围、grownRows、行数，便于精确验证；secret 值安全。TOC bump v6.5-r009。**
+
 ## v6.5-r008 - 2026-11-21（修复：角色面板进度条启用后装备变动导致原生内容消失）
 
 **修复用户实测：启用角色面板进度条（`charPanel.bars.enabled`）后，装备变动使属性数值变化时，原生角色属性面板（CharacterStatsPane）原有内容消失。`Modules/CharPanel.lua` 三处叠加竞态修复：① `RestoreFontString` 原守卫要求当前锚点精确匹配我们写入的偏移才还原；装备变动时暴雪重锚池化行，守卫失效 → 上一轮 +delta 位移残留 → 下一轮以残留位置为基线再上移 → 文字逐次上飘离开可视区；改为无条件还原到记录的原始锚点（暴雪对同一行锚点稳定，写回 base 不破坏其布局）。② `UpdateScrollRange` 测量失败（行池重建中 `GetTop/GetBottom` 无效）时原逻辑把 pane 高度压到 viewHeight，超出视口内容被 ScrollFrame 裁掉；改为直接 return、保留原生尺寸等下一帧补测。③ `PaperDollFrame_UpdateStats` hook 原只测一次；`Relayout()` 返回 false（行未就绪）时改为 0.05s 后补测一次（OnShow 的 ticker 不覆盖装备变动路径）。TOC bump v6.5-r008。**

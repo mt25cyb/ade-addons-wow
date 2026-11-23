@@ -126,6 +126,13 @@ SlashCmdList["ADESTATPLUS"] = function(input)
         SP.SortWindow.Toggle()
     elseif cmd == "config" then
         SP.OpenSettings()
+    elseif cmd == "charpanel" then
+        -- r009：角色面板进度条/滚动容器诊断（打开角色面板后运行）
+        if SP.CharPanel and SP.CharPanel.Diagnose then
+            SP.CharPanel.Diagnose()
+        else
+            SP:Print("角色面板模块未加载")
+        end
     else
         SP:Print(SP.L["CMD_USAGE"])
     end
