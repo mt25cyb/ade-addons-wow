@@ -10,6 +10,7 @@ local ns = _G.adeMapMark
 local L = ns.L
 local PANEL_MODE = "adeMapMark_PANEL_MODE"
 local REPUTATION_STAR = "Interface\\Common\\ReputationStar"
+local DEFAULT_ICON_SIZE = ns.DEFAULT_ICON_SIZE
 local DEFAULT_TEXT_SIZE = ns.DEFAULT_TEXT_SIZE
 
 -- 工具转发：Core/Provider/WorldMapPin 已实现，UI 段沿用旧名以减少改动
@@ -669,7 +670,7 @@ local function GetEditingIndex()
 end
 
 -- 表单值与数据包内置原值比较：color 按分量比，灰度把 nil 当 false，空串/nil/false 视为同义；
--- textSize 在数据包未提供该字段时与原 size（渲染回落基准）一致即视为未自定义
+-- textSize 在数据包未提供该字段时与全局默认字号一致即视为未自定义
 local function ExternalValueEqual(field, a, b, original)
     if field == "color" then
         if type(a) ~= "table" or type(b) ~= "table" then return a == b end
@@ -680,7 +681,7 @@ local function ExternalValueEqual(field, a, b, original)
             and math.abs(alpha(a) - alpha(b)) < 0.001
     end
     if field == "isGrayscale" then return (a == true) == (b == true) end
-    if field == "textSize" and b == nil and original then b = original.size end
+    if field == "textSize" and b == nil then b = ns.DEFAULT_TEXT_SIZE end
     if a == nil or a == "" or a == false then a = nil end
     if b == nil or b == "" or b == false then b = nil end
     return a == b
@@ -739,7 +740,7 @@ local function ClearPanelForm()
     colorBtn.curColor = cloneColor(lastColor)
     if grayBtn then grayBtn:SetGray(false) end
     SyncPreviewStyle()
-    sizeSlider:SetValue(DEFAULT_TEXT_SIZE)
+    sizeSlider:SetValue(DEFAULT_ICON_SIZE)
     textSizeSlider:SetValue(db.settings.lastTextSize or DEFAULT_TEXT_SIZE)
     -- 3. 彻底清空 Plus 模块的图标数据（传 true）
     if ns.Plus and ns.Plus.ResetIconAndRotator then
@@ -787,8 +788,8 @@ local function EnsurePanel(parent)
 
 
     -- ── 图标大小 / 文本字体滑块 ───────────────────────────────────────────
-    -- 原「尺寸」一个值同时驱动图标与文字，现拆成两个字段：size 只管图标（含小地图），
-    -- textSize 只管大地图文字字号；旧数据没有 textSize 时渲染回落到 size，行为不变。
+    -- 原「尺寸」一个值同时驱动图标与文字，现拆成两个字段：iconSize 只管图标（含小地图），
+    -- textSize 只管大地图文字字号；两者解耦，缺省时各自取默认值（46 / 12）。
 
     local offsetY = -10  -- 首行控件起始 Y 偏移
     local offsetX = 15  -- 每行第一个控件 X 偏移
@@ -801,9 +802,9 @@ local function EnsurePanel(parent)
     panel.sizeSlider = sizeSlider  -- 暴露给 Plus 模块（Item 4：图标尺寸联动）
     sizeSlider:SetPoint("LEFT", lIconSize, "RIGHT", 4, 0)
     sizeSlider:SetWidth(160)
-    sizeSlider:SetMinMaxValues(10, 120)
+    sizeSlider:SetMinMaxValues(12, 36)
     sizeSlider:SetValueStep(1)
-    sizeSlider:SetValue(ns.db().settings.lastSize)
+    sizeSlider:SetValue(ns.db().settings.lastSize or DEFAULT_ICON_SIZE)
     _G[sizeSlider:GetName() .. "Low"]:SetText(L.SIZE_LOW)
     _G[sizeSlider:GetName() .. "High"]:SetText(L.SIZE_HIGH)
 
@@ -819,9 +820,9 @@ local function EnsurePanel(parent)
         _G[s:GetName() .. "Text"]:SetText(v)
         local db = ns.db()
         if panel.editingData then
-            if panel.editingData.size ~= v then  -- 只有真正改变才刷新
-                if not WriteExternalOverride("size", v) then
-                    panel.editingData.size = v
+            if panel.editingData.iconSize ~= v then  -- 只有真正改变才刷新
+                if not WriteExternalOverride("iconSize", v) then
+                    panel.editingData.iconSize = v
                     RefreshMapPins()
                     local idx = GetEditingIndex()
                     if idx then CallPlus("UpdateMinimapPinStyle", idx) end
@@ -833,7 +834,7 @@ local function EnsurePanel(parent)
     end)
 
     -- ── 文本字体滑块 ─────────────────────────────────────────────────────
-    -- 与图标大小同一尺度（渲染仍乘 0.34*zoomAdj），只是独立作用于大地图文字。
+    -- 与图标大小同一尺度（渲染乘 zoomAdj 随画布自适应），只是独立作用于大地图文字。
 
     local lTextSize = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     local lTextSizeY = -32  -- 控件 Y 偏移
@@ -843,9 +844,9 @@ local function EnsurePanel(parent)
     textSizeSlider = CreateFrame("Slider", "adeMapMark_TextSizeSlider", panel, "OptionsSliderTemplate")
     textSizeSlider:SetPoint("LEFT", lTextSize, "RIGHT", 4, 0)
     textSizeSlider:SetWidth(160)
-    textSizeSlider:SetMinMaxValues(10, 120)
+    textSizeSlider:SetMinMaxValues(8, 24)
     textSizeSlider:SetValueStep(1)
-    textSizeSlider:SetValue(ns.db().settings.lastTextSize or ns.db().settings.lastSize or DEFAULT_TEXT_SIZE)
+    textSizeSlider:SetValue(ns.db().settings.lastTextSize or DEFAULT_TEXT_SIZE)
     _G[textSizeSlider:GetName() .. "Low"]:SetText(L.SIZE_LOW)
     _G[textSizeSlider:GetName() .. "High"]:SetText(L.SIZE_HIGH)
 
@@ -859,7 +860,7 @@ local function EnsurePanel(parent)
         _G[s:GetName() .. "Text"]:SetText(v)
         local db = ns.db()
         if panel.editingData then
-            if (panel.editingData.textSize or panel.editingData.size) ~= v then
+            if panel.editingData.textSize ~= v then
                 if not WriteExternalOverride("textSize", v) then
                     panel.editingData.textSize = v
                     RefreshMapPins()
@@ -966,34 +967,6 @@ local function EnsurePanel(parent)
 
     -- ── 图标选择器（由 adeMapMarkPlus 提供）──────────────────────────────────
     CallPlus("SetupIconSelector", panel, titleBg)
-
-    -- 放大/缩小按钮
-    local btnExpand = CreateFrame("Frame", nil, panel, "MaximizeMinimizeButtonFrameTemplate")
-    btnExpand:SetSize(22, 22)
-    btnExpand:SetPoint("TOP", lTitle, "BOTTOM", 0, -4)
-    panel.btnExpand = btnExpand
-
-    -- 根据展开状态切换最大化/最小化按钮的显示
-    local function UpdateVisuals(isExpanded)
-        if isExpanded then
-            btnExpand.MaximizeButton:Hide()
-            btnExpand.MinimizeButton:Show()
-        else
-            btnExpand.MaximizeButton:Show()
-            btnExpand.MinimizeButton:Hide()
-        end
-    end
-
-    btnExpand.MaximizeButton:SetScript("OnClick", function()
-        ShowBigNoteEditor(editBoxTitle, editBoxNote)
-        UpdateVisuals(true)
-    end)
-    btnExpand.MinimizeButton:SetScript("OnClick", function()
-        if bigNotePopup then bigNotePopup:Hide() end
-        UpdateVisuals(false)
-    end)
-
-    UpdateVisuals(false)
 
     -- ── 备注输入框 ───────────────────────────────────────────────────────
 
@@ -1185,7 +1158,7 @@ local function EnsurePanel(parent)
             local overrides = {
                 note = (editBoxNote.fullText or editBoxNote:GetText() or ""):gsub("||", "|"),
                 color = cloneColor(colorBtn.curColor),
-                size = math.floor(sizeSlider:GetValue()),
+                iconSize = math.floor(sizeSlider:GetValue()),
                 textSize = math.floor(textSizeSlider:GetValue()),
                 isGrayscale = grayBtn and grayBtn.isGray or false,
             }
@@ -1240,7 +1213,7 @@ local function EnsurePanel(parent)
             title      = finalTitle,
             note       = note,
             color      = cloneColor(colorBtn.curColor),
-            size       = math.floor(sizeSlider:GetValue()),
+            iconSize   = math.floor(sizeSlider:GetValue()),
             textSize   = math.floor(textSizeSlider:GetValue()),
             isFavorite = isFav,
             isVisible  = true,
@@ -1483,8 +1456,8 @@ function ns.Panel.OpenForEdit(data)
     editBoxNote:SetText(GetDisplayNote(data.note))
     editBoxNote:SetCursorPosition(0)
     panel.editingData = data
-    sizeSlider:SetValue(data.size or ns.db().settings.lastSize)
-    textSizeSlider:SetValue(data.textSize or data.size or ns.db().settings.lastTextSize or ns.db().settings.lastSize)
+    sizeSlider:SetValue(data.iconSize or ns.db().settings.lastSize or DEFAULT_ICON_SIZE)
+    textSizeSlider:SetValue(data.textSize or ns.db().settings.lastTextSize or DEFAULT_TEXT_SIZE)
     colorBtn.curColor = cloneColor(data.color)
     btnAdd:SetText(isExternal and L.MARK_UPDATE_EXTERNAL or L.MARK_UPDATE_POINT)
     if btnDelete then btnDelete:SetEnabled(not isExternal) end
@@ -1511,7 +1484,7 @@ function ns.QuickMark(msg)
     local finalTitle = (title ~= "") and title or L.MARK_DEFAULT_TITLE
     tinsert(db.markers, {
         mapID = mapID, coord = encodeCoord(x, y), title = finalTitle, note = "",
-        color = cloneColor(db.settings.lastColor), size = ns.DEFAULT_TEXT_SIZE,
+        color = cloneColor(db.settings.lastColor), iconSize = ns.DEFAULT_ICON_SIZE,
         textSize = ns.DEFAULT_TEXT_SIZE,
         isFavorite = false, isVisible = true, icon = nil,
     })
@@ -1560,7 +1533,7 @@ local function SerializeMarkers()
             EncodeString(m.title),
             EncodeString(m.note),
             r, g, b, a,
-            tostring(m.size or 100),
+            tostring(m.iconSize or 100),
             isF, isE,
             EncodeString(m.icon),
             string.format("%.0f", math.deg(m.iconRotation or 0)),
@@ -1599,7 +1572,7 @@ local function DeserializeMarkers(str)
     local newMarkers = {}
     if markerPart then
         for record in markerPart:gmatch("[^|]+") do
-            local mapID, coord, t, n, r, g, b, a, size, isF, isE, ic, rot, crop, gameinIconName, gray = strsplit(";", record)
+            local mapID, coord, t, n, r, g, b, a, iconSize, isF, isE, ic, rot, crop, gameinIconName, gray = strsplit(";", record)
             local mID = tonumber(mapID)
             local co  = tonumber(coord)
             if mID and co then
@@ -1610,7 +1583,7 @@ local function DeserializeMarkers(str)
                     title        = DecodeString(t),
                     note         = DecodeString(n),
                     color        = { r = tonumber(r) or 0.2, g = tonumber(g) or 1, b = tonumber(b) or 0.73, a = tonumber(a) or 1 },
-                    size         = tonumber(size) or 100,
+                    iconSize     = tonumber(iconSize) or 100,
                     isFavorite   = (isF == "1"),
                     isVisible    = (isE == "1"),
                     icon         = tonumber(iconStr) or iconStr,

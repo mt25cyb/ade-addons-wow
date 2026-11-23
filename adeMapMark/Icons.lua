@@ -10,7 +10,6 @@ local addonName = ...
 local ns = _G.adeMapMark
 local L = ns.L
 ns.Plus = ns.Plus or {}
-local DEFAULT_TEXT_SIZE = ns.DEFAULT_TEXT_SIZE
 local DEFAULT_ICON_SIZE = ns.DEFAULT_ICON_SIZE
 
 -- ===== 图标库数据（字典化重构：tex 路径仅此处定义一次，单一来源）=====
@@ -153,7 +152,7 @@ local MAP_ICONS_ORDER_TABLES = {
 --   未知 CAT → 返回 nil（白名单拦截）
 local function GetAtlasName(ref)
     if type(ref) ~= "string" then return nil end
-    return ref:match("^ATLAS:(.+)$")
+    return ref:match("^ATLAS:(.+)$") or ref:match("^[%w_]+:ATLAS:(.+)$")
 end
 
 function ns.ResolveIcon(ref)
@@ -263,7 +262,7 @@ function ns.Plus.OnPinEnter(self, data)
 end
 
 -- 大地图 Pin 渲染钩子：有图标时接管渲染并返回 true，否则返回 false
-function ns.Plus.OnPinAcquired(self, data, size, zoomAdj)
+function ns.Plus.OnPinAcquired(self, data, iconSize, zoomAdj)
     if not data.icon then
         if self.icon then self.icon:Hide() end
         return false
@@ -278,7 +277,7 @@ function ns.Plus.OnPinAcquired(self, data, size, zoomAdj)
     self.icon:SetVertexColor(1, 1, 1)
     self.icon:SetAlpha(data.color.a or 1)
     self.icon:SetDesaturated(data.isGrayscale == true)
-    local iconSizeWM = math.max(size * 0.4 * zoomAdj, 1)    -- 大地图图标标记尺寸（随缩放自适应，与 RoyMapGuide 一致）
+    local iconSizeWM = math.max(iconSize * zoomAdj, 1)          -- 大地图图标尺寸：设置值即像素，随画布缩放自适应
     self:SetSize(iconSizeWM, iconSizeWM)
     return true
 end
@@ -347,9 +346,9 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
             iconSelectorBtn.tex:SetTexture(nil)
             iconSelectorBtn.tex:Hide()
             iconSelectorBtn.label:Show()
-            -- Item 4：新建标记清除图标时，尺寸滑块设回默认文字尺寸
+            -- Item 4：新建标记清除图标时，尺寸滑块设回默认图标尺寸
             if not panel.editingData and panel.sizeSlider then
-                panel.sizeSlider:SetValue(DEFAULT_TEXT_SIZE)
+                panel.sizeSlider:SetValue(DEFAULT_ICON_SIZE)
             end
         end
     end
@@ -482,7 +481,7 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
                     row:SetPoint("TOPLEFT", padding + colIdx * SUBPANEL_COL_WIDTH, -padding - rowIdx * rowH)
                     row:SetWidth(SUBPANEL_COL_WIDTH - padding)
                     row:SetHeight(rowH)
-                    row.ico:SetTexture(item.tex)
+                    ns.ApplyIconTexture(row.ico, item.tex, 1)
                     row.lbl:SetText(item.name)
                     -- 限制文字宽度，超出部分自动显示省略号
                     row.lbl:SetWidth(SUBPANEL_COL_WIDTH - 30)
@@ -580,7 +579,7 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
             local ico = row:CreateTexture(nil, "ARTWORK")
             ico:SetSize(16, 16)
             ico:SetPoint("LEFT", 2, 0)
-            ico:SetTexture(item.tex)
+            ns.ApplyIconTexture(ico, item.tex, 1)
             local lbl = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
             lbl:SetPoint("LEFT", ico, "RIGHT", 4, 0)
             lbl:SetText(item.name)
@@ -745,20 +744,20 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
 
     -- 6. 原生简陋弹窗（支持空格分离自定义名字）
     StaticPopupDialogs["BDMAP_ADD_CUSTOM_ICON"] = {
-        text       = "输入【ID】或【ID 自定名】(空格隔开)",
-        button1    = "提取",
-        button2    = "取消",
+        text       = L.ICON_EXTRACT_HINT,
+        button1    = L.ICON_EXTRACT_BTN,
+        button2    = L.ICON_EXTRACT_CANCEL,
         hasEditBox = true,
         OnAccept   = function(self)
             local eBox   = self.EditBox or self.editBox
             local input  = eBox:GetText()
-            -- 用空格分离 ID 和自定义名称
-            local idStr, nameStr = input:match("^(%S+)%s*(.*)$")
-            local id = tonumber(idStr)
+            -- 用空格分离 ID / ATLAS 定义名和自定义名称
+            local valueStr, nameStr = input:match("^(%S+)%s*(.*)$")
+            local tex, defaultName
+            local id = tonumber(valueStr)
 
             if id then
-                local tex         = id
-                local defaultName = "ID:" .. id
+                tex, defaultName = id, "ID:" .. id
                 if C_Spell and C_Spell.GetSpellInfo then
                     local sInfo = C_Spell.GetSpellInfo(id)
                     if sInfo then
@@ -770,9 +769,19 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
                     defaultName = C_Item.GetItemNameByID(id)
                     tex         = C_Item.GetItemIconByID(id) or tex
                 end
-                -- 玩家写了自定义名则用玩家的，否则用系统原名
+            else
+                -- ATLAS 定义名（可带 ATLAS: 前缀），用客户端 atlas 信息验证
+                local atlasName = valueStr and valueStr:match("^ATLAS:(.+)$") or valueStr
+                if atlasName and C_Texture.GetAtlasInfo(atlasName) then
+                    tex = "ATLAS:" .. atlasName
+                    defaultName = atlasName
+                end
+            end
+
+            if tex then
+                -- 玩家写了自定义名则用玩家的，否则用系统原名/ATLAS 名
                 local finalName = (nameStr and nameStr ~= "") and nameStr or defaultName
-                -- 字典格式：KEY = tex 路径
+                -- 字典格式：KEY = tex（ATLAS:xxx 由 ResolveIcon 拆成 file + tCoord）
                 MAP_ICONS_GAMEINICON[tex] = { name = finalName, tex = tex }
                 local dbNow = _G["adeMapMarkDB"]
                 if dbNow then
@@ -781,10 +790,8 @@ function ns.Plus.SetupIconSelector(panel, titleBg)
                 end
                 if BuildCustomMenu then BuildCustomMenu() end
                 print("|cff88ff88[adeMapMark]|r " .. string.format(L.ICON_EXTRACT_OK, finalName))
-            else
-                if input and input ~= "" then
-                    print("|cffff4444[adeMapMark]|r " .. L.ICON_EXTRACT_FAIL)
-                end
+            elseif input and input ~= "" then
+                print("|cffff4444[adeMapMark]|r " .. L.ICON_EXTRACT_FAIL)
             end
         end,
         EditBoxOnEnterPressed = function(self)

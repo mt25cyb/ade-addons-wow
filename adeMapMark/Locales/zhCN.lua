@@ -40,6 +40,10 @@ L.SETTINGS_TOMTOM = "使用 TomTom 导航"
 L.SETTINGS_LEFT_CLICK = "左键打开编辑器"
 L.SETTINGS_MINIMAP = "在小地图上显示标记"
 L.SETTINGS_ARROW = "显示玩家箭头"
+L.SETTINGS_DISPLAY_MODE = "显示模式"
+L.DISPLAY_MODE_ICON = "仅图标"
+L.DISPLAY_MODE_TEXT = "仅文本"
+L.DISPLAY_MODE_BOTH = "图标+文本"
 L.SETTINGS_PROVIDERS = "外挂数据包"
 L.SETTINGS_CLOSE = "关闭"
 
@@ -93,8 +97,11 @@ L.IO_NO_NEW = "导入完成，但没有发现新的点位或图标（已跳过�
 L.ICON_LABEL = "图标"
 L.ICON_SELECTOR_TITLE = "图标选择器"
 L.ICON_SELECTOR_HELP = "\n【左键】弹出下拉列表\n【右键】取消当前的图标选择\n\n【红色小把手】旋转图标。右击把手回正\n【滚轮】缩放以裁切显示区域\n\n【双击】手动输入 ID 添加提取图标\n【拖拽】将物品/法术拖到此处直接添加\n\n <游戏内提取>  列表里的图标可右键删除"
+L.ICON_EXTRACT_HINT = "输入【ID】/【ATLAS 定义名】或【值 自定名】(空格隔开)"
+L.ICON_EXTRACT_BTN = "提取"
+L.ICON_EXTRACT_CANCEL = "取消"
 L.ICON_EXTRACT_OK = "成功提取游戏内图标：%s"
-L.ICON_EXTRACT_FAIL = "提取失败：请输入正确的 ID ！"
+L.ICON_EXTRACT_FAIL = "提取失败：请输入正确的 ID 或 ATLAS 定义名！"
 L.ICON_DELETE_FORBID = "只能删除自己提取的图标哦"
 
 -- 数据包注册

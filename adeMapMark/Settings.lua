@@ -146,12 +146,17 @@ function DropdownMixin:OnValueChanged(value, userInput)
 end
 function DropdownMixin:UpdateState()
     if not self.data or not self.Dropdown then return end
-    if self.Dropdown.SetText then self.Dropdown:SetText(self.data.value or "") end
+    local row, current = self, self.data.value
+    local text = tostring(current or "")
+    for _, item in ipairs(self.data.items or {}) do
+        if item.value == current then text = item.text; break end
+    end
+    -- WowStyle1DropdownTemplate 的主文本由 SetDefaultText 提供；Button:SetText 对它无效
+    if self.Dropdown.SetDefaultText then self.Dropdown:SetDefaultText(text) end
     if self.Dropdown.SetupMenu then
-        local row = self
         self.Dropdown:SetupMenu(function(_, rootDescription)
             for _, item in ipairs(row.data.items or {}) do
-                rootDescription:CreateButton(item.text, function()
+                rootDescription:CreateRadio(item.text, function() return item.value == current end, function()
                     row:OnValueChanged(item.value, true)
                 end)
             end
@@ -364,8 +369,21 @@ function adeMapMarkSettingsPanelMixin:Reconstruct()
         })
         dataProvider:Insert({
             type = "slider", label = L.MARK_SIZE,
-            min = 10, max = 120, step = 1, value = db.settings.lastSize or 32,
+            min = 12, max = 36, step = 1, value = db.settings.lastSize or 22,
             onChanged = function(v) db.settings.lastSize = v end,
+        })
+        dataProvider:Insert({
+            type = "dropdown", label = L.SETTINGS_DISPLAY_MODE,
+            value = db.settings.displayMode or "icon",
+            items = {
+                { text = L.DISPLAY_MODE_ICON, value = "icon" },
+                { text = L.DISPLAY_MODE_TEXT, value = "text" },
+                { text = L.DISPLAY_MODE_BOTH, value = "both" },
+            },
+            onChanged = function(v)
+                db.settings.displayMode = v
+                ns.RefreshAllPins()
+            end,
         })
         dataProvider:Insert({
             type = "color", label = L.MARK_COLOR,

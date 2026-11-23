@@ -45,7 +45,9 @@ function ns.GetProviderDisplayName(providerName)
 end
 
 -- 把外部原始坐标规范为内部标记结构
--- raw: { mapID, coord 或 x/y, title, note, color, icon, size, isVisible }
+-- raw: { mapID, coord 或 x/y, title, note, color, icon,
+--        iconSize（图标/标记基准尺寸）, textSize（大地图文字字号）, isVisible }
+-- 归一化后的内部标记结构与 raw 字段同名（iconSize/textSize），全链路统一命名。
 -- 颜色/尺寸/备注/图标等默认值来自数据包；若子插件 DB 有单标覆写则以覆写为准。
 local function NormalizeMark(raw, providerName, ignoreOverrides)
     if type(raw) ~= "table" or not raw.mapID then return nil end
@@ -68,7 +70,7 @@ local function NormalizeMark(raw, providerName, ignoreOverrides)
         note       = tostring(raw.note or ""),
         color      = ns.cloneColor(raw.color),
         icon       = raw.icon,
-        size       = raw.size,
+        iconSize   = raw.iconSize,
         textSize   = raw.textSize,
         isVisible  = (raw.isVisible ~= false),
         isExternal = true,
@@ -80,7 +82,7 @@ local function NormalizeMark(raw, providerName, ignoreOverrides)
         local ov = db and db.overrides and db.overrides[GetProviderFavKey(m)]
         if type(ov) == "table" then
             if ov.color then m.color = ns.cloneColor(ov.color) end
-            if ov.size then m.size = ov.size end
+            if ov.iconSize then m.iconSize = ov.iconSize end
             if ov.textSize then m.textSize = ov.textSize end
             if ov.note then m.note = tostring(ov.note) end
             if ov.icon then m.icon = ov.icon end

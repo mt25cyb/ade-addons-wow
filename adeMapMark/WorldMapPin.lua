@@ -98,8 +98,14 @@ function ns.ShowPinHighlight(pin, data)
         if not pin.highlight then
             pin.highlight = pin:CreateTexture(nil, "OVERLAY")
             pin.highlight:SetBlendMode("ADD")
-            pin.highlight:SetAllPoints(pin)
             pin.highlight:SetAlpha(0.4)
+        end
+        -- 图标+文本模式下只高亮图标区；铺满整个 Pin 会盖住文字
+        pin.highlight:ClearAllPoints()
+        if pin.icon and pin.icon:IsShown() then
+            pin.highlight:SetAllPoints(pin.icon)
+        else
+            pin.highlight:SetAllPoints(pin)
         end
         if ns.ApplyIconTexture then ns.ApplyIconTexture(pin.highlight, data.icon, data.iconCrop) end
         if data.iconRotation and pin.highlight.SetRotation then
@@ -154,7 +160,7 @@ function adeMapMarkWorldMapPinMixin:OnAcquired(dataIndex, data, x, y)
 
     -- 字体源加兜底，不直接依赖运行时可变的全局 Font 对象
     local fontPath = (GameFontNormal and GameFontNormal:GetFont()) or STANDARD_TEXT_FONT
-    local size = data.size or ns.db().settings.lastSize
+    local iconSize = data.iconSize or ns.db().settings.lastSize
     local zoomAdj = math.pow(GetWorldMapCanvasScale(), 0.3)
     local c = ns.cloneColor(data.color)
     local cr, cg, cb = c.r, c.g, c.b
@@ -165,24 +171,54 @@ function adeMapMarkWorldMapPinMixin:OnAcquired(dataIndex, data, x, y)
 
     -- 字体状态无条件全量重设，与本次是不是图标点无关。Pin 是池化复用的：上一次若被用作
     -- 图标点，Plus 分支 return true 会整段跳过 SetFont，字体状态就随这个 Pin 带到下一条标记上。
-    -- 字号由各标记自己的 size 决定并取整（数据包可为不同点设计不同字号），外挂/本地同一路径。
-    -- 字号由各标记自己的 textSize 决定并取整；旧数据没有 textSize 时回落到 size（图标大小），
-    -- 与拆分前的行为一致。外挂/本地同一路径。
-    local fontSizeWM = math.max(math.floor((data.textSize or size) * 0.34 * zoomAdj + 0.5), 10)
+    -- 字号由各标记自己的 textSize 决定并取整（数据包可为不同点设计不同字号）；
+    -- 未提供时用全局默认字号，与 iconSize 解耦。外挂/本地同一路径。
+    local fontSizeWM = math.max(math.floor((data.textSize or ns.DEFAULT_TEXT_SIZE) * zoomAdj + 0.5), 8)
     self.text:SetFont(fontPath, fontSizeWM, "OUTLINE")
     self.text:SetShadowOffset(0, 0)
     self.text:SetShadowColor(0, 0, 0, 0)
     self.text:SetTextColor(1, 1, 1, 1)
     self.text:SetAlpha(c.a or 1)
 
-    -- 图标点由 Plus 接管渲染；用 handled 而非直接 return，让两条路径都能统一 Pin 缩放。
-    local handled = ns.Plus and ns.Plus.OnPinAcquired
-        and ns.Plus.OnPinAcquired(self, data, size, zoomAdj)
+    -- 显示模式：全局选项只决定「图标与文本同时存在」时如何呈现；仅有一种时总显示那一种。
+    local showIcon, showText = ns.GetIconTextVisibility(data)
+    local iconSizeWM = math.max(iconSize * zoomAdj, 1)   -- 与 Icons.lua 的 OnPinAcquired 保持一致
+    if showIcon and ns.Plus and ns.Plus.OnPinAcquired then
+        ns.Plus.OnPinAcquired(self, data, iconSize, zoomAdj)
+    end
 
-    if not handled then
+    if showText then
         local hexColor = string.format("|cff%02x%02x%02x", math.floor(cr * 255 + 0.5), math.floor(cg * 255 + 0.5), math.floor(cb * 255 + 0.5))
         self.text:SetText(hexColor .. (data.title or L.MARK_UNNAMED) .. "|r")
         self.text:Show()
+    end
+
+    if showIcon and showText and self.icon then
+        -- 图标+文本：垂直排列，图标在上、文本在下，两者 X 轴中心对齐。
+        local gap = 2 * zoomAdj
+        local tw = math.max(self.text:GetStringWidth(), 1)
+        local th = math.max(self.text:GetStringHeight(), 1)
+        local w = math.max(iconSizeWM, tw) + 8
+        local h = iconSizeWM + gap + th + 8
+        self.icon:ClearAllPoints()
+        self.icon:SetSize(iconSizeWM, iconSizeWM)
+        self.icon:SetPoint("TOP", self, "TOP", 0, -4)
+        self.text:ClearAllPoints()
+        self.text:SetPoint("TOP", self.icon, "BOTTOM", 0, -gap)
+        self:SetSize(math.floor(w), math.floor(h))
+    elseif showIcon then
+        -- 仅图标：显式重设居中锚点。Pin 池化复用时图标可能残留上一轮的 TOP 锚点
+        -- （如刚从「图标+文本」切回），不重置会偏移并溢出 Pin 边界。
+        if self.icon then
+            self.icon:ClearAllPoints()
+            self.icon:SetPoint("CENTER", 0, 0)
+            self.icon:SetSize(iconSizeWM, iconSizeWM)
+        end
+        self:SetSize(math.floor(iconSizeWM), math.floor(iconSizeWM))
+    else
+        -- 仅文本：沿用原有居中文本布局
+        self.text:ClearAllPoints()
+        self.text:SetPoint("CENTER", 0, 0)
         local sw = math.max(self.text:GetStringWidth(), 10)
         local sh = math.max(self.text:GetStringHeight(), 10)
         self:SetSize(math.floor(sw + 16 * zoomAdj), math.floor(sh + 12 * zoomAdj))
@@ -197,6 +233,10 @@ function adeMapMarkWorldMapPinMixin:OnAcquired(dataIndex, data, x, y)
     local map = self:GetMap()
     if self.ApplyCurrentScale and map and map.HasZoomLevels and map:HasZoomLevels() then
         self:ApplyCurrentScale()
+    else
+        -- 地图首次打开时缩放层尚未就绪，本轮 Pin 未应用系统缩放（图标视觉偏小）。
+        -- 标记待重刷，等 WorldMapFrame 显示稳定后由下方 OnShow 钩子补一次 ApplyCurrentScale。
+        ns._zoomLevelsPendingRefresh = true
     end
 end
 
@@ -313,4 +353,16 @@ ns.RegisterOnAddonLoaded(function()
     ns.hookScript(sc, "OnZoomChanged", refresh)
     if sc.ZoomIn then ns.hookScript(sc.ZoomIn, "OnClick", refresh) end
     if sc.ZoomOut then ns.hookScript(sc.ZoomOut, "OnClick", refresh) end
+
+    -- 首次打开地图时 OnAcquired 早于缩放层初始化，ApplyCurrentScale 被守卫跳过，
+    -- 图标偏小。显示后延迟补一次刷新，让 Pin 按已就绪的缩放层重新渲染。
+    -- 只做一次（标志由 OnAcquired 置位），避免每次开关地图都重排。
+    ns.hookScript(WorldMapFrame, "OnShow", function()
+        if not ns._zoomLevelsPendingRefresh then return end
+        C_Timer.After(0.1, function()
+            if not ns._zoomLevelsPendingRefresh then return end
+            ns._zoomLevelsPendingRefresh = nil
+            ns.RefreshMapPins()
+        end)
+    end)
 end)

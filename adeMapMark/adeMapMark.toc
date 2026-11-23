@@ -6,7 +6,7 @@
 ## Notes-zhCN: 地图标记与外挂坐标数据包。支持图标/文字、导航、导入导出。
 ## Notes-zhTW: 地圖標記與外掛座標數據包。支援圖標/文字、導航、導入導出。
 ## Author: ADE 阿德
-## Version: v6.5-r021
+## Version: v6.5-r042
 ## IconAtlas: poi-hub
 ## IconTexture: Interface\AddOns\adeMapMark\assets\ade_128
 ## Category: -|cff00D9FF ade |r-

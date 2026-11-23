@@ -25,15 +25,18 @@ _G.adeMapMarkPanelID = EnumUtil.MakeEnum("Markers", "Settings")
 local DB_NAME = "adeMapMarkDB"
 ns.DB_NAME = DB_NAME
 
--- 标记默认尺寸（供 Icons/MinimapPin 运行时引用）
-ns.DEFAULT_TEXT_SIZE = 32
-ns.DEFAULT_ICON_SIZE = 46
+-- 标记默认尺寸（供 Icons/MinimapPin 运行时引用；单位=像素，滑条所见即所得）
+-- 文字 10px、图标 22px（用户实测最合适；20 偏小、24 偏大）。
+ns.DEFAULT_TEXT_SIZE = 10
+ns.DEFAULT_ICON_SIZE = 22
 
 local DEFAULTS = {
     version = 1,
     markers = {},
     settings = {
-        lastSize = 32,
+        lastSize = 22,
+        lastTextSize = 10,
+        displayMode = "icon",
         lastColor = { r = 0.2, g = 1, b = 0.73, a = 1 },
         useTomTom = true,
         leftClickEditMode = false,
@@ -71,6 +74,20 @@ local function EnsureDB()
     db.markers = db.markers or {}
     db.settings.liveUpdate = nil
     ns.MergeDefaults(db, DEFAULTS)
+    -- 尺寸 schema 迁移（仅执行一次，用 sizePixelSchema 标记）：
+    --   r039: 46 → 20；r041: 20 → 24；r042: 24 → 22（用户实测最合适）。
+    -- 只重置"等于上一版默认值"的值，尊重用户手动调过的滑条。
+    if db.settings.sizePixelSchema ~= 3 then
+        if db.settings.lastSize == 24 or (type(db.settings.lastSize) == "number" and db.settings.lastSize > 36) then
+            db.settings.lastSize = 22
+        end
+        for _, m in ipairs(db.markers or {}) do
+            if type(m.iconSize) == "number" and (m.iconSize == 24 or m.iconSize > 36) then
+                m.iconSize = 22
+            end
+        end
+        db.settings.sizePixelSchema = 3
+    end
     return db
 end
 
@@ -118,6 +135,24 @@ end
 function ns.decodeCoord(coord)
     if not coord then return 0, 0 end
     return math.floor(coord / 10000) / 10000, (coord % 10000) / 10000
+end
+
+-- 显示模式：仅决定「图标与文本同时存在」时的呈现；只有其中一种时总是显示那一种。
+--   icon = 仅图标（默认，兼容旧行为）；text = 仅文本；both = 图标+文本
+-- hasIcon 取 data.icon；hasText 在「无图标」时恒为 true（保留「未命名」文本兜底）。
+function ns.GetIconTextVisibility(data)
+    if not data then return false, false end
+    local hasIcon = data.icon ~= nil and data.icon ~= ""
+    local hasText = not hasIcon or (type(data.title) == "string" and data.title:trim() ~= "")
+    local mode = "icon"
+    local db = _G[DB_NAME]
+    if db and db.settings then mode = db.settings.displayMode or "icon" end
+    if mode == "text" then
+        return not hasText, hasText
+    elseif mode == "both" then
+        return hasIcon, hasText
+    end
+    return hasIcon, not hasIcon
 end
 
 function ns.hookScript(frame, event, fn)

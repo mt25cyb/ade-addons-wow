@@ -21,53 +21,72 @@ local minimapPinByData     = {}
 local MAX_MINIMAP_PIN_POOL = 50
 local MINIMAP_MIN_SIZE     = 80
 
--- ── B.1 小地图图标渲染 ───────────────────────────────────────────────────────
+-- ── B.1~2 小地图图标/文字渲染（显示模式感知）──────────────────────────────────
 
-local function ApplyMinimapPinIcon(pin, data, db)
-    if not data.icon then
-        if pin.icon then pin.icon:Hide() end
-        return false
-    end
-    if not pin.icon then
-        pin.icon = pin:CreateTexture(nil, "ARTWORK")
-        pin.icon:SetAllPoints()
-        if pin.icon.SetSnapToPixelGrid then
-            pin.icon:SetSnapToPixelGrid(false)
-            pin.icon:SetTexelSnappingBias(0)
-        end
-    end
-    local mmSize     = math.max(data.size or db.settings.lastSize, MINIMAP_MIN_SIZE)
-    local iconSizeMM = math.floor(mmSize * 0.24 / 2) * 2  -- 小地图图标标记尺寸
+local function ApplyMinimapPinDisplay(pin, data, db, fontPath, outline)
+    local showIcon, showText = ns.GetIconTextVisibility(data)
+    -- 图标尺寸直接取设置值（取偶数避免半像素）；旧版 max(...,80)*0.24 会把 80 以下设置全部钳成 18px
+    local mmSize     = data.iconSize or db.settings.lastSize or ns.DEFAULT_ICON_SIZE
+    local iconSizeMM = math.floor(mmSize / 2) * 2
+
+    -- Pin 池化复用：先清掉上一条标记的残留
+    if pin.icon then pin.icon:Hide() end
     pin.text:Hide()
-    pin.icon:Show()
-    ns.ApplyIconTexture(pin.icon, data.icon, data.iconCrop)
-    pin.icon:SetVertexColor(1, 1, 1)
-    pin.icon:SetAlpha(data.color.a or 1)
-    pin.icon:SetDesaturated(data.isGrayscale == true)
-    pin.icon:SetRotation(-math.rad(data.iconRotation or 0))
-    pin:SetSize(iconSizeMM, iconSizeMM)
-    return true
-end
 
--- ── B.2 小地图文字渲染 ────────────────────────────────────────────────────────
-
-local function ApplyMinimapPinText(pin, data, db, fontPath, outline)
-    local mmSize     = math.max(data.size or db.settings.lastSize, MINIMAP_MIN_SIZE)
-    local fontSizeMM = math.floor((mmSize * 0.2) + 0.5)   -- 小地图文字标记尺寸
-    local tC         = data.color or { r = 0.2, g = 1, b = 0.73 }
-    local tr, tg, tb = tC.r, tC.g, tC.b
-    if data.isGrayscale then
-        local lum = tr * 0.299 + tg * 0.587 + tb * 0.114
-        tr, tg, tb = lum, lum, lum
+    if showIcon then
+        if not pin.icon then
+            pin.icon = pin:CreateTexture(nil, "ARTWORK")
+            if pin.icon.SetSnapToPixelGrid then
+                pin.icon:SetSnapToPixelGrid(false)
+                pin.icon:SetTexelSnappingBias(0)
+            end
+        end
+        pin.icon:ClearAllPoints()
+        ns.ApplyIconTexture(pin.icon, data.icon, data.iconCrop)
+        pin.icon:SetVertexColor(1, 1, 1)
+        pin.icon:SetAlpha(data.color.a or 1)
+        pin.icon:SetDesaturated(data.isGrayscale == true)
+        pin.icon:SetRotation(-math.rad(data.iconRotation or 0))
+        pin.icon:Show()
     end
-    local hexColor   = string.format("|cff%02x%02x%02x", tr*255, tg*255, tb*255)
-    pin.text:Show()
-    pin.text:SetFont(fontPath, fontSizeMM, outline)
-    pin.text:SetText(hexColor .. (data.title or L.MARK_UNNAMED) .. "|r")
-    pin.text:SetAlpha(tC.a or 1)
-    local tboxW = math.floor((pin.text:GetStringWidth()  + 10) / 2) * 2
-    local tboxH = math.floor((pin.text:GetStringHeight() + 10) / 2) * 2
-    pin:SetSize(tboxW, tboxH)
+
+    if showText then
+        local fontSizeMM = math.floor((MINIMAP_MIN_SIZE * 0.2) + 0.5)   -- 小地图文字标记字号恒定
+        local tC         = data.color or { r = 0.2, g = 1, b = 0.73 }
+        local tr, tg, tb = tC.r, tC.g, tC.b
+        if data.isGrayscale then
+            local lum = tr * 0.299 + tg * 0.587 + tb * 0.114
+            tr, tg, tb = lum, lum, lum
+        end
+        local hexColor   = string.format("|cff%02x%02x%02x", tr*255, tg*255, tb*255)
+        pin.text:ClearAllPoints()
+        pin.text:SetFont(fontPath, fontSizeMM, outline)
+        pin.text:SetText(hexColor .. (data.title or L.MARK_UNNAMED) .. "|r")
+        pin.text:SetAlpha(tC.a or 1)
+        pin.text:Show()
+    end
+
+    if showIcon and showText then
+        -- 图标+文本：垂直排列，图标在上、文本在下，两者 X 轴中心对齐
+        local gap = 2
+        local tw = math.max(pin.text:GetStringWidth(), 1)
+        local th = math.max(pin.text:GetStringHeight(), 1)
+        local w = math.max(iconSizeMM, tw) + 4
+        local h = iconSizeMM + gap + th + 4
+        pin.icon:SetSize(iconSizeMM, iconSizeMM)
+        pin.icon:SetPoint("TOP", pin, "TOP", 0, -2)
+        pin.text:SetPoint("TOP", pin.icon, "BOTTOM", 0, -gap)
+        pin:SetSize(math.floor(w), math.floor(h))
+    elseif showIcon then
+        pin.icon:SetSize(iconSizeMM, iconSizeMM)
+        pin.icon:SetPoint("CENTER", 0, 0)
+        pin:SetSize(iconSizeMM, iconSizeMM)
+    else
+        pin.text:SetPoint("CENTER", 0, 0)
+        local tboxW = math.floor((pin.text:GetStringWidth()  + 10) / 2) * 2
+        local tboxH = math.floor((pin.text:GetStringHeight() + 10) / 2) * 2
+        pin:SetSize(tboxW, tboxH)
+    end
 end
 
 -- ── B.1~2 旋转小地图图标标记 ─────────────────────────────────────────────────
@@ -159,9 +178,7 @@ function ns.Plus.RefreshMinimapPins()
         pin.data               = data
         pin.dataIndex          = index
         minimapPinByData[data] = pin    -- 写入查找表
-        if not ApplyMinimapPinIcon(pin, data, db) then
-            ApplyMinimapPinText(pin, data, db, fontPath, "OUTLINE")
-        end
+        ApplyMinimapPinDisplay(pin, data, db, fontPath, "OUTLINE")
         pin:Show()
         tinsert(minimapActivePins, pin)
         HBDPins:AddMinimapIconMap("adeMapMark", pin, mapID, x, y, true)
@@ -193,9 +210,7 @@ function ns.Plus.UpdateMinimapPinStyle(index)
     if not data or data.mapID ~= mapID then return end
     local db       = _G["adeMapMarkDB"]
     local fontPath = ChatFontNormal:GetFont()
-    if not ApplyMinimapPinIcon(targetPin, data, db) then
-        ApplyMinimapPinText(targetPin, data, db, fontPath, "OUTLINE")
-    end
+    ApplyMinimapPinDisplay(targetPin, data, db, fontPath, "OUTLINE")
 end
 
 -- ── B.5 玩家箭头 ─────────────────────────────────────────────────────────────
