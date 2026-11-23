@@ -709,12 +709,18 @@ local MAP_INFO_ALIGN = { phase = "LEFT", map = "CENTER", worldmap = "RIGHT" }
 
 local function anchorMapInfoPanel(ws)
 	mapInfoPanel:ClearAllPoints()
+	-- Y 轴偏移按位置分别保存（用户 2026-11-23）：gwWorldMapOffsetTop / gwWorldMapOffsetBottom，
+	-- 默认值即原锚点偏移（top=2 / bottom=-4），旧档缺键时回退默认，行为不变。
 	if db().gwWorldMapPosition == "bottom" then
-		mapInfoPanel:SetPoint("TOPLEFT", ws, "BOTTOMLEFT", 0, -4)
-		mapInfoPanel:SetPoint("TOPRIGHT", ws, "BOTTOMRIGHT", 0, -4)
+		local offsetY = db().gwWorldMapOffsetBottom
+		if offsetY == nil then offsetY = ns.DB_DEFAULTS.gwWorldMapOffsetBottom end
+		mapInfoPanel:SetPoint("TOPLEFT", ws, "BOTTOMLEFT", 0, offsetY)
+		mapInfoPanel:SetPoint("TOPRIGHT", ws, "BOTTOMRIGHT", 0, offsetY)
 	else
-		mapInfoPanel:SetPoint("TOPLEFT", ws, "TOPLEFT", 0, 2)
-		mapInfoPanel:SetPoint("TOPRIGHT", ws, "TOPRIGHT", 0, 2)
+		local offsetY = db().gwWorldMapOffsetTop
+		if offsetY == nil then offsetY = ns.DB_DEFAULTS.gwWorldMapOffsetTop end
+		mapInfoPanel:SetPoint("TOPLEFT", ws, "TOPLEFT", 0, offsetY)
+		mapInfoPanel:SetPoint("TOPRIGHT", ws, "TOPRIGHT", 0, offsetY)
 	end
 end
 
@@ -838,7 +844,8 @@ end)
 
 function ns.OnPanelSettingChanged(key)
 	-- 地图信息面板独立管控，不受主面板状态影响
-	if key == "gwWorldMapPanel" or key == "gwWorldMapPosition" then
+	if key == "gwWorldMapPanel" or key == "gwWorldMapPosition"
+		or key == "gwWorldMapOffsetTop" or key == "gwWorldMapOffsetBottom" then
 		updateMapInfoPanel()
 		return
 	end

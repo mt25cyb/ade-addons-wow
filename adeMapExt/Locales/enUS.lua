@@ -47,6 +47,7 @@ ns.L.Panel = {
 	WorldMapPosition = "Map Info Panel Position",
 	WorldMapTop = "Above World Map",
 	WorldMapBottom = "Below World Map",
+	WorldMapOffsetY = "Y Offset",
 	UpdateInterval = "Update Interval",
 	FontSize = "Font Size",
 	Alpha = "Panel Opacity",

@@ -6,7 +6,7 @@
 ## Notes-zhCN: 地图增强宿主插件——地理监视面板与世界地图信息面板
 ## Notes-zhTW: 地圖增強宿主插件——地理監視面板與世界地圖資訊面板
 ## Author: ADE 阿德
-## Version: v6.5-r002
+## Version: v6.5-r003
 ## IconAtlas: perks-maintenance
 ## Dependencies: ade_UIKit
 ## SavedVariables: adeMapExtDB

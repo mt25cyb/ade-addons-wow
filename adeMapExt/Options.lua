@@ -44,6 +44,29 @@ local function ColorExecute(key, label)
 	return { kind = "color", label = label }
 end
 
+--- 地图信息面板 Y 轴偏移（用户 2026-11-23）：顶部/底部各存一份（gwWorldMapOffsetTop/Bottom），
+--- 设置页只显示一个滑块，get/set 动态读写「当前布局」那份；位置下拉切换后 UIKit 的
+--- OnOptionChanged → Window:Refresh 会重跑本行 get（Widget/OptionRow.lua:49 + WindowFooter.lua:70），
+--- 滑块显示值自动跟随，无需宿主额外联动。default 不设（动态键无法给固定默认），
+--- 行级变更条/默认按钮退化为不可用；宿主 ResetSection 按 sectionKeys 覆盖两个键，重置功能完整。
+local function MapInfoOffsetSpec(label)
+	return {
+		kind = "range",
+		label = label,
+		min = -80, max = 80, step = 1,
+		get = function()
+			local pos = ns.db().gwWorldMapPosition == "top" and "Top" or "Bottom"
+			return ns.db()["gwWorldMapOffset" .. pos]
+		end,
+		set = function(value)
+			local pos = ns.db().gwWorldMapPosition == "top" and "Top" or "Bottom"
+			ns.db()["gwWorldMapOffset" .. pos] = value
+			if ns.OnPanelSettingChanged then ns.OnPanelSettingChanged("gwWorldMapOffset" .. pos) end
+		end,
+		disabled = function() return not ns.db().gwWorldMapPanel end,
+	}
+end
+
 local P = L.Panel
 
 local sections = {
@@ -64,6 +87,7 @@ local sections = {
 			items = { { value = "top", text = P.WorldMapTop },
 				{ value = "bottom", text = P.WorldMapBottom } },
 			disabled = function() return not ns.db().gwWorldMapPanel end }, "gwWorldMapPosition"),
+		MapInfoOffsetSpec(P.WorldMapOffsetY),
 	},
 	appearance = {
 		KeySpec({ kind = "select", label = L.Style,
@@ -98,7 +122,8 @@ local sectionNames = {
 
 local sectionKeys = {
 	panel = { "gwShowPhase", "gwUseHexadecimal", "gwShowMap", "gwShowWorldMap", "gwShowInstance",
-		"gwShowZone", "gwMapNameMode", "gwShowPanel", "gwWorldMapPanel", "gwWorldMapPosition" },
+		"gwShowZone", "gwMapNameMode", "gwShowPanel", "gwWorldMapPanel", "gwWorldMapPosition",
+		"gwWorldMapOffsetTop", "gwWorldMapOffsetBottom" },
 	appearance = { "style", "gwPrefixClassColorEnabled", "gwPrefixColor", "gwPanelWidth", "gwFontSize",
 		"gwAlpha", "gwBgColor", "gwBgAlpha", "gwBorderColor", "gwBorderAlpha" },
 	behavior = { "gwIsLocked", "gwAutoHideInCombat", "gwShowTooltip", "gwGrowDirection", "gwUpdateInterval" },

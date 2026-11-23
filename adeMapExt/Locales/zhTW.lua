@@ -46,6 +46,7 @@ ns.L.Panel = {
 	WorldMapPosition = "地圖資訊面板位置",
 	WorldMapTop = "世界地圖頂部",
 	WorldMapBottom = "世界地圖底部",
+	WorldMapOffsetY = "Y 軸偏移",
 	UpdateInterval = "更新間隔",
 	FontSize = "字體大小",
 	Alpha = "面板透明度",

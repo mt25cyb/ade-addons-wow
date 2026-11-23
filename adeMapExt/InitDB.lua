@@ -23,6 +23,8 @@ ns.DB_DEFAULTS = {
 	gwShowPanel = true,                -- 显示地理监视面板
 	gwWorldMapPanel = true,            -- 在世界地图显示（独立地图信息面板，不受上面总开关影响）
 	gwWorldMapPosition = "bottom",     -- 地图信息面板位置：top 顶部 / bottom 底部
+	gwWorldMapOffsetTop = 2,           -- 地图信息面板 Y 轴偏移（顶部位置专用；默认 = 原锚点偏移，行为不变）
+	gwWorldMapOffsetBottom = -4,       -- 地图信息面板 Y 轴偏移（底部位置专用；默认 = 原锚点偏移，行为不变）
 	gwIsLocked = false,                -- 锁定面板位置
 	gwAutoHideInCombat = true,         -- 战斗中自动隐藏
 	gwShowTooltip = true,              -- 悬停面板时显示详细信息
@@ -77,6 +79,10 @@ function ns.ensureDB()
 	if DB.gwGrowDirection ~= nil
 		and DB.gwGrowDirection ~= "up" and DB.gwGrowDirection ~= "down" then
 		DB.gwGrowDirection = DEFAULTS.gwGrowDirection
+	end
+	-- Y 轴偏移只接受数字（旧档迁移/异常写入防护）
+	for _, key in ipairs({ "gwWorldMapOffsetTop", "gwWorldMapOffsetBottom" }) do
+		if DB[key] ~= nil and type(DB[key]) ~= "number" then DB[key] = DEFAULTS[key] end
 	end
 	if DB.gwPrefixColor ~= nil and type(DB.gwPrefixColor) ~= "string" then
 		DB.gwPrefixColor = DEFAULTS.gwPrefixColor
