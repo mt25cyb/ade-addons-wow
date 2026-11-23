@@ -100,3 +100,27 @@ L["SETTING_ZONE_BUTTONS_SHOW_CONTINENT_DESC"] = "Also show zone teleport buttons
 
 -- Tab name, kept identical to the EnhanceQoL teleport tab.
 L["TAB_TITLE"] = "Teleport Compendium"
+
+-- Teleport announcement module (ported from TeleportAnnouncer v1.9.0; MIT, see Data/TeleportAnnouncer.lua)
+L["SETTINGS_CATEGORY_ANNOUNCE"] = "Teleport Announcements"
+L["SETTING_ANNOUNCE_TELEPORT"] = "Announce teleports"
+L["SETTING_ANNOUNCE_TELEPORT_DESC"] = "Announce your teleport destination to instance/raid/party chat while casting. Silent when alone."
+L["SETTING_ANNOUNCE_TELEPORT_TIMING"] = "Announcement timing"
+L["SETTING_ANNOUNCE_TELEPORT_TIMING_DESC"] = "Announce when the cast begins, or only when it completes."
+L["SETTING_ANNOUNCE_TELEPORT_CHANNEL"] = "Announcement channel"
+L["SETTING_ANNOUNCE_TELEPORT_CHANNEL_DESC"] = "RAID is preferred in a raid, otherwise PARTY; instance chat always takes priority."
+L["SETTING_ANNOUNCE_TELEPORT_NO_ITEM"] = "Use spell name instead of item"
+L["SETTING_ANNOUNCE_TELEPORT_NO_ITEM_DESC"] = "Do not announce the teleport item name; use the spell name/link instead."
+L["SETTING_ANNOUNCE_TELEPORT_ONLY_KEYSTONE"] = "Only Mythic+ teleports"
+L["SETTING_ANNOUNCE_TELEPORT_ONLY_KEYSTONE_DESC"] = "Announce Mythic+ dungeon teleports only."
+L["SETTING_ANNOUNCE_TELEPORT_IGNORE_HEARTHSTONE"] = "Ignore hearthstones"
+L["SETTING_ANNOUNCE_TELEPORT_IGNORE_HEARTHSTONE_DESC"] = "Do not announce hearthstone-style teleports (e.g. Dalaran, Garrison)."
+L["SETTING_ANNOUNCE_TIMING_START"] = "Start of cast"
+L["SETTING_ANNOUNCE_TIMING_END"] = "End of cast"
+L["SETTING_ANNOUNCE_CHANNEL_RAID"] = "RAID > PARTY"
+L["SETTING_ANNOUNCE_CHANNEL_PARTY"] = "PARTY"
+L["ANNOUNCE_USING_HEADING"] = "Using %s, heading to: %s"
+L["ANNOUNCE_CASTING_HEADING"] = "Casting %s, heading to: %s"
+L["ANNOUNCE_USED_HEADING"] = "Used %s, heading to: %s"
+L["ANNOUNCE_CAST_HEADING"] = "Cast %s, heading to: %s"
+L["ANNOUNCE_UNKNOWN_SPELL"] = "Unknown spell"

@@ -31,6 +31,13 @@
 - `adeMapTab`（`AdeMapTab-1.0` 公共库）
 - 可选：Masque（按钮皮肤）
 
+## 传送通报模块（2026-11-21 并入）
+
+- 功能移植自 TeleportAnnouncer v1.9.0（原作者 电视卫士(SGSwdzgr), KeiraMetz；MIT 版权与许可声明全文保留在 `Data/TeleportAnnouncer.lua` 文件头，原插件零修改）；数据、公告逻辑与设置均为本插件自有实现，不依赖第三方设置库。
+- **播报数据源与主表统一（v6.5-r004）**：可播报法术集合 = `Data/Teleports.lua` 全部传送 + `Data/TeleportAnnouncer.lua` 中 68 条主表未收录的老传送；目的地名与物品 ID 由 `Services/Catalog.lua` 的 `AnnounceInfo(spellID)` 从主表 / `DestinationOverrides` 派生。**新增传送只要写进 `Data/Teleports.lua` 即自动进入播报**，不再维护独立白名单与双语目的地表；仅 keystone/heartstone 两个过滤标记留在 `TeleportAnnounceFlags`（主表字段无法推导）。
+- 施法开始或结束时向实例小队 / 团队 / 队伍频道通报目的地，单人静默；`castGUID` 120 秒去重 + 同法术 2 秒节流，防止开始/成功双报。
+- 设置：世界地图 Tab 齿轮页 →「传送通报」分组；总开关默认**关闭**，子项控制通报时机（施法开始/结束）、频道（团队优先/仅队伍）、用法术名代替物品名、仅 M+ 传送、忽略炉石。
+
 ## 验证清单
 
 1. 世界地图出现传送 Tab，图标 28×28 正常；传送按钮圆形/方形与边缘虚影正常（内联 StyledButton）。

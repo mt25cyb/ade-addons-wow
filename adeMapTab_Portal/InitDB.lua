@@ -35,5 +35,12 @@ addon.defaults = {
         zoneButtonsLayout = "topLeftColumn", -- 区域按钮布局预设（ZoneTeleportButtons.LAYOUTS 键）
         portalButtonSquare = false,        -- 区域传送按钮是否方形（false = 圆形，默认）
         portalButtonEdgeShadow = 1,        -- 区域传送按钮暗色边缘虚影厚度（像素，0 = 无；方形/圆形都生效）
+        -- 传送通报模块（移植自 TeleportAnnouncer v1.9.0；默认关闭，避免打扰未启用的用户）
+        announceTeleport = false,             -- 施法时向队伍/团队频道公告传送目的地
+        announceTeleportTiming = 1,           -- 通报时机：1=施法开始 2=施法结束
+        announceTeleportChannel = 1,          -- 通报频道：1=RAID>PARTY 2=仅 PARTY
+        announceTeleportNoItem = false,       -- 不报物品名，改用法术名
+        announceTeleportOnlyKeystone = false, -- 仅通报 M+ 地下城传送
+        announceTeleportIgnoreHearthstone = false, -- 不通报炉石类传送
     },
 }

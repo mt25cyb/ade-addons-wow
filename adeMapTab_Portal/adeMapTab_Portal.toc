@@ -3,7 +3,7 @@
 ## Title-zhCN: |cff00AAFF[ADE]|r 地图标签页 - 传送
 ## Title-zhTW: |cff00AAFF[ADE]|r 地圖標籤頁 - 傳送
 ## Author: Martin Good (mt25cyb)
-## Version: v6.5-r001
+## Version: v6.5-r004
 ## Notes: World map teleport tab with search, favorites, recent list and random hearthstone.
 ## Notes-zhCN: 世界地图传送标签页：搜索、收藏、最近使用与随机炉石。
 ## Notes-zhTW: 世界地圖傳送標籤頁：搜尋、收藏、最近使用與隨機爐石。
@@ -26,6 +26,7 @@ Services\Hearthstones.lua
 Data\Teleports.lua
 Data\ZoneTeleports.lua
 Data\DestinationOverrides.lua
+Data\TeleportAnnouncer.lua
 Services\Housing.lua
 Services\Catalog.lua
 UI\ButtonSkin.lua
@@ -34,4 +35,5 @@ UI\SettingsPanel.lua
 UI\WorldMapPanel.lua
 UI\ZoneTeleportButtons.lua
 Services\RecentHistory.lua
+Services\TeleportAnnouncer.lua
 Core.lua

@@ -135,6 +135,7 @@ local poolSize = 0
 local used = 0
 local relatedCache = {}
 local pendingUpdate = false
+local sizeChangePending = false
 
 local function InCombat()
     return InCombatLockdown and InCombatLockdown() or false
@@ -282,6 +283,13 @@ end
 -- 形状由设置项 portalButtonSquare 控制（与 EQoLPlusMapExt 对齐：circle 用 commonmaskcircle、
 -- square 用 common-iconmask；参考 EQoLPlus/API.lua CreateStyledButton 241-269）。
 -- 图标与高亮用同一形状遮罩；边框由 ButtonSkin 按 button.shape 同步（圆形时禁用 Masque、改自带圆环描边）。
+--- r003：形状+虚影程度组成样式键，按钮池复用时只在变化后才重跑 ApplyZoneButtonStyle。
+local function CurrentStyleKey()
+    local db = addon.db
+    return ((db and db.portalButtonSquare) and "square" or "circle")
+        .. "|" .. ((db and db.portalButtonEdgeShadow) or 0)
+end
+
 local function ApplyZoneButtonStyle(button)
     local square = addon.db and addon.db.portalButtonSquare
     button.shape = square and "square" or "circle"
@@ -324,8 +332,10 @@ local function Acquire()
         if self.entry and addon.MapPanel.ShowTooltip then addon.MapPanel.ShowTooltip(self, self.entry) end
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    -- 形状与边框在 ApplyZoneButtonStyle 内按当前设置统一处理（含 ButtonSkin 注册）。
+    -- 形状与边框在 ApplyZoneButtonStyle 内按当前设置统一处理（含 ButtonSkin 注册）；
+    -- 记录 styleKey，复用时 Configure 只在参数变化后才重跑（r003）。
     ApplyZoneButtonStyle(button)
+    button._styleKey = CurrentStyleKey()
     poolSize = poolSize + 1
     pool[poolSize] = button
     return button
@@ -333,7 +343,14 @@ end
 
 local function Configure(button, entry)
     button.entry = entry
-    ApplyZoneButtonStyle(button)
+    -- r003：形状/虚影参数没变就不重跑 ApplyZoneButtonStyle——它内部反复 Icon:ClearAllPoints
+    -- + 重设遮罩/EdgeShadow，OnSizeChanged 高频触发（侧边日志栏开合动画）时与布局 pass
+    -- 时序冲突，图标额外材质会轻微变大变小闪烁。
+    local styleKey = CurrentStyleKey()
+    if button._styleKey ~= styleKey then
+        ApplyZoneButtonStyle(button)
+        button._styleKey = styleKey
+    end
     -- 家宅标识：家宅条目在按钮上方叠加 homestone 小图标（约图标 1/2），不可用同步置灰（照 EQoLPlusMapExt）。
     local badge = button.HousingBadge
     if badge then
@@ -373,6 +390,11 @@ local function Update()
         ReleaseAll()
         return
     end
+    -- r003：rootFrame 是 SetAllPoints 容器，rect 尚未重排完成时 GetWidth/GetHeight 可能读到
+    -- 旧值甚至 0——横向布局按它算 maxCols 会退化成每行 1 个（BOTTOMRIGHT 锚下向上堆，
+    -- 观感 = 横排变纵排；用户实测点侧边日志栏关闭按钮后触发）。保留现状等下一次触发重排。
+    local rootW, rootH = rootFrame:GetWidth(), rootFrame:GetHeight()
+    if not rootW or rootW <= 0 or not rootH or rootH <= 0 then return end
     if addon.MapPanel and addon.MapPanel.IsSuppressed and addon.MapPanel.IsSuppressed() then
         ReleaseAll()
         return
@@ -453,6 +475,18 @@ local function RefreshCooldowns()
     end
 end
 
+--- r003：WorldMapFrame 尺寸变化（侧边日志栏开合动画会连续触发 OnSizeChanged）时，
+--- 同帧内 SetAllPoints 的 rootFrame rect 还没重排完，必须等一帧再按新尺寸算布局；
+--- pending 去抖避免动画期间每帧整场重排。
+local function UpdateAfterLayout()
+    if sizeChangePending then return end
+    sizeChangePending = true
+    C_Timer.After(0, function()
+        sizeChangePending = false
+        Update()
+    end)
+end
+
 local function EnsureRoot()
     if rootFrame or not WorldMapFrame then return end
     local parent = WorldMapFrame.ScrollContainer or WorldMapFrame
@@ -466,7 +500,8 @@ local function HookMap()
     WorldMapFrame._adePortalTabZoneButtonsHooked = true
     WorldMapFrame:HookScript("OnShow", function() Update() end)
     WorldMapFrame:HookScript("OnHide", function() ReleaseAll() end)
-    WorldMapFrame:HookScript("OnSizeChanged", function() Update() end)
+    -- r003：尺寸变化延迟一帧重排（同帧 rect 未稳定，横向 maxCols 会算错退化成纵排观感）。
+    WorldMapFrame:HookScript("OnSizeChanged", function() UpdateAfterLayout() end)
     if WorldMapFrame.OnMapChanged then hooksecurefunc(WorldMapFrame, "OnMapChanged", function() Update() end) end
 end
 

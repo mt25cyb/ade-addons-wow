@@ -11,6 +11,7 @@ addon.MapPanel = {}
 addon.ZoneButtons = {}
 addon.SectionHeaders = {}
 addon.Recent = {}
+addon.TeleportAnnouncer = {} -- 传送通报功能模块（Data/Services/TeleportAnnouncer.lua，移植自 TeleportAnnouncer v1.9.0）
 addon.State = {} -- 本次登录的临时状态，不写入 SavedVariables。
 addon.Player = {
  unitClass = select(2, UnitClass("player")),

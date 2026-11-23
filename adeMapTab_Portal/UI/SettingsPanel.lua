@@ -40,6 +40,16 @@ local CHARACTER_FILTER_OPTIONS = {
     { text = "SETTING_ZONE_BUTTONS_FILTER_HOUSING", value = "housing" },
 }
 
+-- 传送通报模块（移植自 TeleportAnnouncer）：时机/频道下拉选项（value 与 addon.db 数值一致）。
+local ANNOUNCE_TIMING_OPTIONS = {
+    { text = "SETTING_ANNOUNCE_TIMING_START", value = 1 },
+    { text = "SETTING_ANNOUNCE_TIMING_END", value = 2 },
+}
+local ANNOUNCE_CHANNEL_OPTIONS = {
+    { text = "SETTING_ANNOUNCE_CHANNEL_RAID", value = 1 },
+    { text = "SETTING_ANNOUNCE_CHANNEL_PARTY", value = 2 },
+}
+
 local LAYOUT = {
     {
         category = "SETTINGS_CATEGORY_GENERAL",
@@ -82,6 +92,21 @@ local LAYOUT = {
             { key = "zoneButtonsOffsetY", kind = "slider", min = -100, max = 100, step = 1,
               get = function() return CurrentOffset().y end,
               set = function(value) CurrentOffset().y = value end },
+        },
+    },
+    {
+        -- 传送通报模块（TeleportAnnouncer 移植）：单人静默、实例/团队/队伍频道，
+        -- 施法事件实时读 addon.db，设置切换无需重建帧，子项 parent 依赖总开关置灰。
+        category = "SETTINGS_CATEGORY_ANNOUNCE",
+        items = {
+            { key = "announceTeleport" },
+            { key = "announceTeleportTiming", kind = "dropdown", options = ANNOUNCE_TIMING_OPTIONS,
+              parent = "announceTeleport" },
+            { key = "announceTeleportChannel", kind = "dropdown", options = ANNOUNCE_CHANNEL_OPTIONS,
+              parent = "announceTeleport" },
+            { key = "announceTeleportNoItem", parent = "announceTeleport" },
+            { key = "announceTeleportOnlyKeystone", parent = "announceTeleport" },
+            { key = "announceTeleportIgnoreHearthstone", parent = "announceTeleport" },
         },
     },
 }

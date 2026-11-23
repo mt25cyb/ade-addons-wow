@@ -300,6 +300,103 @@ local function BuildEntries(section, context, includeUnavailable)
  return FavoritesFirst(items)
 end
 
+--[[ 传送播报的单一查询入口（v6.5-r004）。
+返回 nil 表示该 spellID 不可播报（既不在主表也不在补充表）；否则返回：
+  { destination = 本地化目的地名, item = 物品ID 或 nil,
+    keystone = bool, heartstone = bool }
+来源优先级（与 UI tooltip 的 DestinationName 一致）：
+  extras 自带双语文案 > DestinationOverrides(name/nameFn) > 主表 destination.mapID 地图名。
+可播报集合 = 主表 TeleportData 全部 spellID + extras（主表未收录的老传送）。
+不纳入 HearthstoneData：随机炉石池原本就不在原播报白名单（仅要塞/达拉然两个
+固定目的地炉石在 TeleportData 里，靠 flags.heartstone 过滤），全量纳入会扩大播报范围。
+这样新增传送只要写进 TeleportData 即自动进入播报，无需再维护独立白名单。 ]]
+local announceIndex
+local function BuildAnnounceIndex()
+	if announceIndex then return announceIndex end
+	announceIndex = {}
+	for _, section in ipairs(addon.TeleportData or {}) do
+		for _, data in ipairs(section.spells or {}) do
+			-- spellID 0 是宠物等无施法条目的占位（BuildEntries 里 data.spellID or 0），不可播报。
+			if data.spellID and data.spellID > 0 then
+				local entry = announceIndex[data.spellID]
+				if not entry then entry = {}; announceIndex[data.spellID] = entry end
+				entry.data = data
+			end
+		end
+	end
+	for spellID, extra in pairs(addon.TeleportAnnouncerExtras or {}) do
+		local entry = announceIndex[spellID]
+		if not entry then entry = {}; announceIndex[spellID] = entry end
+		entry.extra = extra
+	end
+	return announceIndex
+end
+
+function addon.Catalog.InvalidateAnnounceIndex()
+	announceIndex = nil
+end
+
+local function AnnounceItemID(entry)
+	local extra = entry.extra
+	if extra and extra.item then return extra.item end
+	local data = entry.data
+	if not data then return nil end
+	local action = data.action or {}
+	if type(action.id) == "number" and (action.type == "item" or action.type == "toy") then
+		return action.id
+	end
+	-- 多物品变体（如传送戒指）取第一项，与原白名单展示策略一致。
+	if type(action.id) == "table" and action.id[1] and (action.type == "item" or action.type == "toy") then
+		return action.id[1]
+	end
+	return nil
+end
+
+local function AnnounceDestination(entry, spellID)
+	local extra = entry.extra
+	if extra then
+		local name = (GetLocale() == "zhCN") and extra.zhCN or extra.enUS
+		if name and name ~= "" then return name end
+	end
+	local override = addon.DestinationOverrides and addon.DestinationOverrides[spellID]
+	if override then
+		if override.hide then return "" end
+		if override.nameFn then
+			-- nameFn 期望的是 Catalog entry（读 housingFaction 等）；这里按主表数据构一个最小 entry。
+			local data = entry.data or {}
+			local action = data.action or {}
+			local proxy = { spellID = spellID, housingFaction = action.housing }
+			local ok, name = pcall(override.nameFn, proxy)
+			if ok and name and name ~= "" then return name end
+		end
+		if override.name then return L[override.name] or override.name end
+	end
+	local data = entry.data
+	if data then
+		local mapID = Destination(data)
+		if mapID then
+			local name = cachedMapName(mapID)
+			if name and name ~= "" then return name end
+		end
+	end
+	return ""
+end
+
+function addon.Catalog.AnnounceInfo(spellID)
+	if not spellID then return nil end
+	local entry = BuildAnnounceIndex()[spellID]
+	if not entry then return nil end
+	local flags = addon.TeleportAnnounceFlags or {}
+	local keystone = (flags.keystone and flags.keystone[spellID]) or (entry.extra and entry.extra.keystone) or false
+	local heartstone = (flags.heartstone and flags.heartstone[spellID]) or (entry.extra and entry.extra.heartstone) or false
+	return {
+		destination = AnnounceDestination(entry, spellID),
+		item = AnnounceItemID(entry),
+		keystone = keystone,
+		heartstone = heartstone,
+	}
+end
+
 function addon.Catalog.BuildSections(includeUnavailable)
  local context = Context()
  addon.Hearthstones.UpdateHomeEntry()

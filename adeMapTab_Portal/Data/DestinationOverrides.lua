@@ -55,5 +55,6 @@ addon.DestinationOverrides = {
 	[189838] = { name = "DEST_NAVAL_DOCK" }, -- 海军上将的罗盘（道具 128353）
 	[171253] = { name = "DEST_GARRISON" }, -- 要塞炉石（玩具 110560）
 	[39937] = { name = "DEST_INN" }, -- 红宝石靴子（道具 28585）：同炉石，绑定旅店
-	[139437] = { name = "DEST_BRAWL_CLUB" }, -- 黄铜指虎（道具 95051）
+	[139437] = { name = "DEST_BRAWL_CLUB" }, -- 黄铜指虎（道具 95051）联盟版
+	[139432] = { name = "DEST_BRAWL_CLUB" }, -- 黄铜指虎（道具 95050）部落版
 }
